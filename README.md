@@ -1,5 +1,5 @@
-# SematicSLAM
-A sematic SLAM based on object-oriented slam concept
+# AG-Mapping
+An application for 3D mapping tasks in agriculture uses object-based Visual SLAM 
 
 ## Run
 ```
