@@ -105,3 +105,6 @@ target_link_libraries(${CONVENIENCE_LIB_NAME} gtsam
 set_property(TARGET ${CONVENIENCE_LIB_NAME} PROPERTY CXX_STANDARD 14)
 
 add_subdirectory(test)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/config
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
