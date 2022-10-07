@@ -4,7 +4,7 @@
 
 #include <gtsam/base/numericalDerivative.h>
 #include <boost/function.hpp>
-#include "sematicSLAM/core/QuadricAngleFactor.h"
+#include "core/QuadricAngleFactor.h"
 
 #define NUMERICAL_DERIVATIVE false
 

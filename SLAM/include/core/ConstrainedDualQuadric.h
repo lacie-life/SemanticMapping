@@ -8,7 +8,7 @@
 #include <gtsam/geometry/Cal3_S2.h>
 #include <gtsam/geometry/Pose3.h>
 #include <gtsam/nonlinear/Values.h>
-#include "sematicSLAM/core/AlignedBox3.h"
+#include "core/AlignedBox3.h"
 
 #include <random>
 

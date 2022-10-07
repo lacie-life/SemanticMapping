@@ -1,4 +1,4 @@
-#include "visualOdometry.h"
+#include "vo/visualOdometry.h"
 
 using namespace cv;
 

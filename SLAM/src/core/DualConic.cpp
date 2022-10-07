@@ -4,10 +4,10 @@
 
 #include <gtsam/base/numericalDerivative.h>
 
-#include "sematicSLAM/sematicBase/QuadricProjectionException.h"
-#include "sematicSLAM/sematicBase/Utilities.h"
-#include "sematicSLAM/core/DualConic.h"
-#include "sematicSLAM/core/Camera.h"
+#include "semanticBase/QuadricProjectionException.h"
+#include "semanticBase/Utilities.h"
+#include "core/DualConic.h"
+#include "core/Camera.h"
 
 #include <cmath>
 #include <iomanip>

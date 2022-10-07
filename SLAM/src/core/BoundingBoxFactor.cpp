@@ -3,9 +3,9 @@
 //
 
 #include <gtsam/base/numericalDerivative.h>
-#include "sematicSLAM/sematicBase/QuadricProjectionException.h"
-#include "sematicSLAM/core/BoundingBoxFactor.h"
-#include "sematicSLAM/core/Camera.h"
+#include "semanticBase/QuadricProjectionException.h"
+#include "core/BoundingBoxFactor.h"
+#include "core/Camera.h"
 
 #define NUMERICAL_DERIVATIVE false
 

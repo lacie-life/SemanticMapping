@@ -1,4 +1,4 @@
-#include "frame.h"
+#include "vo/frame.h"
 
 Frame::Frame()
 {}

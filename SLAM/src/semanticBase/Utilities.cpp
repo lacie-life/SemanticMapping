@@ -2,7 +2,7 @@
 // Created by lacie-life on 09/10/2021.
 //
 
-#include "sematicSLAM/sematicBase/Utilities.h"
+#include "semanticBase/Utilities.h"
 #include <iostream>
 
 using namespace std;

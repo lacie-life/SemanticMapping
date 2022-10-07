@@ -33,7 +33,7 @@ include(GtsamBuildTypes) 			# Load build type flags and default to Debug mode
 include(GtsamTesting)    			# Easy functions for creating unit tests and scripts
 include(GtsamMakeConfigFile) 	# Defines a function for generating config file so package can be found with find_package function
 
-set(Torch_DIR /home/jun/Github/libtorch/share/cmake/Torch)
+set(Torch_DIR /home/lacie/Github/libtorch/share/cmake/Torch)
 find_package(Torch PATHS ${Torch_DIR} NO_DEFAULT REQUIRED)
 if (Torch_FOUND)
     message(STATUS "Torch library found!")
@@ -45,11 +45,12 @@ endif()
 include_directories(${TORCH_INCLUDE_DIRS})
 
 include_directories(BEFORE "${PROJECT_SOURCE_DIR}")
+include_directories( include )
 
 set(SOURCE_FILES
-        src/sematicBase/QuadricProjectionException.cpp
-        src/sematicBase/Utilities.cpp
-        src/sematicBase/yolo.cpp
+        src/semanticBase/QuadricProjectionException.cpp
+        src/semanticBase/Utilities.cpp
+        src/semanticBase/yolo.cpp
         src/core/Camera.cpp
         src/core/ConstrainedDualQuadric.cpp
         src/core/AlignedBox2.cpp
@@ -65,14 +66,13 @@ set(SOURCE_FILES
         src/vo/utils.cpp
         src/vo/visualOdometry.cpp
         src/imu/imudata.cpp
-        src/imu/IMUPreintegrator.cpp
-        src/imu/so3.h)
+        src/imu/IMUPreintegrator.cpp)
 
 set(HEADER_FILES
-        include/sematicslam.h
-        include/sematicBase/QuadricProjectionException.h
-        include/sematicBase/Utilities.h
-        include/sematicBase/yolo.h
+        include/semanticSLAM.h
+        include/semanticBase/QuadricProjectionException.h
+        include/semanticBase/Utilities.h
+        include/semanticBase/yolo.h
         include/core/Camera.h
         include/core/ConstrainedDualQuadric.h
         include/core/AlignedBox2.h
@@ -90,6 +90,7 @@ set(HEADER_FILES
         include/vo/visualOdometry.h
         include/imu/imudata.h
         include/imu/IMUPreintegrator.h
+        include/imu/so3.h
         include/imu/se3.hpp
         include/imu/so3.hpp
         include/imu/sophus.hpp)

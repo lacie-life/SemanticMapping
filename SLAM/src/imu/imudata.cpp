@@ -1,4 +1,4 @@
-#include "imudata.h"
+#include "imu/imudata.h"
 
 
 namespace semanticSLAM

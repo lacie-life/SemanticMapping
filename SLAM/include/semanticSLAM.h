@@ -2,8 +2,8 @@
 // Created by lacie-life on 12/10/2021.
 //
 
-#ifndef SEMATICSLAM_SEMATICSLAM_H
-#define SEMATICSLAM_SEMATICSLAM_H
+#ifndef SEMANTICSLAM_SEMANTICSLAM_H
+#define SEMANTICSLAM_SEMANTICSLAM_H
 
 
 virtual class NonlinearFactor;
@@ -24,12 +24,12 @@ class DualConic;
 
 namespace gtsam {
 
-#include "sematicSLAM/sematicBase/Utilities.h"
+#include "semanticBase/Utilities.h"
 namespace utils {
     Pose3 interpolate(const Pose3& p1, const Pose3& p2, const double& percent);
 }
 
-#include "sematicSLAM/core/ConstrainedDualQuadric.h"
+#include "core/ConstrainedDualQuadric.h"
 class ConstrainedDualQuadric {
     ConstrainedDualQuadric();
     ConstrainedDualQuadric(const Matrix& dQ);
@@ -55,7 +55,7 @@ class ConstrainedDualQuadric {
     bool equals(const ConstrainedDualQuadric& other) const;
 };
 
-#include "sematicSLAM/core/BoundingBoxFactor.h"
+#include "core/BoundingBoxFactor.h"
 virtual class BoundingBoxFactor : NoiseModelFactor {
     BoundingBoxFactor();
     BoundingBoxFactor(const AlignedBox2& measured, const Cal3_S2* calibration,
@@ -72,7 +72,7 @@ virtual class BoundingBoxFactor : NoiseModelFactor {
     Matrix evaluateH2(const Values& x) const;
 };
 
-#include "sematicSLAM/core/QuadricAngleFactor.h"
+#include "core/QuadricAngleFactor.h"
 virtual class QuadricAngleFactor : NoiseModelFactor {
     QuadricAngleFactor(const size_t& quadricKey, const Rot3& measured, const gtsam::noiseModel::Base* model);
     Vector evaluateError(const ConstrainedDualQuadric& quadric) const;
@@ -88,7 +88,7 @@ virtual class PriorFactor : NoiseModelFactor {
     void serialize() const;
 };
 
-#include "sematicSLAM/core/AlignedBox2.h"
+#include "core/AlignedBox2.h"
 class Vector3Vector
 {
     Vector3Vector();
@@ -122,7 +122,7 @@ class AlignedBox2 {
     bool equals(const AlignedBox2& other) const;
 };
 
-#include "sematicSLAM/core/AlignedBox3.h"
+#include "core/AlignedBox3.h"
 class AlignedBox3 {
     AlignedBox3();
     AlignedBox3(const double& xmin, const double& xmax, const double& ymin, const double& ymax, const double& zmin, const double& zmax);
@@ -145,7 +145,7 @@ class AlignedBox3 {
     bool equals(const AlignedBox3& other) const;
 };
 
-#include "sematicSLAM/core/DualConic.h"
+#include "core/DualConic.h"
 class DualConic {
     DualConic();
     DualConic(const Matrix& dC);
@@ -156,7 +156,7 @@ class DualConic {
     bool isEllipse() const;
 };
 
-#include "sematicSLAM/core/Camera.h"
+#include "core/Camera.h"
     class QuadricCamera {
         static Matrix transformToImage(const Pose3& pose, const Cal3_S2* calibration);
         static gtsam::DualConic project(const ConstrainedDualQuadric& quadric, const Pose3& pose, const Cal3_S2* calibration);
@@ -164,4 +164,4 @@ class DualConic {
 
 }
 
-#endif //SEMATICSLAM_SEMATICSLAM_H
+#endif //SEMANTICSLAM_SEMANTICSLAM_H

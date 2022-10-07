@@ -11,8 +11,8 @@
 #include <gtsam/nonlinear/NonlinearFactor.h>
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 
-#include "sematicSLAM/core/AlignedBox2.h"
-#include "sematicSLAM/core/ConstrainedDualQuadric.h"
+#include "core/AlignedBox2.h"
+#include "core/ConstrainedDualQuadric.h"
 
 namespace semanticSLAM{
     /**

@@ -9,8 +9,8 @@
 #include <gtsam/base/types.h>
 #include <gtsam/geometry/Cal3_S2.h>
 #include <gtsam/geometry/PinholePose.h>
-#include "sematicSLAM/core/ConstrainedDualQuadric.h"
-#include "sematicSLAM/core/DualConic.h"
+#include "core/ConstrainedDualQuadric.h"
+#include "core/DualConic.h"
 
 namespace semanticSLAM{
     /**

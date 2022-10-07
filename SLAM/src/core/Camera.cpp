@@ -3,8 +3,8 @@
 //
 
 #include <gtsam/base/numericalDerivative.h>
-#include "sematicSLAM/sematicBase/Utilities.h"
-#include "sematicSLAM/core/Camera.h"
+#include "semanticBase/Utilities.h"
+#include "core/Camera.h"
 
 namespace semanticSLAM{
     /* ************************************************************************* */

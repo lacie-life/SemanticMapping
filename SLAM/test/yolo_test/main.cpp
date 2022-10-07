@@ -3,7 +3,7 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
-#include "sematicSLAM/sematicBase/yolo.h"
+#include "semanticBase/yolo.h"
 
 using namespace std;
 using namespace semanticSLAM;

@@ -2,10 +2,10 @@
 // Created by lacie-life on 10/10/2021.
 //
 
-#include "sematicSLAM/sematicBase/Utilities.h"
-#include "sematicSLAM/core/AlignedBox2.h"
-#include "sematicSLAM/core/ConstrainedDualQuadric.h"
-#include "sematicSLAM/core/Camera.h"
+#include "semanticBase/Utilities.h"
+#include "core/AlignedBox2.h"
+#include "core/ConstrainedDualQuadric.h"
+#include "core/Camera.h"
 
 #include <gtsam/base/Value.h>
 #include <Eigen/Eigenvalues>

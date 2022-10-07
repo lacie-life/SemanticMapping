@@ -2,7 +2,7 @@
 // Created by lacie-life on 09/10/2021.
 //
 
-#include "sematicSLAM/core/AlignedBox2.h"
+#include "core/AlignedBox2.h"
 
 using namespace std;
 

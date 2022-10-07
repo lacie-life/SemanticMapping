@@ -1,5 +1,5 @@
-#include "feature.h"
-#include "bucket.h"
+#include "vo/feature.h"
+#include "vo/bucket.h"
 
 #if USE_CUDA
 static void download(const cv::cuda::GpuMat& d_mat, std::vector<cv::Point2f>& vec)

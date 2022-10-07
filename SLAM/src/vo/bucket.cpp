@@ -1,4 +1,4 @@
-#include "bucket.h"
+#include "vo/bucket.h"
 
 Bucket::Bucket(int size){
     max_size = size;

@@ -1,7 +1,7 @@
-#include "sematicSLAM/core/ConstrainedDualQuadric.h"
-#include "sematicSLAM/core/AlignedBox2.h"
-#include "sematicSLAM/core/Camera.h"
-#include "sematicSLAM/core/BoundingBoxFactor.h"
+#include "core/ConstrainedDualQuadric.h"
+#include "core/AlignedBox2.h"
+#include "core/Camera.h"
+#include "core/BoundingBoxFactor.h"
 
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/nonlinear/Values.h>

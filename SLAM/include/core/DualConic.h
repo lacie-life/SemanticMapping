@@ -8,7 +8,7 @@
 #include <gtsam/base/Testable.h>
 #include <gtsam/geometry/Cal3_S2.h>
 #include <gtsam/geometry/Pose2.h>
-#include "sematicSLAM/core/AlignedBox2.h"
+#include "core/AlignedBox2.h"
 
 namespace semanticSLAM{
     class DualConic {

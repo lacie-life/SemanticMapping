@@ -1,4 +1,4 @@
-#include "IMUPreintegrator.h"
+#include "imu/IMUPreintegrator.h"
 
 namespace semanticSLAM
 {

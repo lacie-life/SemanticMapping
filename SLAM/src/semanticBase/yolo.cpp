@@ -2,7 +2,7 @@
 // Created by lacie-life on 19/10/2021.
 //
 
-#include "yolo.h"
+#include "semanticBase/yolo.h"
 
 namespace semanticSLAM{
     Yolo::Yolo(std::string model_path, std::string names_path){
