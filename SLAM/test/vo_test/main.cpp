@@ -29,26 +29,25 @@ int main(int argc, char **argv){
     bool display_ground_truth = false;
 
     std::vector<Matrix> pose_matrix_gt;
-    if(argc == 4)
-    {   display_ground_truth = true;
-        std::cerr << "Display ground truth trajectory" << std::endl;
-        // load ground truth pose
-        std::string filename_pose = std::string(argv[3]);
-        pose_matrix_gt = loadPoses(filename_pose);
+    display_ground_truth = true;
+    std::cerr << "Display ground truth trajectory" << std::endl;
+    // load ground truth pose
+    std::string filename_pose = std::string("/home/lacie/Github/Dataset/00/00/ground-truth.txt");
+    pose_matrix_gt = loadPoses(filename_pose);
 
-    }
-    if(argc < 3)
-    {
-        std::cerr << "Usage: ./test_vo path_to_sequence(rgbd for using intel rgbd) path_to_calibration [optional]path_to_ground_truth_pose" << std::endl;
-        return 1;
-    }
+
+//    if(argc < 3)
+//    {
+//        std::cerr << "Usage: ./test_vo path_to_sequence path_to_calibration path_to_ground_truth_pose" << std::endl;
+//        return 1;
+//    }
 
     // Sequence
-    std::string filepath = std::string(argv[1]);
+    std::string filepath = std::string("/home/lacie/Github/Dataset/00/00/");
     std::cout << "Filepath: " << filepath << std::endl;
 
     // Camera calibration
-    std::string strSettingPath = std::string(argv[2]);
+    std::string strSettingPath = std::string("/home/lacie/Github/AG-Mapping/SLAM/config/kitti00.yaml");
     std::cout << "Calibration Filepath: " << strSettingPath << std::endl;
 
     cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
