@@ -8,12 +8,12 @@ An application for 3D mapping tasks in agriculture uses object-based Visual SLAM
 
 # Tasks
 
-[x] VO Mode
-[ ] VIO Mode
-[ ] Model Semantic test
-[ ] Quadric feature test
-[ ] VO with Quadric feature
-[ ] VIO with Quadric feature
+- [x] VO Mode
+- [ ] VIO Mode
+- [ ] Model Semantic test
+- [ ] Quadric feature test
+- [ ] VO with Quadric feature
+- [ ] VIO with Quadric feature
 
 ## Run
 ```
