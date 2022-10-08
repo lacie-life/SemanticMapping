@@ -8,10 +8,10 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 
-#include "vo/feature.h"
-#include "vo/utils.h"
-#include "vo/evaluate_odometry.h"
-#include "vo/visualOdometry.h"
+#include "odometry/feature.h"
+#include "odometry/utils.h"
+#include "odometry/evaluate_odometry.h"
+#include "odometry/visualOdometry.h"
 
 int main(int argc, char **argv){
     std::cout << "Hello VO_Test" << std::endl;

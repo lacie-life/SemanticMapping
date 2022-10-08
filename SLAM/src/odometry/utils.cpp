@@ -1,5 +1,5 @@
-#include "vo/utils.h"
-#include "vo/evaluate_odometry.h"
+#include "odometry/utils.h"
+#include "odometry/evaluate_odometry.h"
 
 // --------------------------------
 // Visualization

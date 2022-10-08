@@ -1,4 +1,4 @@
-#include "vo/bucket.h"
+#include "odometry/bucket.h"
 
 Bucket::Bucket(int size){
     max_size = size;

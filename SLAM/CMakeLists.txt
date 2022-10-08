@@ -58,13 +58,13 @@ set(SOURCE_FILES
         src/core/DualConic.cpp
         src/core/BoundingBoxFactor.cpp
         src/core/QuadricAngleFactor.cpp
-        src/vo/bucket.cpp
-        src/vo/evaluate_odometry.cpp
-        src/vo/feature.cpp
-        src/vo/frame.cpp
-        src/vo/matrix.cpp
-        src/vo/utils.cpp
-        src/vo/visualOdometry.cpp
+        src/odometry/bucket.cpp
+        src/odometry/evaluate_odometry.cpp
+        src/odometry/feature.cpp
+        src/odometry/frame.cpp
+        src/odometry/matrix.cpp
+        src/odometry/utils.cpp
+        src/odometry/visualOdometry.cpp
         src/imu/imudata.cpp
         src/imu/IMUPreintegrator.cpp)
 
@@ -80,14 +80,14 @@ set(HEADER_FILES
         include/core/DualConic.h
         include/core/QuadricAngleFactor.h
         include/core/BoundingBoxFactor.h
-        include/vo/bucket.h
-        include/vo/camera.h
-        include/vo/evaluate_odometry.h
-        include/vo/feature.h
-        include/vo/frame.h
-        include/vo/matrix.h
-        include/vo/utils.h
-        include/vo/visualOdometry.h
+        include/odometry/bucket.h
+        include/odometry/camera.h
+        include/odometry/evaluate_odometry.h
+        include/odometry/feature.h
+        include/odometry/frame.h
+        include/odometry/matrix.h
+        include/odometry/utils.h
+        include/odometry/visualOdometry.h
         include/imu/imudata.h
         include/imu/IMUPreintegrator.h
         include/imu/so3.h

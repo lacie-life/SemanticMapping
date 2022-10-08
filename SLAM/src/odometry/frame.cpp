@@ -1,4 +1,4 @@
-#include "vo/frame.h"
+#include "odometry/frame.h"
 
 Frame::Frame()
 {}

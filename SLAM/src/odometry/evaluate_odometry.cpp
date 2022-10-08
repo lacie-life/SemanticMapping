@@ -4,8 +4,8 @@
 #include <vector>
 #include <limits>
 
-#include "vo/matrix.h"
-#include "vo/evaluate_odometry.h"
+#include "odometry/matrix.h"
+#include "odometry/evaluate_odometry.h"
 using namespace std;
 
 // static parameter
