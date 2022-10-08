@@ -1,24 +1,17 @@
 #include <iostream>
 #include <ctype.h>
 #include <algorithm>
-#include <iterator>
 #include <vector>
 #include <ctime>
-#include <sstream>
-#include <fstream>
 #include <string>
 
-#include <opencv2/video/tracking.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/features2d/features2d.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 
 #include "vo/feature.h"
 #include "vo/utils.h"
 #include "vo/evaluate_odometry.h"
 #include "vo/visualOdometry.h"
-#include "vo/frame.h"
 
 int main(int argc, char **argv){
     std::cout << "Hello VO_Test" << std::endl;
@@ -32,7 +25,7 @@ int main(int argc, char **argv){
     display_ground_truth = true;
     std::cerr << "Display ground truth trajectory" << std::endl;
     // load ground truth pose
-    std::string filename_pose = std::string("/home/lacie/Github/Dataset/00/00/ground-truth.txt");
+    std::string filename_pose = std::string("/home/lacie/Github/Dataset/00/00.txt");
     pose_matrix_gt = loadPoses(filename_pose);
 
 
@@ -43,7 +36,7 @@ int main(int argc, char **argv){
 //    }
 
     // Sequence
-    std::string filepath = std::string("/home/lacie/Github/Dataset/00/00/");
+    std::string filepath = std::string("/home/lacie/Github/Dataset/00/");
     std::cout << "Filepath: " << filepath << std::endl;
 
     // Camera calibration
