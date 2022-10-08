@@ -14,6 +14,8 @@ An application for 3D mapping tasks in agriculture uses object-based Visual SLAM
 - [ ] Quadric feature test
 - [ ] VO with Quadric feature
 - [ ] VIO with Quadric feature
+- [ ] VPI test
+- [ ] Quadric feature with VPI (???)
 
 ## Run
 ```
