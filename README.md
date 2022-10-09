@@ -8,7 +8,8 @@ An application for 3D mapping tasks in agriculture uses object-based Visual SLAM
 
 # Tasks
 
-- [x] VO Mode
+- [ ] Refactor Odometry System
+- [ ] VO Mode
 - [ ] VIO Mode
 - [ ] Model Semantic test
 - [ ] Quadric feature test
