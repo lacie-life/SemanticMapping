@@ -1,8 +1,6 @@
 #ifndef CAMERA_MODELS_H
 #define CAMERA_MODELS_H
 
-
-
 //// Spline.h
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
