@@ -1,5 +1,5 @@
-#ifndef TVISLAM_IMUPREINTEGRATOR_H
-#define TVISLAM_IMUPREINTEGRATOR_H
+#ifndef IMUPREINTEGRATOR_H
+#define IMUPREINTEGRATOR_H
 
 #include <Eigen/Dense>
 
@@ -204,4 +204,4 @@ private:
 
 }
 
-#endif // TVISLAM_IMUPREINTEGRATOR_H
+#endif // IMUPREINTEGRATOR_H

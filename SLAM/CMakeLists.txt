@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
-project(SematicSLAM)
+project(SemanticSLAM)
 
-set(sematicSLAM_VERSION 1.0.0)
+set(semanticSLAM_VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 14)
 
 # we want to use some C++11 features
@@ -66,7 +66,7 @@ set(SOURCE_FILES
         src/odometry/utils.cpp
         src/odometry/visualOdometry.cpp
         src/imu/imudata.cpp
-        src/imu/IMUPreintegrator.cpp)
+        src/imu/IMUPreintegrator.cpp include/vins_estimator/initial_pose_factor.h include/vins_estimator/initial_bias_factor.h include/vins_estimator/integration_base.h include/vins_estimator/imu_factor.h src/vins_estimator/marginalization_factor.cpp include/vins_estimator/marginalization_factor.h src/vins_estimator/pose_local_parameterization.cpp include/vins_estimator/pose_local_parameterization.h src/vins_estimator/projection_factor.cpp include/vins_estimator/projection_factor.h src/vins_estimator/projectionOneFrameTwoCamFactor.cpp include/vins_estimator/projectionOneFrameTwoCamFactor.h src/vins_estimator/projectionTwoFrameOneCamFactor.cpp include/vins_estimator/projectionTwoFrameOneCamFactor.h src/vins_estimator/projectionTwoFrameTwoCamFactor.cpp include/vins_estimator/projectionTwoFrameTwoCamFactor.h src/vins_estimator/initial_alignment.cpp include/vins_estimator/initial_alignment.h src/vins_estimator/initial_ex_rotation.cpp include/vins_estimator/initial_ex_rotation.h)
 
 set(HEADER_FILES
         include/semanticSLAM.h
