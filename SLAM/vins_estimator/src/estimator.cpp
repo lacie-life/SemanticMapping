@@ -973,7 +973,7 @@ bool Estimator::failureDetection()
     {
         // ROS_INFO(" little feature %d", f_manager.last_track_num);
         printf(" little feature %d \n", f_manager.last_track_num);
-        //return true;
+        return true;
     }
     if (Bas[WINDOW_SIZE].norm() > 2.5)
     {
@@ -987,23 +987,23 @@ bool Estimator::failureDetection()
         printf(" big IMU gyr bias estimation %f \n", Bgs[WINDOW_SIZE].norm());
         return true;
     }
-    /*
-    if (tic(0) > 1)
-    {
-        ROS_INFO(" big extri param estimation %d", tic(0) > 1);
-        return true;
-    }
-    */
+
+//    if (tic(0) > 1)
+//    {
+//        printf(" big extri param estimation %d", tic(0) > 1);
+//        return true;
+//    }
+
     Vector3d tmp_P = Ps[WINDOW_SIZE];
     if ((tmp_P - last_P).norm() > 5)
     {
-        //ROS_INFO(" big translation");
-        //return true;
+        printf(" big translation");
+        return true;
     }
     if (abs(tmp_P.z() - last_P.z()) > 1)
     {
-        //ROS_INFO(" big z translation");
-        //return true;
+        printf(" big z translation");
+        return true;
     }
     Matrix3d tmp_R = Rs[WINDOW_SIZE];
     Matrix3d delta_R = tmp_R.transpose() * last_R;
@@ -1012,8 +1012,8 @@ bool Estimator::failureDetection()
     delta_angle = acos(delta_Q.w()) * 2.0 / 3.14 * 180.0;
     if (delta_angle > 50)
     {
-        // ROS_INFO(" big delta_angle ");
-        //return true;
+        printf(" big delta_angle ");
+        return true;
     }
     return false;
 }
@@ -1045,12 +1045,12 @@ void Estimator::optimization()
         problem.AddParameterBlock(para_Ex_Pose[i], SIZE_POSE, local_parameterization);
         if ((ESTIMATE_EXTRINSIC && frame_count == WINDOW_SIZE && Vs[0].norm() > 0.2) || openExEstimation)
         {
-            //ROS_INFO("estimate extinsic param");
+            printf("estimate extinsic param");
             openExEstimation = 1;
         }
         else
         {
-            //ROS_INFO("fix extinsic param");
+            printf("fix extinsic param");
             problem.SetParameterBlockConstant(para_Ex_Pose[i]);
         }
     }

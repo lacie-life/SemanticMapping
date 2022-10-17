@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(SemanticSLAM)
 
-set(semanticSLAM_VERSION 1.0.0)
+set(semanticSLAM_VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 14)
 
 set(USE_CUDA OFF)
@@ -69,13 +69,11 @@ include_directories(
         semanticBase/include
         vins_estimator/include)
 
-add_library(camera_models SHARED IMPORTED)
-set_target_properties(camera_models PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/../camera_models/build/libcamera_models.so)
-
 if (ROS_VISUAL)
     catkin_package()
 endif ()
 
+add_subdirectory(camera_models)
 add_subdirectory(odometry)
 add_subdirectory(semanticBase)
 add_subdirectory(vins_estimator)

@@ -1,3 +1,6 @@
+#ifndef SEMANTICSLAM_PARAMETERS_H
+#define SEMANTICSLAM_PARAMETERS_H
+
 #include "ros_things.h"
 #include "camodocal/camera_models.h"
 
@@ -33,9 +36,13 @@
 #include <eigen3/Eigen/Geometry>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/opencv.hpp>
+
+#ifdef USE_CUDA
 #include <opencv2/cudaoptflow.hpp> // GPU
 #include <opencv2/cudaimgproc.hpp> // GPU
 #include <opencv2/cudaarithm.hpp>  // GPU
+#endif
+
 #include <Eigen/Dense>
 
 #include <iostream> // error
@@ -117,3 +124,5 @@ enum NoiseOrder
     O_AW = 6,
     O_GW = 9
 };
+
+#endif //SEMANTICSLAM_PARAMETERS_H
