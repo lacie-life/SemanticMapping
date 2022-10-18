@@ -5,6 +5,11 @@
 #ifndef SEMANTICSLAM_TOOLS_H
 #define SEMANTICSLAM_TOOLS_H
 
+#include <eigen3/Eigen/Dense>
+#include <fstream>
+
+#include "estimator.h"
+#include "parameters.h"
 #include "ros_things.h"
 
 #if ROS_VISUAL
@@ -22,14 +27,8 @@
 #include <geometry_msgs/PointStamped.h>
 #include <visualization_msgs/Marker.h>
 #include <tf/transform_broadcaster.h>
-#include <eigen3/Eigen/Dense>
 
-#include <fstream>
-
-#include "estimator.h"
-#include "parameters.h"
 #include "CameraPoseVisualization.h"
-
 
 extern ros::Publisher pub_odometry;
 extern ros::Publisher pub_path, pub_pose;
@@ -66,5 +65,7 @@ void pubRelocalization(const Estimator &estimator);
 void pubCar(const Estimator & estimator, const std_msgs::Header &header);
 
 #endif
+
+void display2D (int frame_id, const Estimator &estimator, cv::Mat& trajectory);
 
 #endif //SEMANTICSLAM_TOOLS_H

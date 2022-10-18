@@ -4,10 +4,12 @@
 
 #include "tools.h"
 
+using namespace Eigen;
+
 #if ROS_VISUAL
 
 using namespace ros;
-using namespace Eigen;
+
 ros::Publisher pub_odometry, pub_latest_odometry;
 ros::Publisher pub_path;
 ros::Publisher pub_point_cloud, pub_margin_cloud;
@@ -453,3 +455,24 @@ void pubKeyframe(const Estimator &estimator)
 }
 
 #endif
+
+void display2D(int frame_id, const Estimator &estimator, cv::Mat& trajectory)
+{
+if (estimator.solver_flag == Estimator::SolverFlag::NON_LINEAR)
+    {
+        nav_msgs::Odometry odometry;
+
+        odometry.pose.pose.position.x = estimator.Ps[WINDOW_SIZE].x();
+        odometry.pose.pose.position.y = estimator.Ps[WINDOW_SIZE].y();
+        odometry.pose.pose.position.z = estimator.Ps[WINDOW_SIZE].z();
+
+        // draw estimated trajectory 
+        int x = int(odometry.pose.pose.position.x) + 300;
+        int y = int(odometry.pose.pose.position.y) + 100;
+        circle(trajectory, cv::Point(x, y) ,1, CV_RGB(255,0,0), 2);
+
+        cv::imshow( "Trajectory", trajectory ;
+
+        cv::waitKey(1);
+    }
+}

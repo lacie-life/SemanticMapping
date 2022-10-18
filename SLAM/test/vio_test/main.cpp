@@ -11,6 +11,8 @@ queue<sensor_msgs::PointCloudConstPtr> feature_buf;
 queue<pair<cv::Mat, double>> img0_buf;
 queue<pair<cv::Mat, double>> img1_buf;
 
+cv::Mat trajectory = cv::Mat::zeros(600, 1200, CV_8UC3);
+
 std::mutex m_buf;
 
 void img0_callback(const cv::Mat &img_msg, const double &t)
@@ -36,6 +38,7 @@ void img1_callback(const cv::Mat &img_msg, const double &t)
 // extract images with same timestamp from two topics
 void sync_process()
 {
+    int frame_id = 0;
     while(1)
     {
         if(STEREO)
@@ -88,6 +91,9 @@ void sync_process()
             if(!image.empty())
                 estimator.inputImage(time, image);
         }
+
+        display2D(frame_id, estimator, trajectory);
+        frame_id++;
 
         std::chrono::milliseconds dura(1);
         std::this_thread::sleep_for(dura);
