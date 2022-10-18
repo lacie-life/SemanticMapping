@@ -12,6 +12,7 @@
 #include "parameters.h"
 #include "ros_things.h"
 
+
 #if ROS_VISUAL
 
 #include <ros/ros.h>
@@ -65,7 +66,5 @@ void pubRelocalization(const Estimator &estimator);
 void pubCar(const Estimator & estimator, const std_msgs::Header &header);
 
 #endif
-
-void display2D (int frame_id, const Estimator &estimator, cv::Mat& trajectory);
 
 #endif //SEMANTICSLAM_TOOLS_H

@@ -701,9 +701,11 @@ bool Estimator::initialStructure()
         cv::Mat K = (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
         if(pts_3_vector.size() < 6)
         {
+#ifdef  PRINT_LOG
             cout << "pts_3_vector size " << pts_3_vector.size() << endl;
             // ROS_DEBUG("Not enough points for solve pnp !");
             printf("Not enough points for solve pnp ! \n");
+#endif
             return false;
         }
         if (! cv::solvePnP(pts_3_vector, pts_2_vector, K, D, rvec, t, 1))
@@ -1050,7 +1052,7 @@ void Estimator::optimization()
         }
         else
         {
-            printf("fix extinsic param");
+            printf("fix extinsic param \n");
             problem.SetParameterBlockConstant(para_Ex_Pose[i]);
         }
     }

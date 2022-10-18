@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(USE_CUDA OFF)
 set(ROS_VISUAL OFF)
+set(PRINT_LOG OFF)
 
 # we want to use some C++11 features
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra")

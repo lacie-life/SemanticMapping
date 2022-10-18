@@ -2,6 +2,7 @@
 
 #include "parameters.h"
 #include "estimator.h"
+#include "tools.h"
 
 // static FeatureTracker trackerData[NUM_OF_CAM];
 static Estimator estimator;
@@ -11,7 +12,7 @@ queue<sensor_msgs::PointCloudConstPtr> feature_buf;
 queue<pair<cv::Mat, double>> img0_buf;
 queue<pair<cv::Mat, double>> img1_buf;
 
-cv::Mat trajectory = cv::Mat::zeros(600, 1200, CV_8UC3);
+cv::Mat visual = cv::Mat::zeros(600, 1200, CV_8UC3);
 
 std::mutex m_buf;
 
@@ -33,6 +34,26 @@ void img1_callback(const cv::Mat &img_msg, const double &t)
     tmp.second=t;
     img1_buf.push(tmp);
     m_buf.unlock();
+}
+
+void display2D (int frame_id, const Estimator &estimator, cv::Mat& visual){
+    if (estimator.solver_flag == Estimator::SolverFlag::NON_LINEAR)
+    {
+        nav_msgs::Odometry odometry;
+
+        odometry.pose.pose.position.x = estimator.Ps[WINDOW_SIZE].x();
+        odometry.pose.pose.position.y = estimator.Ps[WINDOW_SIZE].y();
+        odometry.pose.pose.position.z = estimator.Ps[WINDOW_SIZE].z();
+
+        // draw estimated trajectory
+        int x = int(odometry.pose.pose.position.x) + 300;
+        int y = int(odometry.pose.pose.position.y) + 100;
+        circle(visual, cv::Point(x, y) ,1, CV_RGB(255,0,0), 2);
+
+        cv::imshow( "Trajectory", visual);
+
+        cv::waitKey(1);
+    }
 }
 
 // extract images with same timestamp from two topics
@@ -92,7 +113,7 @@ void sync_process()
                 estimator.inputImage(time, image);
         }
 
-        display2D(frame_id, estimator, trajectory);
+        display2D(frame_id, estimator, visual);
         frame_id++;
 
         std::chrono::milliseconds dura(1);

@@ -42,8 +42,12 @@ int FeatureManager::getFeatureCount()
 
 bool FeatureManager::addFeatureCheckParallax(int frame_count, const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &image, double td)
 {
+
+#ifdef PRINT_DEBUG
     printf("input feature: %d", (int)image.size());
     printf("num of feature: %d", getFeatureCount());
+#endif
+
     double parallax_sum = 0;
     int parallax_num = 0;
     last_track_num = 0;
@@ -102,8 +106,10 @@ bool FeatureManager::addFeatureCheckParallax(int frame_count, const map<int, vec
     }
     else
     {
+#ifdef PRINT_LOG
         printf("parallax_sum: %lf, parallax_num: %d", parallax_sum, parallax_num);
         printf("current parallax: %lf", parallax_sum / parallax_num * FOCAL_LENGTH);
+#endif
         last_average_parallax = parallax_sum / parallax_num * FOCAL_LENGTH;
         return parallax_sum / parallax_num >= MIN_PARALLAX;
     }

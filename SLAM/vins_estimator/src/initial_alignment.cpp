@@ -181,9 +181,17 @@ bool LinearAlignment(map<double, ImageFrame> &all_image_frame, Vector3d &g, Vect
     b = b * 1000.0;
     x = A.ldlt().solve(b);
     double s = x(n_state - 1) / 100.0;
+
+#ifdef PRINT_LOG
     printf("estimated scale: %f", s);
+#endif
+
     g = x.segment<3>(n_state - 4);
+
+#ifdef PRINT_LOG
     std::cout << " result g     " << g.norm() << " " << g.transpose();
+#endif
+
     if(fabs(g.norm() - G.norm()) > 0.5 || s < 0)
     {
         return false;

@@ -150,8 +150,10 @@ map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> FeatureTracker::trackIm
         reduceVector(cur_pts, status);
         reduceVector(ids, status);
         reduceVector(track_cnt, status);
+#ifdef PRINT_LOG
         printf("temporal optical flow costs: %fms", t_o.toc());
         //printf("track cnt %d\n", (int)ids.size());
+#endif
     }
 
     for (auto &n : track_cnt)
@@ -160,12 +162,16 @@ map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> FeatureTracker::trackIm
     if (1)
     {
         //rejectWithF();
+#ifdef PRINT_LOG
         printf("set mask begins");
+#endif
         TicToc t_m;
         setMask();
-        printf("set mask costs %fms", t_m.toc());
 
+#ifdef PRINT_LOG
+        printf("set mask costs %fms", t_m.toc());
         printf("detect feature begins");
+#endif
         TicToc t_t;
         int n_max_cnt = MAX_CNT - static_cast<int>(cur_pts.size());
         if (n_max_cnt > 0)
@@ -178,7 +184,9 @@ map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> FeatureTracker::trackIm
         }
         else
             n_pts.clear();
+#ifdef PRINT_LOG
         printf("detect feature costs: %f ms", t_t.toc());
+#endif
 
         for (auto &p : n_pts)
         {
@@ -327,8 +335,10 @@ void FeatureTracker::rejectWithF()
         reduceVector(cur_un_pts, status);
         reduceVector(ids, status);
         reduceVector(track_cnt, status);
+#ifdef PRINT_LOG
         printf("FM ransac: %d -> %lu: %f", size_a, cur_pts.size(), 1.0 * cur_pts.size() / size_a);
         printf("FM ransac costs: %fms", t_f.toc());
+#endif
     }
 }
 
