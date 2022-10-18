@@ -8,7 +8,7 @@ num_of_cam: 1
 imu_topic: "/imu0"
 image0_topic: "/cam0/image_raw"
 image1_topic: "/cam1/image_raw"
-output_path: "/home/hcshim/config/output/"
+output_path: "/home/lacie/config/output/"
 
 cam0_calib: "cam0_mei.yaml"
 cam1_calib: "cam1_mei.yaml"
@@ -44,7 +44,7 @@ F_threshold: 1.0        # ransac threshold (pixel)
 show_track: 1           # publish tracking image as topic
 show_TMI?: 0
 fisheye : 0
-fisheye_mask_path : "/home/hcshim/fisheye_mask.jpg"
+fisheye_mask_path : "/home/lacie/fisheye_mask.jpg"
 flow_back: 1            # perform forward and backward optical flow to improve feature tracking accuracy
 
 #optimization parameters

@@ -212,7 +212,7 @@ int main(int argc, char **argv)
 {
     /******************* load image begin ***********************/
     //read parameters section
-    readParameters("/home/lacie/Github/AG-Mapping/SLAM/config/mono.yaml");
+    readParameters("/home/lacie/Github/AG-Mapping/SLAM/config/stereo.yaml");
     estimator.setParameter();
 
     if (!STEREO)
@@ -283,7 +283,7 @@ int main(int argc, char **argv)
     {
         //imu data file
         ifstream fImus;
-        fImus.open(argv[6]); // check
+        fImus.open("/home/lacie/Github/Dataset/MH_03_medium/mav0/imu0/data.csv"); // check
 
         cv::Mat image;
         cv::Mat image2;
@@ -293,8 +293,8 @@ int main(int argc, char **argv)
         vector<string> vStrImagesFileNames2 ;
         vector<double> vTimeStamps;
         vector<double> vTimeStamps2;
-        LoadImages(string(argv[2]),string(argv[4]),vStrImagesFileNames,vTimeStamps); //left
-        LoadImages(string(argv[3]),string(argv[5]),vStrImagesFileNames2,vTimeStamps2); //right
+        LoadImages(string("/home/lacie/Github/Dataset/MH_03_medium/mav0/cam0/data"),string("/home/lacie/Github/AG-Mapping/data/euroc_data_timestamp/MH03.txt"),vStrImagesFileNames,vTimeStamps); //left
+        LoadImages(string("/home/lacie/Github/Dataset/MH_03_medium/mav0/cam1/data"),string("/home/lacie/Github/AG-Mapping/data/euroc_data_timestamp/MH03.txt"),vStrImagesFileNames2,vTimeStamps2); //right
 
         int tmp_imageNum = vStrImagesFileNames.size();
         int tmp_imageNum2 = vStrImagesFileNames2.size();

@@ -3,7 +3,7 @@
 imu: 1         
 num_of_cam: 2
 
-output_path: "/home/hcshim/config/output/"
+output_path: "/home/lacie/config/output/"
 
 cam0_calib: "cam0_mei.yaml"
 cam1_calib: "cam1_mei.yaml"
@@ -41,7 +41,7 @@ body_T_cam1: !!opencv-matrix
           0, 0, 0, 1]
 
 #Multiple thread support
-multiple_thread: 0
+multiple_thread: 8
 use_gpu: 0
 use_gpu_acc_flow: 0
 

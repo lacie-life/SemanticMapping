@@ -1047,12 +1047,16 @@ void Estimator::optimization()
         problem.AddParameterBlock(para_Ex_Pose[i], SIZE_POSE, local_parameterization);
         if ((ESTIMATE_EXTRINSIC && frame_count == WINDOW_SIZE && Vs[0].norm() > 0.2) || openExEstimation)
         {
+#ifdef PRINT_LOG
             printf("estimate extinsic param");
+#endif
             openExEstimation = 1;
         }
         else
         {
+#ifdef  PRINT_LOG
             printf("fix extinsic param \n");
+#endif
             problem.SetParameterBlockConstant(para_Ex_Pose[i]);
         }
     }
@@ -1125,9 +1129,10 @@ void Estimator::optimization()
             f_m_cnt++;
         }
     }
-
+#ifdef PRINT_LOG
     // ROS_DEBUG("visual measurement count: %d", f_m_cnt);
     //printf("prepare for ceres: %f \n", t_prepare.toc());
+#endif
 
     ceres::Solver::Options options;
 
@@ -1145,9 +1150,12 @@ void Estimator::optimization()
     TicToc t_solver;
     ceres::Solver::Summary summary;
     ceres::Solve(options, &problem, &summary);
+
+#ifdef PRINT_LOG
     //cout << summary.BriefReport() << endl;
     // ROS_DEBUG("Iterations : %d", static_cast<int>(summary.iterations.size()));
     //printf("solver costs: %f \n", t_solver.toc());
+#endif
 
     double2vector();
     //printf("frame_count: %d \n", frame_count);
@@ -1342,8 +1350,10 @@ void Estimator::optimization()
 
         }
     }
-    //printf("whole marginalization costs: %f \n", t_whole_marginalization.toc());
-    //printf("whole time for ceres: %f \n", t_whole.toc());
+#ifdef PRINT_LOG
+    printf("whole marginalization costs: %f \n", t_whole_marginalization.toc());
+    printf("whole time for ceres: %f \n", t_whole.toc());
+#endif
 }
 
 void Estimator::slideWindow()
