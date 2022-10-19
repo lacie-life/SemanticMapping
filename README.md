@@ -11,7 +11,7 @@ An application for 3D mapping tasks in agriculture uses object-based Visual SLAM
 - [x] Refactor Odometry System
   - [x] VO Mode
   - [x] VIO Mode
-- [ ] Visual trajectory estimated and ground-truth
+- [ ] Visual trajectory estimated and ground-truth in 3D
 - [ ] Model Semantic test
 - [ ] Quadric feature test
 - [ ] VO with Quadric feature
