@@ -1,8 +1,14 @@
 #include <iostream>
+#include <pcl/io/pcd_io.h>
+#include <pcl/common/common_headers.h>
+#include <pcl/visualization/pcl_visualizer.h>
 
 #include "parameters.h"
 #include "estimator.h"
 #include "tools.h"
+
+using namespace std::chrono;
+using namespace std;
 
 // static FeatureTracker trackerData[NUM_OF_CAM];
 static Estimator estimator;
@@ -15,6 +21,18 @@ queue<pair<cv::Mat, double>> img1_buf;
 cv::Mat visual = cv::Mat::zeros(600, 1200, CV_8UC3);
 
 std::mutex m_buf;
+
+shared_ptr<pcl::visualization::PCLVisualizer> createRGBVisualizer(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud){
+    // Open 3D viewer and add point cloud
+    shared_ptr<pcl::visualization::PCLVisualizer> viewer(new pcl::visualization::PCLVisualizer("PCL ZED 3D Viewer"));
+    viewer->setBackgroundColor(1, 1, 1);
+    pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud);
+    viewer->addPointCloud<pcl::PointXYZRGB>(cloud, rgb);
+    viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1.5);
+    viewer->addCoordinateSystem(1.0);
+    viewer->initCameraParameters();
+    return (viewer);
+}
 
 void img0_callback(const cv::Mat &img_msg, const double &t)
 {
@@ -60,7 +78,17 @@ void display2D (int frame_id, const Estimator &estimator, cv::Mat& visual){
 void sync_process()
 {
     int frame_id = 0;
-    while(1)
+
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr p_pcl_point_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+    p_pcl_point_cloud->points.resize((640, 480));
+
+    shared_ptr<pcl::visualization::PCLVisualizer> viewer = createRGBVisualizer(p_pcl_point_cloud);
+
+    // Set Viewer initial position
+    viewer->setCameraPosition(0, 0, 5,    0, 0, 1,   0, 1, 0);
+    viewer->setCameraClipDistances(0.1,1000);
+
+    while(!viewer->wasStopped())
     {
         if(STEREO)
         {
@@ -113,8 +141,26 @@ void sync_process()
                 estimator.inputImage(time, image);
         }
 
-        display2D(frame_id, estimator, visual);
+//        display2D(frame_id, estimator, visual);
+
+        if (estimator.solver_flag == Estimator::SolverFlag::NON_LINEAR)
+        {
+
+            float _x = estimator.Ps[WINDOW_SIZE].x();
+            float _y = estimator.Ps[WINDOW_SIZE].y();
+            float _z = estimator.Ps[WINDOW_SIZE].z();
+
+            pcl::PointXYZRGB point(_x, _y, _z);
+
+            int index = 0;
+
+            p_pcl_point_cloud->points.push_back(point);
+        }
+
         frame_id++;
+
+        viewer->updatePointCloud(p_pcl_point_cloud);
+        viewer->spinOnce(10);
 
         std::chrono::milliseconds dura(1);
         std::this_thread::sleep_for(dura);

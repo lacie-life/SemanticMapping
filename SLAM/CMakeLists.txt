@@ -41,6 +41,12 @@ find_package (Eigen3 3.3 REQUIRED)
 find_package(Ceres REQUIRED)
 include_directories(${CERES_INCLUDE_DIRS})
 
+# PCL
+find_package(PCL 1.2 REQUIRED)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
 ###################################################################################
 # find GTSAM and GTSAM CMake tools
 find_package(GTSAM REQUIRED)
