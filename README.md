@@ -5,6 +5,7 @@ An application for 3D mapping tasks in agriculture uses object-based Visual SLAM
 
 - OpenCV 4.2.0
 - GTSAM 4.0.3
+- [Gui lib](https://github.com/lacie-life/codecpp/blob/main/3D-tools-install.md) 
 
 # Tasks
 
