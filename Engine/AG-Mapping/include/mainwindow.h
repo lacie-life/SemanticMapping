@@ -3,29 +3,8 @@
 
 #include <QMainWindow>
 
-#include "pcl/common/common_headers.h"
-#include "pcl/features/normal_3d.h"
-#include "pcl/io/obj_io.h"
-#include "pcl/io/ply_io.h"
-#include "pcl/io/pcd_io.h"
-#include "pcl/visualization/pcl_visualizer.h"
-#include "pcl/console/parse.h"
-
-#include "QVTKOpenGLNativeWidget.h"
-#include "vtkCamera.h"
-#include "vtkCubeSource.h"
-#include "vtkDataObjectToTable.h"
-#include "vtkElevationFilter.h"
-#include "vtkGenericOpenGLRenderWindow.h"
-#include "vtkNamedColors.h"
-#include "vtkNew.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkQtTableView.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
-#include "vtkSphereSource.h"
-#include "vtkVersion.h"
-#include "pcl/visualization/pcl_visualizer.h"
+#include "AppConstants.h"
+#include "QPCLVisual.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -39,8 +18,15 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+signals:
+    void pcdFile(QString path);
+
+public slots:
+    void chooseFile();
+    void updatePCLWidget();
+
 private:
     Ui::MainWindow *ui;
-    pcl::visualization::PCLVisualizer::Ptr viewer;
+    QPCLVisual *PCLWidget;
 };
 #endif // MAINWINDOW_H

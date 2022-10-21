@@ -14,14 +14,27 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QVTKOpenGLNativeWidget" name="Viewer_widget" native="true">
+   <widget class="QVTKOpenGLNativeWidget" name="pcl_widget" native="true">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>50</y>
-      <width>631</width>
-      <height>431</height>
+      <x>20</x>
+      <y>70</y>
+      <width>761</width>
+      <height>471</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="openPCD">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>20</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Open</string>
     </property>
    </widget>
   </widget>
