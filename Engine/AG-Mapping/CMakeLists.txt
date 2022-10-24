@@ -49,7 +49,7 @@ source_group("Header Files" FILES ${HEADERS})
 source_group("Source Files" FILES ${SOURCES})
 
 set(UI ${CMAKE_CURRENT_LIST_DIR}/ui/mainwindow.ui
-        ${CMAKE_CURRENT_LIST_DIR}/ui/pclviewer.ui)
+        ${CMAKE_CURRENT_LIST_DIR}/ui/qconfigdialog.ui)
 
 qt5_wrap_ui(UI_HEADERS ${UI})
 

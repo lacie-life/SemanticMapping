@@ -14,7 +14,12 @@
 class QSLAM
 {
 public:
-    QSLAM();
+    explicit QSLAM(QObject *parent = nullptr);
+
+    void shutdown();
+
+private:
+
 };
 
 #endif // QSLAM_H
