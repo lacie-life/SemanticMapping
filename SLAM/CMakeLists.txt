@@ -5,8 +5,9 @@ set(semanticSLAM_VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 14)
 
 set(USE_CUDA OFF)
-set(ROS_VISUAL OFF)
+set(ROSVISUAL OFF)
 set(PRINT_LOG OFF)
+set(TEST_BUILD ON)
 
 # we want to use some C++11 features
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra")
@@ -41,11 +42,14 @@ find_package (Eigen3 3.3 REQUIRED)
 find_package(Ceres REQUIRED)
 include_directories(${CERES_INCLUDE_DIRS})
 
-# PCL
-find_package(PCL 1.2 REQUIRED)
-include_directories(${PCL_INCLUDE_DIRS})
-link_directories(${PCL_LIBRARY_DIRS})
-add_definitions(${PCL_DEFINITIONS})
+if (TEST_BUILD)
+    set(CMAKE_PREFIX_PATH "~/Qt/5.15.2/gcc_64")
+    # PCL
+    find_package(PCL 1.12.1 REQUIRED)
+    include_directories(${PCL_INCLUDE_DIRS})
+    link_directories(${PCL_LIBRARY_DIRS})
+    add_definitions(${PCL_DEFINITIONS})
+endif()
 
 ###################################################################################
 # find GTSAM and GTSAM CMake tools
