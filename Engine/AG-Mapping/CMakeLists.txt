@@ -34,6 +34,8 @@ include_directories(
     ${OpenCV_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
     ${Boost_INCLUDE_DIR}
+    ${CMAKE_SOURCE_DIR}/../../SLAM/vins_estimator/include/
+    ${CMAKE_SOURCE_DIR}/../../SLAM/camera_models/include/
 )
 
 link_directories(${PCL_LIBRARY_DIRS})
@@ -69,7 +71,9 @@ target_link_libraries(AG-Mapping PRIVATE
     ${PCL_LIBRARIES}
     ${OpenCV_LIBS}
     ${EIGEN3_LIBS}
-    ${Boost_LIBRARIES})
+    ${Boost_LIBRARIES}
+    ${CMAKE_SOURCE_DIR}/../../SLAM/lib/libvins_libDebug.so
+    ${CMAKE_SOURCE_DIR}/../../SLAM/lib/libcamera_models.so)
 
 #file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data
 #     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

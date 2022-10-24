@@ -8,6 +8,7 @@ set(USE_CUDA OFF)
 set(ROSVISUAL OFF)
 set(PRINT_LOG OFF)
 set(TEST_BUILD ON)
+set(PIG_BUILD OFF)
 
 # we want to use some C++11 features
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra")
@@ -61,7 +62,12 @@ include(GtsamBuildTypes) 			# Load build type flags and default to Debug mode
 include(GtsamTesting)    			# Easy functions for creating unit tests and scripts
 include(GtsamMakeConfigFile) 	# Defines a function for generating config file so package can be found with find_package function
 
-set(Torch_DIR /home/lacie/Github/libtorch/share/cmake/Torch)
+if (PIG_BUILD)
+    set(Torch_DIR /home/lacie/Github/libtorch/share/cmake/Torch)
+else()
+    set(Torch_DIR /home/jun/Github/libtorch/share/cmake/Torch)
+endif ()
+
 find_package(Torch PATHS ${Torch_DIR} NO_DEFAULT REQUIRED)
 if (Torch_FOUND)
     message(STATUS "Torch library found!")
