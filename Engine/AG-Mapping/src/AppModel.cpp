@@ -15,6 +15,16 @@ AppModel::AppModel(QObject *parent)
     CONSOLE << "Init instance";
 }
 
+void AppModel::set_slam_type(AppEnums::VSLAM_TYPE type)
+{
+    m_slam_type = type;
+}
+
+AppEnums::VSLAM_TYPE AppModel::get_slam_type()
+{
+    return m_slam_type;
+}
+
 AppModel *AppModel::instance(){
     m_lock.lock();
     if (nullptr == m_instance){

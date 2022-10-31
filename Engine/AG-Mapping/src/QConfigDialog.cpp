@@ -39,37 +39,58 @@ void QConfigDialog::readSetting()
 
     readParameters(config_path.toStdString());
 
+
+    if (USE_IMU == 1 && NUM_OF_CAM == 1)
+    {
+        m_model->set_slam_type(AppEnums::VSLAM_TYPE::MONO_IMU);
+    }
+    else if (USE_IMU == 0 && NUM_OF_CAM == 1)
+    {
+        m_model->set_slam_type(AppEnums::VSLAM_TYPE::MONO);
+    }
+    else if (USE_IMU == 0 && NUM_OF_CAM == 2)
+    {
+        m_model->set_slam_type(AppEnums::VSLAM_TYPE::STEREO);
+    }
+    else if (USE_IMU == 1 && NUM_OF_CAM == 2)
+    {
+        m_model->set_slam_type(AppEnums::VSLAM_TYPE::STEREO_IMU);
+    }
+
+    CONSOLE << m_model->get_slam_type();
+
     this->display();
 }
 
 void QConfigDialog::readSeq()
 {
-    QString seq_path = QFileDialog::getOpenFileName(this, "Open a file", "${HOME}");
+    QString seq_path = QFileDialog::getExistingDirectory(this, "Open a file", "${HOME}");
     this->ui->dataset_path->setText(seq_path);
     m_seqPath = seq_path;
 
     if(USE_IMU)
     {
-        m_IMUPath = m_seqPath + "imu0/data.csv";
+        m_IMUPath = m_seqPath + "/imu0/data.csv";
+        CONSOLE << m_IMUPath;
     }
     if (NUM_OF_CAM == 1)
     {
-        m_ImgPath = m_seqPath + "cam0/data";
-        m_AssoPath = m_seqPath + "timestamp/data/time.txt";
+        m_ImgPath = m_seqPath + "/cam0/data";
+        m_AssoPath = m_seqPath + "/timestamp/data/time.txt";
+
+        CONSOLE << m_ImgPath;
+        CONSOLE << m_AssoPath;
     }
     if(NUM_OF_CAM == 2)
     {
-        m_LeftImgPath = m_seqPath + "cam0/data";
-        m_RightImgPath = m_seqPath + "cam1/data";
-        m_AssoPath = m_seqPath + "timestamp/data/time.txt";
+        m_LeftImgPath = m_seqPath + "/cam0/data";
+        m_RightImgPath = m_seqPath + "/cam1/data";
+        m_AssoPath = m_seqPath + "/timestamp/data/time.txt";
+
+        CONSOLE << m_LeftImgPath;
+        CONSOLE << m_RightImgPath;
+        CONSOLE << m_AssoPath;
     }
-
-    if (USE_IMU == 1 && NUM_OF_CAM == 1)
-    {
-
-    }
-
-
 }
 
 void QConfigDialog::readGT()

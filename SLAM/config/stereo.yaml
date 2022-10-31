@@ -3,7 +3,7 @@
 imu: 1         
 num_of_cam: 2
 
-output_path: "/home/lacie/config/output/"
+output_path: "/home/lacie/config/output"
 
 cam0_calib: "cam0_mei.yaml"
 cam1_calib: "cam1_mei.yaml"

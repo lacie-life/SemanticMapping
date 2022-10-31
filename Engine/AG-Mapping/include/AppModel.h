@@ -19,6 +19,10 @@ private:
     AppModel(const AppModel& _other) = delete;
     void operator =(const AppModel& _other) = delete;
 
+public:
+    void set_slam_type(AppEnums::VSLAM_TYPE type);
+    AppEnums::VSLAM_TYPE get_slam_type();
+
 private:
     static AppModel* m_instance;
     static QMutex m_lock;
