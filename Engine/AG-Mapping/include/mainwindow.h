@@ -5,6 +5,7 @@
 
 #include "AppConstants.h"
 #include "QPCLVisual.h"
+#include "QConfigDialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,6 +28,7 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
-    QPCLVisual *PCLWidget;
+    QPCLVisual *m_PCLWidget;
+    QConfigDialog *m_configDiaglog;
 };
 #endif // MAINWINDOW_H

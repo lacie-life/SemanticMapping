@@ -21,6 +21,10 @@
 
 #endif
 
+// GUI
+#define BACKGOUND ":/images/data/res/background.jpg"
+#define APP_ICON ":/images/data/res/icon.png"
+
 #define IMAGE_WIDTH 640
 #define IMAGE_HEIGHT 480
 

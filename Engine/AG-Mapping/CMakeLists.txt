@@ -20,6 +20,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets)
 
 find_package(OpenCV 4.2 REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(Ceres REQUIRED)
 find_package(PCL 1.12.1 REQUIRED)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
@@ -34,6 +35,7 @@ include_directories(
     ${OpenCV_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
     ${Boost_INCLUDE_DIR}
+    ${CERES_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}/../../SLAM/vins_estimator/include/
     ${CMAKE_SOURCE_DIR}/../../SLAM/camera_models/include/
 )
@@ -72,6 +74,7 @@ target_link_libraries(AG-Mapping PRIVATE
     ${OpenCV_LIBS}
     ${EIGEN3_LIBS}
     ${Boost_LIBRARIES}
+    ${CERES_LIBRARIES}
     ${CMAKE_SOURCE_DIR}/../../SLAM/lib/libvins_libDebug.so
     ${CMAKE_SOURCE_DIR}/../../SLAM/lib/libcamera_models.so)
 

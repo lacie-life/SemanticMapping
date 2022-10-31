@@ -10,15 +10,17 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    PCLWidget = new QPCLVisual(nullptr);
+    m_PCLWidget = new QPCLVisual(nullptr);
+    m_configDiaglog = new QConfigDialog(nullptr);
 
-    ui->pcl_widget->setRenderWindow(PCLWidget->viewer->getRenderWindow());
-    PCLWidget->viewer->setupInteractor(ui->pcl_widget->interactor(), ui->pcl_widget->renderWindow());
+    ui->pcl_widget->setRenderWindow(m_PCLWidget->viewer->getRenderWindow());
+    m_PCLWidget->viewer->setupInteractor(ui->pcl_widget->interactor(), ui->pcl_widget->renderWindow());
     ui->pcl_widget->update();
 
     connect(ui->openPCD, &QPushButton::clicked, this, &MainWindow::chooseFile);
-    connect(this, &MainWindow::pcdFile, PCLWidget, &QPCLVisual::openPointaCloud);
-    connect(PCLWidget, &QPCLVisual::updateViewer, this, &MainWindow::updatePCLWidget);
+    connect(this, &MainWindow::pcdFile, m_PCLWidget, &QPCLVisual::openPointaCloud);
+    connect(m_PCLWidget, &QPCLVisual::updateViewer, this, &MainWindow::updatePCLWidget);
+    connect(ui->system_config, &QPushButton::clicked, this->m_configDiaglog, &QConfigDialog::open);
 }
 
 MainWindow::~MainWindow()

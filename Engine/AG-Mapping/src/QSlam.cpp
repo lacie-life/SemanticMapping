@@ -1,6 +1,6 @@
 #include "QSlam.h"
 
-QSLAM::QSLAM()
+QSLAM::QSLAM(QObject *parent)
 {
 
 }
