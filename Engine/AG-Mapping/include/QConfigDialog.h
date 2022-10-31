@@ -5,6 +5,8 @@
 #include <QObject>
 #include <QString>
 
+#include "AppModel.h"
+
 namespace Ui {
 class QConfigDialog;
 }
@@ -14,7 +16,7 @@ class QConfigDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit QConfigDialog(QWidget *parent = nullptr);
+    explicit QConfigDialog(QWidget *parent = nullptr, AppModel *model = nullptr);
     ~QConfigDialog();
 
     void display();
@@ -26,6 +28,8 @@ public slots:
 
 private:
     Ui::QConfigDialog *ui;
+
+    AppModel* m_model;
 
     QString m_seqPath;
 

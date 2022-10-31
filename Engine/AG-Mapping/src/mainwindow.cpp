@@ -11,8 +11,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    m_PCLWidget = new QPCLVisual(nullptr);
-    m_configDiaglog = new QConfigDialog(nullptr);
+    m_model = AppModel::instance();
+
+    m_PCLWidget = new QPCLVisual(nullptr, m_model);
+    m_configDiaglog = new QConfigDialog(nullptr, m_model);
 
     ui->pcl_widget->setRenderWindow(m_PCLWidget->viewer->getRenderWindow());
     m_PCLWidget->viewer->setupInteractor(ui->pcl_widget->interactor(), ui->pcl_widget->renderWindow());

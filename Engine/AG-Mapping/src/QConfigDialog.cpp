@@ -7,11 +7,13 @@
 
 #include "AppConstants.h"
 
-QConfigDialog::QConfigDialog(QWidget *parent) :
+QConfigDialog::QConfigDialog(QWidget *parent, AppModel *model) :
     QDialog(parent),
     ui(new Ui::QConfigDialog)
 {
     ui->setupUi(this);
+
+    m_model = model;
 
     connect(ui->choose_config_file, &QPushButton::clicked, this, &QConfigDialog::readSetting);
     connect(ui->choose_dataset, &QPushButton::clicked, this, &QConfigDialog::readSeq);

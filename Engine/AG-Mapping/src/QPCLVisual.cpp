@@ -10,9 +10,10 @@
 
 #include <pcl/io/pcd_io.h>
 
-QPCLVisual::QPCLVisual(QWidget* parent)
+QPCLVisual::QPCLVisual(QWidget* parent, AppModel *model)
     : QVTKOpenGLNativeWidget(parent)
 {
+    m_model = model;
     // Set up the QVTK window
     renderer = vtkNew<vtkRenderer>();
     renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
