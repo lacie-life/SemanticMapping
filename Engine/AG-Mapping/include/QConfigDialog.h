@@ -28,30 +28,25 @@ private:
     Ui::QConfigDialog *ui;
 
     QString m_seqPath;
-    QString m_colorImgPath;
-    QString m_depthImgPath;
+
+    QString m_ImgPath;
+    QString m_LeftImgPath;
+    QString m_RightImgPath;
+
+    QString m_AssoPath;
+    QString m_LeftAssoPath;
+    QString m_RightAssoPath;
+
+    QString m_IMUPath;
 
     QString m_vocPath;
     QString m_settingPath;
-    QString m_assoPath_d;
-    QString m_assoPath_rgb;
+
+    QString m_GTPath;
 
     QString m_classes;
     QString m_modelConfig;
     QString m_modelWeights;
-
-    QString m_temp_seqPath;
-    QString m_temp_colorImgPath;
-    QString m_temp_depthImgPath;
-
-    QString m_temp_vocPath;
-    QString m_temp_settingPath;
-    QString m_temp_assoPath_d;
-    QString m_temp_assoPath_rgb;
-
-    QString m_temp_classes;
-    QString m_temp_modelConfig;
-    QString m_temp_modelWeights;
 };
 
 #endif // QCONFIGDIALOG_H

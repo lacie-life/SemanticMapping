@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "AppConstants.h"
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>

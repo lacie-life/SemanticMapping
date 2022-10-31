@@ -3,9 +3,9 @@
 
 #include <QMainWindow>
 
-#include "AppConstants.h"
 #include "QPCLVisual.h"
 #include "QConfigDialog.h"
+#include "AppModel.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -30,5 +30,8 @@ private:
     Ui::MainWindow *ui;
     QPCLVisual *m_PCLWidget;
     QConfigDialog *m_configDiaglog;
+
+    AppModel *m_model;
+
 };
 #endif // MAINWINDOW_H
