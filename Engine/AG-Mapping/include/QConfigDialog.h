@@ -21,36 +21,20 @@ public:
 
     void display();
 
+signals:
+    void configDone();
+
 public slots:
     void readSetting();
     void readSeq();
     void readGT();
+    void configReset();
+    void configClose();
 
 private:
     Ui::QConfigDialog *ui;
 
     AppModel* m_model;
-
-    QString m_seqPath;
-
-    QString m_ImgPath;
-    QString m_LeftImgPath;
-    QString m_RightImgPath;
-
-    QString m_AssoPath;
-    QString m_LeftAssoPath;
-    QString m_RightAssoPath;
-
-    QString m_IMUPath;
-
-    QString m_vocPath;
-    QString m_settingPath;
-
-    QString m_GTPath;
-
-    QString m_classes;
-    QString m_modelConfig;
-    QString m_modelWeights;
 };
 
 #endif // QCONFIGDIALOG_H

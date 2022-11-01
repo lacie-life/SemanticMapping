@@ -18,6 +18,8 @@ QConfigDialog::QConfigDialog(QWidget *parent, AppModel *model) :
     connect(ui->choose_config_file, &QPushButton::clicked, this, &QConfigDialog::readSetting);
     connect(ui->choose_dataset, &QPushButton::clicked, this, &QConfigDialog::readSeq);
     connect(ui->choose_gt, &QPushButton::clicked, this, &QConfigDialog::readGT);
+    connect(ui->cancel_config_button, &QPushButton::clicked, this, &QConfigDialog::configReset);
+    connect(ui->close_config, &QPushButton::clicked, this, &QConfigDialog::configClose);
 }
 
 QConfigDialog::~QConfigDialog()
@@ -66,30 +68,30 @@ void QConfigDialog::readSeq()
 {
     QString seq_path = QFileDialog::getExistingDirectory(this, "Open a file", "${HOME}");
     this->ui->dataset_path->setText(seq_path);
-    m_seqPath = seq_path;
+    m_model->m_seqPath = seq_path;
 
     if(USE_IMU)
     {
-        m_IMUPath = m_seqPath + "/imu0/data.csv";
-        CONSOLE << m_IMUPath;
+        m_model->m_IMUPath = m_model->m_seqPath + "/imu0/data.csv";
+        CONSOLE << m_model->m_IMUPath;
     }
     if (NUM_OF_CAM == 1)
     {
-        m_ImgPath = m_seqPath + "/cam0/data";
-        m_AssoPath = m_seqPath + "/timestamp/data/time.txt";
+        m_model->m_ImgPath = m_model->m_seqPath + "/cam0/data";
+        m_model->m_AssoPath = m_model->m_seqPath + "/timestamp/data/time.txt";
 
-        CONSOLE << m_ImgPath;
-        CONSOLE << m_AssoPath;
+        CONSOLE << m_model->m_ImgPath;
+        CONSOLE << m_model->m_AssoPath;
     }
     if(NUM_OF_CAM == 2)
     {
-        m_LeftImgPath = m_seqPath + "/cam0/data";
-        m_RightImgPath = m_seqPath + "/cam1/data";
-        m_AssoPath = m_seqPath + "/timestamp/data/time.txt";
+        m_model->m_LeftImgPath = m_model->m_seqPath + "/cam0/data";
+        m_model->m_RightImgPath = m_model->m_seqPath + "/cam1/data";
+        m_model->m_AssoPath = m_model->m_seqPath + "/timestamp/data/time.txt";
 
-        CONSOLE << m_LeftImgPath;
-        CONSOLE << m_RightImgPath;
-        CONSOLE << m_AssoPath;
+        CONSOLE << m_model->m_LeftImgPath;
+        CONSOLE << m_model->m_RightImgPath;
+        CONSOLE << m_model->m_AssoPath;
     }
 }
 
@@ -97,5 +99,38 @@ void QConfigDialog::readGT()
 {
     QString gt_path = QFileDialog::getOpenFileName(this, "Open a file", "${HOME}");
     this->ui->dataset_path->setText(gt_path);
-    m_GTPath = gt_path;
+    m_model->m_GTPath = gt_path;
+}
+
+void QConfigDialog::configReset()
+{
+    m_model->m_seqPath = "";
+
+    m_model->m_ImgPath = "";
+    m_model->m_LeftImgPath = "";
+    m_model->m_RightImgPath = "";
+
+    m_model->m_AssoPath = "";
+    m_model->m_LeftAssoPath = "";
+    m_model->m_RightAssoPath = "";
+
+    m_model->m_IMUPath = "";
+
+    m_model->m_vocPath = "";
+    m_model->m_settingPath = "";
+
+    m_model->m_GTPath = "";
+
+    m_model->m_classes = "";
+    m_model->m_modelConfig = "";
+    m_model->m_modelWeights = "";
+
+    this->close();
+}
+
+void QConfigDialog::configClose()
+{
+    // TODO: Check path/file availabel
+    emit configDone();
+    this->close();
 }

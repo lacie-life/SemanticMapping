@@ -47,7 +47,7 @@ void readParameters(const string &config_file)
 {
     FILE *fh = fopen(config_file.c_str(),"r");
     if(fh == NULL){
-        printf("config_file dosen't exist; wrong config_file path \n");
+        std::cerr << "config_file dosen't exist; wrong config_file path \n";
         abort();
         return;          
     }
@@ -77,7 +77,7 @@ void readParameters(const string &config_file)
     USE_GPU_ACC_FLOW = fsSettings["use_gpu_acc_flow"];
 
     USE_IMU = fsSettings["imu"];
-    printf("USE_IMU: %d\n", USE_IMU);
+//    printf("USE_IMU: %d\n", USE_IMU);
     if(USE_IMU)
     {
         ACC_N = fsSettings["acc_n"];
@@ -94,7 +94,7 @@ void readParameters(const string &config_file)
 
     fsSettings["output_path"] >> OUTPUT_FOLDER;
     VINS_RESULT_PATH = OUTPUT_FOLDER + "/vio.csv";
-    std::cout << "result path " << VINS_RESULT_PATH << std::endl;
+//    std::cout << "result path " << VINS_RESULT_PATH << std::endl;
     std::ofstream fout(VINS_RESULT_PATH, std::ios::out);
     fout.close();
 
@@ -124,11 +124,11 @@ void readParameters(const string &config_file)
     } 
     
     NUM_OF_CAM = fsSettings["num_of_cam"];
-    printf("camera number %d\n", NUM_OF_CAM);
+//    printf("camera number %d\n", NUM_OF_CAM);
 
     if(NUM_OF_CAM != 1 && NUM_OF_CAM != 2)
     {
-        printf("num_of_cam should be 1 or 2\n");
+        std::cerr << "num_of_cam should be 1 or 2\n";
         assert(0);
     }
 

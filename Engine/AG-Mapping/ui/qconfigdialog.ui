@@ -134,6 +134,32 @@
     </rect>
    </property>
   </widget>
+  <widget class="QPushButton" name="cancel_config_button">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>410</y>
+     <width>89</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="close_config">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>410</y>
+     <width>89</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Oke</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

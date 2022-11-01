@@ -25,6 +25,7 @@ signals:
 public slots:
     void chooseFile();
     void updatePCLWidget();
+    void SLAMInforDisplay();
 
 private:
     Ui::MainWindow *ui;

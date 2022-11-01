@@ -13,6 +13,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_model = AppModel::instance();
 
+    this->ui->slam_type_label->hide();
+    this->ui->run_action->hide();
+
     m_PCLWidget = new QPCLVisual(nullptr, m_model);
     m_configDiaglog = new QConfigDialog(nullptr, m_model);
 
@@ -24,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::pcdFile, m_PCLWidget, &QPCLVisual::openPointaCloud);
     connect(m_PCLWidget, &QPCLVisual::updateViewer, this, &MainWindow::updatePCLWidget);
     connect(ui->system_config, &QPushButton::clicked, this->m_configDiaglog, &QConfigDialog::open);
+    connect(m_configDiaglog, &QConfigDialog::configDone, this, &MainWindow::SLAMInforDisplay);
 }
 
 MainWindow::~MainWindow()
@@ -42,4 +46,27 @@ void MainWindow::updatePCLWidget()
 {
     CONSOLE << "Update PCL Viewer";
     ui->pcl_widget->update();
+}
+
+void MainWindow::SLAMInforDisplay()
+{
+    this->ui->slam_type_label->show();
+    this->ui->run_action->show();
+
+    switch (m_model->get_slam_type()) {
+    case static_cast<int>(AppEnums::VSLAM_TYPE::MONO):
+        this->ui->slam_type_label->setText("SLAM Type Mono-VO");
+        break;
+    case static_cast<int>(AppEnums::VSLAM_TYPE::MONO_IMU):
+        this->ui->slam_type_label->setText("SLAM Type Mono-VIO");
+        break;
+    case static_cast<int>(AppEnums::VSLAM_TYPE::STEREO):
+        this->ui->slam_type_label->setText("SLAM Type Stereo-VO");
+        break;
+    case static_cast<int>(AppEnums::VSLAM_TYPE::STEREO_IMU):
+        this->ui->slam_type_label->setText("SLAM Type Stereo-VIO");
+        break;
+    default:
+        break;
+    }
 }

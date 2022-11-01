@@ -11,6 +11,8 @@ class AppModel : public QObject
     Q_OBJECT
 public:
     static AppModel *instance();
+    void set_slam_type(AppEnums::VSLAM_TYPE type);
+    AppEnums::VSLAM_TYPE get_slam_type();
 
 signals:
 
@@ -20,8 +22,26 @@ private:
     void operator =(const AppModel& _other) = delete;
 
 public:
-    void set_slam_type(AppEnums::VSLAM_TYPE type);
-    AppEnums::VSLAM_TYPE get_slam_type();
+    QString m_seqPath;
+
+    QString m_ImgPath;
+    QString m_LeftImgPath;
+    QString m_RightImgPath;
+
+    QString m_AssoPath;
+    QString m_LeftAssoPath;
+    QString m_RightAssoPath;
+
+    QString m_IMUPath;
+
+    QString m_vocPath;
+    QString m_settingPath;
+
+    QString m_GTPath;
+
+    QString m_classes;
+    QString m_modelConfig;
+    QString m_modelWeights;
 
 private:
     static AppModel* m_instance;
