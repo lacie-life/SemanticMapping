@@ -4,11 +4,11 @@ project(SemanticSLAM)
 set(semanticSLAM_VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 14)
 
-set(USE_CUDA OFF)
+set(USE_CUDA ON)
 set(ROSVISUAL OFF)
 set(PRINT_LOG OFF)
 set(TEST_BUILD ON)
-set(PIG_BUILD ON)
+set(PIG_BUILD OFF)
 
 # we want to use some C++11 features
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra")
@@ -37,7 +37,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 # Eigen3
 include_directories("/usr/include/eigen3")
-find_package (Eigen3 3.3 REQUIRED)
+find_package (Eigen3 REQUIRED)
 
 # Ceres
 find_package(Ceres REQUIRED)
@@ -46,7 +46,7 @@ include_directories(${CERES_INCLUDE_DIRS})
 if (TEST_BUILD)
     set(CMAKE_PREFIX_PATH "~/Qt/5.15.2/gcc_64")
     # PCL
-    find_package(PCL 1.12.1 REQUIRED)
+    find_package(PCL 1.12 REQUIRED)
     include_directories(${PCL_INCLUDE_DIRS})
     link_directories(${PCL_LIBRARY_DIRS})
     add_definitions(${PCL_DEFINITIONS})
@@ -63,9 +63,9 @@ include(GtsamTesting)    			# Easy functions for creating unit tests and scripts
 include(GtsamMakeConfigFile) 	# Defines a function for generating config file so package can be found with find_package function
 
 if (PIG_BUILD)
-    set(Torch_DIR /home/lacie/Github/libtorch/share/cmake/Torch)
+    set(Torch_DIR /home/lacie/Github/libtorch_gpu/share/cmake/Torch)
 else()
-    set(Torch_DIR /home/jun/Github/libtorch/share/cmake/Torch)
+    set(Torch_DIR /home/lacie/Github/libtorch_cpu/share/cmake/Torch)
 endif ()
 
 find_package(Torch PATHS ${Torch_DIR} NO_DEFAULT REQUIRED)

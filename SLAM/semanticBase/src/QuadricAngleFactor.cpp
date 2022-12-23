@@ -4,11 +4,13 @@
 
 #include <gtsam/base/numericalDerivative.h>
 #include <boost/function.hpp>
+#include <boost/bind/bind.hpp>
 #include "QuadricAngleFactor.h"
 
 #define NUMERICAL_DERIVATIVE false
 
 using namespace std;
+using namespace boost::placeholders;
 
 namespace semanticSLAM {
 
@@ -21,7 +23,7 @@ namespace semanticSLAM {
         gtsam::Vector3 error = measured_.localCoordinates(QRot);
         // Rot3::LocalCoordinates(quadric.pose().rotation());
 
-        boost::function<gtsam::Vector(const ConstrainedDualQuadric&)> funPtr(
+        std::function<gtsam::Vector(const ConstrainedDualQuadric&)> funPtr(
         boost::bind(&QuadricAngleFactor::evaluateError, this, _1, boost::none));
         if (H) {
             Eigen::Matrix<double, 3, 9> de_dr =

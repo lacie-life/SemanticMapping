@@ -3,6 +3,7 @@
 //
 
 #include <gtsam/base/numericalDerivative.h>
+#include <boost/bind/bind.hpp>
 #include "QuadricProjectionException.h"
 #include "BoundingBoxFactor.h"
 #include "Camera.h"
@@ -10,6 +11,7 @@
 #define NUMERICAL_DERIVATIVE false
 
 using namespace std;
+using namespace boost::placeholders;
 
 namespace semanticSLAM{
     /* ************************************************************************* */
@@ -61,7 +63,7 @@ namespace semanticSLAM{
             gtsam::Vector4 error = predictedBounds.vector() - measured_.vector();
 
             if (NUMERICAL_DERIVATIVE) {
-                boost::function<gtsam::Vector(const gtsam::Pose3&,
+                std::function<gtsam::Vector(const gtsam::Pose3&,
                 const ConstrainedDualQuadric&)>
                 funPtr(boost::bind(&BoundingBoxFactor::evaluateError, this, _1, _2,
                                    boost::none, boost::none));

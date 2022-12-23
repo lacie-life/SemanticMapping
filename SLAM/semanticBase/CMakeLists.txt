@@ -22,3 +22,4 @@ target_link_libraries(${CONVENIENCE_LIB_NAME}
         ${TORCH_LIBRARIES})
 
 set_property(TARGET ${CONVENIENCE_LIB_NAME} PROPERTY CXX_STANDARD 14)
+

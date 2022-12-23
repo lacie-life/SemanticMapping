@@ -25,7 +25,7 @@ int main(int argc, char **argv){
     display_ground_truth = true;
     std::cerr << "Display ground truth trajectory" << std::endl;
     // load ground truth pose
-    std::string filename_pose = std::string("/home/lacie/Github/Dataset/00/00.txt");
+    std::string filename_pose = std::string("/home/lacie/Github/Data/Dataset/Kitti/Gray/00/00.txt");
     pose_matrix_gt = loadPoses(filename_pose);
 
 
@@ -36,7 +36,7 @@ int main(int argc, char **argv){
 //    }
 
     // Sequence
-    std::string filepath = std::string("/home/lacie/Github/Dataset/00/");
+    std::string filepath = std::string("/home/lacie/Github/Data/Dataset/Kitti/Gray/00/");
     std::cout << "Filepath: " << filepath << std::endl;
 
     // Camera calibration
