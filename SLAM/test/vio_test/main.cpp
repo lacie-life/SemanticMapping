@@ -123,6 +123,28 @@ void sync_process()
             m_buf.unlock();
             if(!image0.empty())
                 estimator.inputImage(time, image0, image1);
+
+            if (estimator.solver_flag == Estimator::SolverFlag::NON_LINEAR)
+            {
+
+                float _x = estimator.Ps[WINDOW_SIZE].x();
+                float _y = estimator.Ps[WINDOW_SIZE].y();
+                float _z = estimator.Ps[WINDOW_SIZE].z();
+
+                pcl::PointXYZRGB point(_x, _y, _z);
+
+                int index = 0;
+
+                p_pcl_point_cloud->points.push_back(point);
+            }
+
+            frame_id++;
+
+            viewer->updatePointCloud(p_pcl_point_cloud);
+            viewer->spinOnce(10);
+
+            std::chrono::milliseconds dura(1);
+            std::this_thread::sleep_for(dura);
         }
         else
         {
@@ -265,15 +287,15 @@ int main(int argc, char **argv)
     {
         //imu data file
         ifstream fImus;
-        fImus.open("/home/lacie/Github/Dataset/MH_03_medium/mav0/imu0/data.csv");
+        fImus.open("/home/lacie/Github/Data/Dataset/MH_01_easy/mav0/imu0/data.csv");
 
         cv::Mat image;
         int ni;//num image
 
         vector<string> vStrImagesFileNames;
         vector<double> vTimeStamps;
-        LoadImages(string("/home/lacie/Github/Dataset/MH_03_medium/mav0/cam0/data"),
-                   string("/home/lacie/Github/AG-Mapping/data/euroc_data_timestamp/MH03.txt"),vStrImagesFileNames,vTimeStamps);
+        LoadImages(string("/home/lacie/Github/Data/Dataset/MH_01_easy/mav0/cam0/data"),
+                   string("/home/lacie/Github/AG-Mapping/data/euroc_data_timestamp/MH01.txt"),vStrImagesFileNames,vTimeStamps);
 
         int imageNum = vStrImagesFileNames.size();
 
@@ -329,7 +351,7 @@ int main(int argc, char **argv)
     {
         //imu data file
         ifstream fImus;
-        fImus.open("/home/lacie/Github/Dataset/MH_03_medium/mav0/imu0/data.csv"); // check
+        fImus.open("/home/lacie/Github/Data/Dataset/MH_01_easy/mav0/imu0/data.csv"); // check
 
         cv::Mat image;
         cv::Mat image2;
@@ -339,8 +361,8 @@ int main(int argc, char **argv)
         vector<string> vStrImagesFileNames2 ;
         vector<double> vTimeStamps;
         vector<double> vTimeStamps2;
-        LoadImages(string("/home/lacie/Github/Dataset/MH_03_medium/mav0/cam0/data"),string("/home/lacie/Github/AG-Mapping/data/euroc_data_timestamp/MH03.txt"),vStrImagesFileNames,vTimeStamps); //left
-        LoadImages(string("/home/lacie/Github/Dataset/MH_03_medium/mav0/cam1/data"),string("/home/lacie/Github/AG-Mapping/data/euroc_data_timestamp/MH03.txt"),vStrImagesFileNames2,vTimeStamps2); //right
+        LoadImages(string("/home/lacie/Github/Data/Dataset/MH_01_easy/mav0/cam0/data"),string("/home/lacie/Github/AG-Mapping/data/euroc_data_timestamp/MH01.txt"),vStrImagesFileNames,vTimeStamps); //left
+        LoadImages(string("/home/lacie/Github/Data/Dataset/MH_01_easy/mav0/cam1/data"),string("/home/lacie/Github/AG-Mapping/data/euroc_data_timestamp/MH01.txt"),vStrImagesFileNames2,vTimeStamps2); //right
 
         int tmp_imageNum = vStrImagesFileNames.size();
         int tmp_imageNum2 = vStrImagesFileNames2.size();
