@@ -265,7 +265,7 @@ namespace semanticSLAM{
 
             // cast to boost::function for numericalDerivative
             auto boost_funptr(
-                    static_cast<std::function<gtsam::Vector(const gtsam::Matrix33&)>>(
+                    static_cast<boost::function<gtsam::Vector(const gtsam::Matrix33&)>>(
                             bounds_funptr));
 
             // calculate derivative of conic_matrix wrt quadric vector

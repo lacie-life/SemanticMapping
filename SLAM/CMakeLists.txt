@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.0)
 project(SemanticSLAM)
 
 set(semanticSLAM_VERSION 0.0.1)
@@ -8,7 +8,7 @@ set(USE_CUDA ON)
 set(ROSVISUAL OFF)
 set(PRINT_LOG OFF)
 set(TEST_BUILD ON)
-set(PIG_BUILD OFF)
+set(PIG_BUILD ON)
 
 # we want to use some C++11 features
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra")
@@ -17,6 +17,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 set(CMAKE_LIBRARY_PATH /opt/intel/mkl/lib/)
+set(CMAKE_CUDA_COMPILER /usr/local/cuda/bin/nvcc)
 
 # ROS package
 if(ROS_VISUAL)
@@ -29,6 +30,18 @@ if(ROS_VISUAL)
             cv_bridge
             image_transport)
     include_directories(${catkin_INCLUDE_DIRS})
+endif()
+
+# CUDA
+if(USE_CUDA)
+    find_package(CUDA QUIET REQUIRED)
+
+    # Pass options to NVCC
+    set(
+            CUDA_NVCC_FLAGS
+            ${CUDA_NVCC_FLAGS};
+            -O3 -gencode arch=compute_86,code=sm_86
+    )
 endif()
 
 # OpenCV
@@ -46,7 +59,7 @@ include_directories(${CERES_INCLUDE_DIRS})
 if (TEST_BUILD)
     set(CMAKE_PREFIX_PATH "~/Qt/5.15.2/gcc_64")
     # PCL
-    find_package(PCL 1.12 REQUIRED)
+    find_package(PCL 1.10 REQUIRED)
     include_directories(${PCL_INCLUDE_DIRS})
     link_directories(${PCL_LIBRARY_DIRS})
     add_definitions(${PCL_DEFINITIONS})
@@ -63,7 +76,7 @@ include(GtsamTesting)    			# Easy functions for creating unit tests and scripts
 include(GtsamMakeConfigFile) 	# Defines a function for generating config file so package can be found with find_package function
 
 if (PIG_BUILD)
-    set(Torch_DIR /home/lacie/Github/libtorch_gpu/share/cmake/Torch)
+    set(Torch_DIR /home/lacie/Github/libtorch/share/cmake/Torch)
 else()
     set(Torch_DIR /home/lacie/Github/libtorch_cpu/share/cmake/Torch)
 endif ()
