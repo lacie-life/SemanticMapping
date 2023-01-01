@@ -21,10 +21,10 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets)
 find_package(OpenCV 4.2 REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Ceres REQUIRED)
-find_package(PCL 1.12.1 REQUIRED)
+find_package(PCL 1.12 REQUIRED)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
-find_package(VTK CONFIG REQUIRED)
+find_package(VTK 9.2 CONFIG REQUIRED)
 #include(${VTK_USE_FILE})
 
 add_definitions(${PCL_DEFINITIONS})

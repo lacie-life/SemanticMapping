@@ -67,7 +67,7 @@ endif()
 
 ###################################################################################
 # find GTSAM and GTSAM CMake tools
-find_package(GTSAM REQUIRED)
+find_package(GTSAM 4 REQUIRED)
 find_package(GTSAMCMakeTools REQUIRED)
 
 # include gtsam cmake tools
