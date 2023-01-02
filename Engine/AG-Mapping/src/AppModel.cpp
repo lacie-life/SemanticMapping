@@ -25,6 +25,11 @@ AppEnums::VSLAM_TYPE AppModel::get_slam_type()
     return m_slam_type;
 }
 
+void AppModel::SLAM_Run(QStringList settingPaths)
+{
+
+}
+
 AppModel *AppModel::instance(){
     m_lock.lock();
     if (nullptr == m_instance){

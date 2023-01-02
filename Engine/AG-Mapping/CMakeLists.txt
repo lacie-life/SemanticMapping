@@ -76,7 +76,8 @@ target_link_libraries(AG-Mapping PRIVATE
     ${Boost_LIBRARIES}
     ${CERES_LIBRARIES}
     ${CMAKE_SOURCE_DIR}/../../SLAM/lib/libvins_libDebug.so
-    ${CMAKE_SOURCE_DIR}/../../SLAM/lib/libcamera_models.so)
+    ${CMAKE_SOURCE_DIR}/../../SLAM/lib/libcamera_models.so
+    -lpthread)
 
 #file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data
 #     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

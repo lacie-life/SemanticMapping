@@ -14,7 +14,8 @@ public:
     void set_slam_type(AppEnums::VSLAM_TYPE type);
     AppEnums::VSLAM_TYPE get_slam_type();
 
-signals:
+public slots:
+    void SLAM_Run(QStringList settingPaths);
 
 private:
     AppModel(QObject* parent = nullptr);

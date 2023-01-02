@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pcl_widget->update();
 
     connect(ui->openPCD, &QPushButton::clicked, this, &MainWindow::chooseFile);
-    connect(this, &MainWindow::pcdFile, m_PCLWidget, &QPCLVisual::openPointaCloud);
+    connect(this, &MainWindow::pcdFile, m_PCLWidget, &QPCLVisual::openPointCloud);
     connect(m_PCLWidget, &QPCLVisual::updateViewer, this, &MainWindow::updatePCLWidget);
     connect(ui->system_config, &QPushButton::clicked, this->m_configDiaglog, &QConfigDialog::open);
     connect(m_configDiaglog, &QConfigDialog::configDone, this, &MainWindow::SLAMInforDisplay);

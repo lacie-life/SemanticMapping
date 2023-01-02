@@ -2,6 +2,7 @@
 #define QPCLVISUAL_H
 
 #include "AppModel.h"
+#include "AppConstants.h"
 
 #include <QString>
 
@@ -27,9 +28,9 @@ class QPCLVisual : public QVTKOpenGLNativeWidget
 public:
     QPCLVisual(QWidget* parent = nullptr, AppModel *model = nullptr);
 
-    void openPointaCloud(QString path);
+    void openPointCloud(QString path);
 
-    void showPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr frameCloud, Sophus::SE3f Tcw);
+    void updatePointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr frameCloud, Sophus::SE3f Tcw);
 
     double curTime();
 
