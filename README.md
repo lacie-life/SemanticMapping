@@ -3,9 +3,9 @@ An application for 3D mapping tasks in agriculture uses object-based Visual SLAM
 
 # Enviroments
 
-- Ubuntu 22.04
+- Ubuntu 20.04
 - RTX 3060
-- CUDA 11.5
+- CUDA 11.6
 - cuDNN 8.7
 - Libtorch 1.13
 
