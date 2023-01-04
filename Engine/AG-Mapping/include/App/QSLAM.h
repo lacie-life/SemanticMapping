@@ -18,7 +18,9 @@ class QSLAM : public QObject
 {
     Q_OBJECT
 public:
-    QSLAM(QObject *parent = nullptr, QString settingPaths = "");
+    QSLAM();
+
+    void init(QString settingPaths);
 
     void run(QStringList dataPath);
 
@@ -34,9 +36,9 @@ public:
     void display2D(int frame_id, const Estimator &estimator, cv::Mat& visual);
 
 signals:
+    void slamComplete();
 
 public:
-    static Estimator estimator;
     QMutex *m_mutex;
 
     queue<sensor_msgs::ImuConstPtr> imu_buf;
@@ -44,8 +46,7 @@ public:
     queue<pair<cv::Mat, double>> img0_buf;
     queue<pair<cv::Mat, double>> img1_buf;
 
-    cv::Mat visual = cv::Mat::zeros(600, 1200, CV_8UC3);
-
+    cv::Mat visual;
 };
 
 #endif // QSLAM_H

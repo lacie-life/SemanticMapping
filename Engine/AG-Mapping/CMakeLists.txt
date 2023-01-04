@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(AG-Mapping VERSION 0.1 LANGUAGES CXX)
 
+cmake_policy(SET CMP0057 NEW)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC OFF)
@@ -22,8 +24,12 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets)
 
 find_package(OpenCV 4.2 REQUIRED)
 find_package(Eigen3 REQUIRED)
+
 find_package(Ceres REQUIRED)
+include_directories(${CERES_INCLUDE_DIRS})
+
 find_package(PCL 1.12 REQUIRED)
+
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 find_package(VTK 9.2 CONFIG REQUIRED)
@@ -37,24 +43,29 @@ include_directories(
     ${OpenCV_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
     ${Boost_INCLUDE_DIR}
-    ${CERES_INCLUDE_DIRS}
-    ${CMAKE_SOURCE_DIR}/vins_estimator/include/
-    ${CMAKE_SOURCE_DIR}/camera_models/include/
+    ${CMAKE_SOURCE_DIR}/include/App/
+    ${CMAKE_SOURCE_DIR}/include/Camera_models/
+    ${CMAKE_SOURCE_DIR}/include/Estimator/
 )
 
 link_directories(${PCL_LIBRARY_DIRS})
 link_directories(${Boost_LIBRARY_DIR})
 
-add_subdirectory(camera_models)
-add_subdirectory(vins_estimator)
-
 file(GLOB HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/App/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/App/*.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Camera_models/camodocal/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Estimator/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Estimator/*.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Estimator/sophus/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Estimator/sophus/*.hpp
 )
 
 file(GLOB SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/App/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Camera_models/*.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Camera_models/camera_models/*.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Estimator/*.cpp
 )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -90,8 +101,6 @@ target_link_libraries(AG-Mapping PRIVATE
     ${OpenCV_LIBS}
     ${EIGEN3_LIBS}
     ${Boost_LIBRARIES}
-    vins_lib
-    camera_models
     Ceres::ceres
     -lpthread
 )

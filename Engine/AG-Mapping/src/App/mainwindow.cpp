@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_PCLWidget, &QPCLVisual::updateViewer, this, &MainWindow::updatePCLWidget);
     connect(ui->system_config, &QPushButton::clicked, this->m_configDiaglog, &QConfigDialog::open);
     connect(m_configDiaglog, &QConfigDialog::configDone, this, &MainWindow::SLAMInforDisplay);
+    connect(ui->run_action, &QPushButton::clicked, this->m_model, &AppModel::SLAM_Run);
 }
 
 MainWindow::~MainWindow()

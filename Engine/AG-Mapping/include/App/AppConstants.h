@@ -7,6 +7,7 @@
 #include <QColor>
 #include <QMutex>
 #include <QCoreApplication>
+#include <QDebug>
 
 #ifndef MACRO_DEFINE
 #define MACRO_DEFINE

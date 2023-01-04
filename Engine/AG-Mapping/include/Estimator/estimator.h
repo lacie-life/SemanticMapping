@@ -30,7 +30,6 @@
 #include "projectionTwoFrameTwoCamFactor.h"
 #include "projectionOneFrameTwoCamFactor.h"
 #include "feature_tracker.h"
-#include "tools.h"
 
 class Estimator
 {

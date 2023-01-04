@@ -39,6 +39,8 @@ void QConfigDialog::readSetting()
 
     this->ui->config_path->setText(config_path);
 
+    m_model->m_slamSettingPath = config_path;
+
     readParameters(config_path.toStdString());
 
 
@@ -98,12 +100,13 @@ void QConfigDialog::readSeq()
 void QConfigDialog::readGT()
 {
     QString gt_path = QFileDialog::getOpenFileName(this, "Open a file", "${HOME}");
-    this->ui->dataset_path->setText(gt_path);
+    this->ui->gt_path->setText(gt_path);
     m_model->m_GTPath = gt_path;
 }
 
 void QConfigDialog::configReset()
 {
+    m_model->m_slamSettingPath = "";
     m_model->m_seqPath = "";
 
     m_model->m_ImgPath = "";

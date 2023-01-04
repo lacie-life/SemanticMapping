@@ -5,6 +5,7 @@
 #include <QMutex>
 
 #include "AppEnums.h"
+#include "QSLAM.h"
 
 class AppModel : public QObject
 {
@@ -15,7 +16,7 @@ public:
     AppEnums::VSLAM_TYPE get_slam_type();
 
 public slots:
-    void SLAM_Run(QStringList settingPaths);
+    void SLAM_Run();
 
 private:
     AppModel(QObject* parent = nullptr);
@@ -23,6 +24,7 @@ private:
     void operator =(const AppModel& _other) = delete;
 
 public:
+    QString m_slamSettingPath;
     QString m_seqPath;
 
     QString m_ImgPath;
@@ -51,6 +53,8 @@ private:
     static AppEnums::APP_STATE m_state;
     static AppEnums::VSLAM_TYPE m_slam_type;
     static AppEnums::SLAM_STATE m_slam_state;
+
+    QSLAM *m_slam;
 };
 
 #endif // APPMODEL_H

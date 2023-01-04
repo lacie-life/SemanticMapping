@@ -1,16 +1,29 @@
 #include "QSLAM.h"
+#include "AppConstants.h"
 
 #include "parameters.h"
 
-QSLAM::QSLAM(QObject *parent, QString settingPaths)
-    : QObject{parent}
+static Estimator estimator;
+
+QSLAM::QSLAM()
 {
+}
+
+void QSLAM::init(QString settingPaths)
+{
+    CONSOLE << "Init SLAM ";
+
     readParameters(settingPaths.toStdString());
+
     estimator.setParameter();
+
+    visual = cv::Mat::zeros(600, 1200, CV_8UC3);
 }
 
 void QSLAM::run(QStringList dataPath)
 {
+    CONSOLE << "Fucking thread";
+
     //imu data file
     ifstream fImus;
     fImus.open(dataPath[0].toStdString()); // check
@@ -40,40 +53,43 @@ void QSLAM::run(QStringList dataPath)
     auto sync_process = [this]()
     {
         int frame_id = 0;
+
+        CONSOLE << "Start SLAM";
+
         while (1) {
             cv::Mat image0, image1;
             std_msgs::Header header;
             double time = 0;
-            m_mutex->lock();
-            if (!img0_buf.empty() && !img1_buf.empty())
+            this->m_mutex->lock();
+            if (!this->img0_buf.empty() && !this->img1_buf.empty())
             {
-                double time0 = img0_buf.front().second;
-                double time1 = img1_buf.front().second;
+                double time0 = this->img0_buf.front().second;
+                double time1 = this->img1_buf.front().second;
                 // 0.003s sync tolerance
                 if(time0 < time1 - 0.003)
                 {
-                    img0_buf.pop();
+                    this->img0_buf.pop();
                     printf("throw img0\n");
                 }
                 else if(time0 > time1 + 0.003)
                 {
-                    img1_buf.pop();
+                    this->img1_buf.pop();
                     printf("throw img1\n");
                 }
                 else
                 {
-                    time = img0_buf.front().second;
-                    image0 = img0_buf.front().first;
-                    img0_buf.pop();
-                    image1 = img1_buf.front().first;
-                    img1_buf.pop();
+                    time = this->img0_buf.front().second;
+                    image0 = this->img0_buf.front().first;
+                    this->img0_buf.pop();
+                    image1 = this->img1_buf.front().first;
+                    this->img1_buf.pop();
                 }
             }
-            m_mutex->unlock();
+            this->m_mutex->unlock();
             if(!image0.empty())
                 estimator.inputImage(time, image0, image1);
 
-            display2D(frame_id, estimator, visual);
+            display2D(frame_id, estimator, this->visual);
 
             frame_id++;
 
@@ -88,6 +104,7 @@ void QSLAM::run(QStringList dataPath)
 
     for(ni=0; ni<imageNum; ni++)
     {
+        CONSOLE << ni;
         double  tframe = vTimeStamps[ni];   //timestamp
         uint32_t  sec = tframe;
         uint32_t nsec = (tframe-sec)*1e9;
@@ -127,6 +144,11 @@ void QSLAM::run(QStringList dataPath)
             usleep((T-timeSpent)*1e6); //sec->us:1e6
         else
             cerr << endl << "process image speed too slow, larger than interval time between two consecutive frames" << endl;
+    }
+
+    if (ni >= imageNum)
+    {
+        emit slamComplete();
     }
 }
 

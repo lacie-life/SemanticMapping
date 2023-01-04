@@ -2,6 +2,7 @@
 #include "AppConstants.h"
 
 #include <QDebug>
+#include <QStringList>
 
 AppModel* AppModel::m_instance = nullptr;
 QMutex AppModel::m_lock;
@@ -13,6 +14,13 @@ AppModel::AppModel(QObject *parent)
     : QObject{parent}
 {
     CONSOLE << "Init instance";
+
+    m_slam = new QSLAM();
+
+    connect(m_slam, &QSLAM::slamComplete, this, []()
+    {
+        CONSOLE << "SLAM Completed !!";
+    });
 }
 
 void AppModel::set_slam_type(AppEnums::VSLAM_TYPE type)
@@ -25,9 +33,17 @@ AppEnums::VSLAM_TYPE AppModel::get_slam_type()
     return m_slam_type;
 }
 
-void AppModel::SLAM_Run(QStringList settingPaths)
+void AppModel::SLAM_Run()
 {
+    m_slam->init(m_slamSettingPath);
 
+    QStringList temp;
+    temp.append(m_IMUPath);
+    temp.append(m_LeftImgPath);
+    temp.append(m_RightImgPath);
+    temp.append(m_AssoPath);
+
+    m_slam->run(temp);
 }
 
 AppModel *AppModel::instance(){
