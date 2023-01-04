@@ -8,8 +8,10 @@ set(CMAKE_AUTOUIC OFF)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_CXX_FLAGS "-std=c++14")
 
 set(CMAKE_PREFIX_PATH "~/Qt/5.15.2/gcc_64")
 
@@ -36,28 +38,42 @@ include_directories(
     ${EIGEN3_INCLUDE_DIR}
     ${Boost_INCLUDE_DIR}
     ${CERES_INCLUDE_DIRS}
-    ${CMAKE_SOURCE_DIR}/../../SLAM/vins_estimator/include/
-    ${CMAKE_SOURCE_DIR}/../../SLAM/camera_models/include/
+    ${CMAKE_SOURCE_DIR}/vins_estimator/include/
+    ${CMAKE_SOURCE_DIR}/camera_models/include/
 )
 
 link_directories(${PCL_LIBRARY_DIRS})
 link_directories(${Boost_LIBRARY_DIR})
 
-file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
-file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+add_subdirectory(camera_models)
+add_subdirectory(vins_estimator)
+
+file(GLOB HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
+)
+
+file(GLOB SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+)
 
 source_group("Header Files" FILES ${HEADERS})
 source_group("Source Files" FILES ${SOURCES})
 
-set(UI ${CMAKE_CURRENT_LIST_DIR}/ui/mainwindow.ui
-        ${CMAKE_CURRENT_LIST_DIR}/ui/qconfigdialog.ui)
+set(UI
+    ${CMAKE_CURRENT_LIST_DIR}/ui/mainwindow.ui
+    ${CMAKE_CURRENT_LIST_DIR}/ui/qconfigdialog.ui
+)
 
 qt5_wrap_ui(UI_HEADERS ${UI})
 
-list(APPEND RESOURCES ${CMAKE_CURRENT_LIST_DIR}/resources.qrc)
+list(APPEND RESOURCES
+    ${CMAKE_CURRENT_LIST_DIR}/resources.qrc
+)
 
-qt5_add_resources(RCC_SOURCES ${RESOURCES})
+qt5_add_resources(RCC_SOURCES
+    ${RESOURCES}
+)
 
 add_executable(AG-Mapping
     ${HEADERS}
@@ -74,10 +90,13 @@ target_link_libraries(AG-Mapping PRIVATE
     ${OpenCV_LIBS}
     ${EIGEN3_LIBS}
     ${Boost_LIBRARIES}
-    ${CERES_LIBRARIES}
-    ${CMAKE_SOURCE_DIR}/../../SLAM/lib/libvins_libDebug.so
-    ${CMAKE_SOURCE_DIR}/../../SLAM/lib/libcamera_models.so
-    -lpthread)
+    vins_lib
+    camera_models
+    Ceres::ceres
+    -lpthread
+)
+
+set_property(TARGET AG-Mapping PROPERTY CXX_STANDARD 14)
 
 #file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data
 #     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

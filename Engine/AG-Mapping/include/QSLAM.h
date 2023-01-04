@@ -5,20 +5,22 @@
 #include <QString>
 #include <QThread>
 #include <QMutex>
+#include <QStringList>
 
 #include <iostream>
 #include <pcl/io/pcd_io.h>
 #include <pcl/common/common_headers.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
-#include "parameters.h"
 #include "estimator.h"
 
 class QSLAM : public QObject
 {
     Q_OBJECT
 public:
-    QSLAM(QObject *parent = nullptr, QString settingPaths ="");
+    QSLAM(QObject *parent = nullptr, QString settingPaths = "");
+
+    void run(QStringList dataPath);
 
     void LoadImages(const string &strImagePath, const string &strTimesStampsPath,
                     vector<string> &strImagesFileNames, vector<double> &timeStamps);
