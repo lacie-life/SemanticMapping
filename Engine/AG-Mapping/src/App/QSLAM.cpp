@@ -30,8 +30,6 @@ void QSLAM::run(QStringList dataPath)
     ifstream fImus;
     fImus.open(dataPath[0].toStdString()); // check
 
-    CONSOLE << "Fucking thread";
-
     cv::Mat image;
     cv::Mat image2;
     int ni;//num image
@@ -40,6 +38,12 @@ void QSLAM::run(QStringList dataPath)
     vector<string> vStrImagesFileNames2 ;
     vector<double> vTimeStamps;
     vector<double> vTimeStamps2;
+
+    CONSOLE << dataPath[0];
+    CONSOLE << dataPath[1];
+    CONSOLE << dataPath[2];
+    CONSOLE << dataPath[3];
+
     LoadImages(string(dataPath[1].toStdString()),string(dataPath[3].toStdString()),vStrImagesFileNames,vTimeStamps); //left
     LoadImages(string(dataPath[2].toStdString()),string(dataPath[3].toStdString()),vStrImagesFileNames2,vTimeStamps2); //right
 
@@ -54,7 +58,9 @@ void QSLAM::run(QStringList dataPath)
         return;
     }
 
-    auto sync_process = [this]()
+    CONSOLE << "Fucking thread";
+
+    auto sync_process = [](QSLAM *m_slam)
     {
         int frame_id = 0;
 
@@ -65,37 +71,45 @@ void QSLAM::run(QStringList dataPath)
             std_msgs::Header header;
             double time = 0;
 
-            QMutexLocker locker(&m_mutex);
+            QMutexLocker locker(&m_slam->m_mutex);
+
             CONSOLE << "continue";
 
-            if (!this->img0_buf.empty() && !this->img1_buf.empty())
+            if (!m_slam->img0_buf.empty() && !m_slam->img1_buf.empty())
             {
-                double time0 = this->img0_buf.front().second;
-                double time1 = this->img1_buf.front().second;
+                CONSOLE << "Check time";
+
+                double time0 = m_slam->img0_buf.front().second;
+                double time1 = m_slam->img1_buf.front().second;
                 // 0.003s sync tolerance
                 if(time0 < time1 - 0.003)
                 {
-                    this->img0_buf.pop();
+                    m_slam->img0_buf.pop();
                     printf("throw img0\n");
                 }
                 else if(time0 > time1 + 0.003)
                 {
-                    this->img1_buf.pop();
+                    m_slam->img1_buf.pop();
                     printf("throw img1\n");
                 }
                 else
                 {
-                    time = this->img0_buf.front().second;
-                    image0 = this->img0_buf.front().first;
-                    this->img0_buf.pop();
-                    image1 = this->img1_buf.front().first;
-                    this->img1_buf.pop();
+                    time = m_slam->img0_buf.front().second;
+                    image0 = m_slam->img0_buf.front().first;
+                    m_slam->img0_buf.pop();
+                    image1 = m_slam->img1_buf.front().first;
+                    m_slam->img1_buf.pop();
                 }
             }
+            else
+            {
+                CONSOLE << "Empty";
+            }
+
             if(!image0.empty())
                 estimator.inputImage(time, image0, image1);
 
-            display2D(frame_id, estimator, this->visual);
+            m_slam->display2D(frame_id, estimator, m_slam->visual);
 
             frame_id++;
 
@@ -104,7 +118,7 @@ void QSLAM::run(QStringList dataPath)
         }
     };
 
-    QtConcurrent::run(sync_process);
+    QtConcurrent::run(sync_process, this);
 
 //    std::thread measurement_process{sync_process};
 //    measurement_process.detach();
@@ -159,6 +173,7 @@ void QSLAM::run(QStringList dataPath)
     }
 }
 
+
 void QSLAM::LoadImages(const string &strImagePath, const string &strTimesStampsPath, vector<string> &strImagesFileNames, vector<double> &timeStamps)
 {
     ifstream fTimes;
@@ -174,7 +189,7 @@ void QSLAM::LoadImages(const string &strImagePath, const string &strTimesStampsP
             stringstream ss;
             ss << s;
             strImagesFileNames.push_back(strImagePath + "/" + ss.str() + ".png");
-            CONSOLE << QString::fromStdString(ss.str());
+//            CONSOLE << QString::fromStdString(ss.str());
             double t;
             ss >> t;
             timeStamps.push_back(t/1e9);

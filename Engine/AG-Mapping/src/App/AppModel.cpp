@@ -17,6 +17,12 @@ AppModel::AppModel(QObject *parent)
 
     m_slam = new QSLAM();
 
+    m_slamSettingPath = PARAM_PATH;
+    m_IMUPath = QString(IMAGE_PATH) + "/imu0/data.csv";
+    m_LeftImgPath = QString(IMAGE_PATH) + "/cam0/data";
+    m_RightImgPath = QString(IMAGE_PATH) + "/cam1/data";
+    m_AssoPath = QString(IMAGE_PATH) + "/timestamp/data/time.txt";
+
     connect(m_slam, &QSLAM::slamComplete, this, []()
     {
         CONSOLE << "SLAM Completed !!";

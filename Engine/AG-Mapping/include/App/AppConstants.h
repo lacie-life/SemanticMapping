@@ -26,6 +26,10 @@
 #define BACKGOUND ":/images/data/res/background.jpg"
 #define APP_ICON ":/images/data/res/icon.png"
 
+#define PARAM_PATH "/home/lacie/Github/AG-Mapping/slam_core_test/config/stereo.yaml"
+#define IMAGE_PATH "/home/lacie/Github/Data/EuRoC/MH_01_easy/mav0"
+#define TIMESTAMP_PATH "/home/lacie/Github/AG-Mapping/data/euroc_data_timestamp/MH01.txt"
+
 #define IMAGE_WIDTH 640
 #define IMAGE_HEIGHT 480
 
