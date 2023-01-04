@@ -1,5 +1,7 @@
 #include "QSLAM.h"
 #include "AppConstants.h"
+#include <QtConcurrent>
+#include <QMutexLocker>
 
 #include "parameters.h"
 
@@ -27,6 +29,8 @@ void QSLAM::run(QStringList dataPath)
     //imu data file
     ifstream fImus;
     fImus.open(dataPath[0].toStdString()); // check
+
+    CONSOLE << "Fucking thread";
 
     cv::Mat image;
     cv::Mat image2;
@@ -60,7 +64,10 @@ void QSLAM::run(QStringList dataPath)
             cv::Mat image0, image1;
             std_msgs::Header header;
             double time = 0;
-            this->m_mutex->lock();
+
+            QMutexLocker locker(&m_mutex);
+            CONSOLE << "continue";
+
             if (!this->img0_buf.empty() && !this->img1_buf.empty())
             {
                 double time0 = this->img0_buf.front().second;
@@ -85,7 +92,6 @@ void QSLAM::run(QStringList dataPath)
                     this->img1_buf.pop();
                 }
             }
-            this->m_mutex->unlock();
             if(!image0.empty())
                 estimator.inputImage(time, image0, image1);
 
@@ -98,9 +104,10 @@ void QSLAM::run(QStringList dataPath)
         }
     };
 
-    std::thread measurement_process{sync_process};
+    QtConcurrent::run(sync_process);
 
-    measurement_process.detach();
+//    std::thread measurement_process{sync_process};
+//    measurement_process.detach();
 
     for(ni=0; ni<imageNum; ni++)
     {
@@ -167,6 +174,7 @@ void QSLAM::LoadImages(const string &strImagePath, const string &strTimesStampsP
             stringstream ss;
             ss << s;
             strImagesFileNames.push_back(strImagePath + "/" + ss.str() + ".png");
+            CONSOLE << QString::fromStdString(ss.str());
             double t;
             ss >> t;
             timeStamps.push_back(t/1e9);
@@ -236,22 +244,20 @@ void QSLAM::imu_callback(const sensor_msgs::ImuConstPtr &imu_msg)
 
 void QSLAM::img0_callback(const cv::Mat &img_msg, const double &t)
 {
-    m_mutex->lock();
+    QMutexLocker locker(&m_mutex);
     pair<cv::Mat, double> tmp;
     tmp.first=img_msg;
     tmp.second=t;
     img0_buf.push(tmp);
-    m_mutex->unlock();
 }
 
 void QSLAM::img1_callback(const cv::Mat &img_msg, const double &t)
 {
-    m_mutex->lock();
+    QMutexLocker locker(&m_mutex);
     pair<cv::Mat, double> tmp;
     tmp.first=img_msg;
     tmp.second=t;
     img1_buf.push(tmp);
-    m_mutex->unlock();
 }
 
 void QSLAM::display2D(int frame_id, const Estimator &estimator, cv::Mat &visual)

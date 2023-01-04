@@ -39,7 +39,7 @@ signals:
     void slamComplete();
 
 public:
-    QMutex *m_mutex;
+    QMutex m_mutex;
 
     queue<sensor_msgs::ImuConstPtr> imu_buf;
     queue<sensor_msgs::PointCloudConstPtr> feature_buf;

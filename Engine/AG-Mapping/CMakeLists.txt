@@ -19,8 +19,8 @@ set(CMAKE_PREFIX_PATH "~/Qt/5.15.2/gcc_64")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Concurrent)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Concurrent)
 
 find_package(OpenCV 4.2 REQUIRED)
 find_package(Eigen3 REQUIRED)
@@ -96,6 +96,7 @@ add_executable(AG-Mapping
 target_link_libraries(AG-Mapping PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
     ${VTK_LIBRARIES}
     ${PCL_LIBRARIES}
     ${OpenCV_LIBS}
