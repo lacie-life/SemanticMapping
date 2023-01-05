@@ -7,16 +7,6 @@
 
 static Estimator estimator;
 
-queue<sensor_msgs::ImuConstPtr> imu_buf;
-queue<pair<cv::Mat, double>> img0_buf;
-queue<pair<cv::Mat, double>> img1_buf;
-
-std::mutex m_mutex;
-
-queue<sensor_msgs::PointCloudConstPtr> feature_buf;
-
-cv::Mat visual = cv::Mat::zeros(600, 1200, CV_8UC3);
-
 QSLAM::QSLAM()
 {
 
@@ -31,14 +21,17 @@ void QSLAM::init(QString settingPaths)
     readParameters(settingPaths.toStdString());
 
     estimator.setParameter();
+
+    visual = cv::Mat::zeros(600, 1200, CV_8UC3);
+
 }
 
 void QSLAM::run(QStringList dataPath)
 {
-    runSLAM(dataPath, this);
+    runSLAM(dataPath);
 }
 
-void LoadImages(const string &strImagePath, const string &strTimesStampsPath, vector<string> &strImagesFileNames, vector<double> &timeStamps)
+void QSLAM::LoadImages(const string &strImagePath, const string &strTimesStampsPath, vector<string> &strImagesFileNames, vector<double> &timeStamps)
 {
     ifstream fTimes;
     fTimes.open(strTimesStampsPath.c_str());
@@ -53,7 +46,6 @@ void LoadImages(const string &strImagePath, const string &strTimesStampsPath, ve
             stringstream ss;
             ss << s;
             strImagesFileNames.push_back(strImagePath + "/" + ss.str() + ".png");
-//            CONSOLE << QString::fromStdString(ss.str());
             double t;
             ss >> t;
             timeStamps.push_back(t/1e9);
@@ -62,10 +54,8 @@ void LoadImages(const string &strImagePath, const string &strTimesStampsPath, ve
 
 }
 
-void LoadImus(ifstream &fImus, const ros::Time &imageTimestamp)
+void QSLAM::LoadImus(ifstream &fImus, const ros::Time &imageTimestamp)
 {
-    CONSOLE << "Load IMU: " << imageTimestamp.toSec();
-
     while(!fImus.eof())
     {
         string s;
@@ -108,9 +98,8 @@ void LoadImus(ifstream &fImus, const ros::Time &imageTimestamp)
     }
 }
 
-void imu_callback(const sensor_msgs::ImuConstPtr &imu_msg)
+void QSLAM::imu_callback(const sensor_msgs::ImuConstPtr &imu_msg)
 {
-    CONSOLE << "CallBack IMU";
     double t = imu_msg->header.stamp.toSec();
     double dx = imu_msg->linear_acceleration.x;
     double dy = imu_msg->linear_acceleration.y;
@@ -124,32 +113,30 @@ void imu_callback(const sensor_msgs::ImuConstPtr &imu_msg)
     return;
 }
 
-void img0_callback(const cv::Mat &img_msg, const double &t)
+void QSLAM::img0_callback(const cv::Mat &img_msg, const double &t)
 {
-    CONSOLE << "CallBack 0";
-    m_mutex.lock();
+    QMutexLocker locker(&m_mutex);
     pair<cv::Mat, double> tmp;
     tmp.first=img_msg;
     tmp.second=t;
     img0_buf.push(tmp);
-    m_mutex.unlock();
 }
 
-void img1_callback(const cv::Mat &img_msg, const double &t)
+void QSLAM::img1_callback(const cv::Mat &img_msg, const double &t)
 {
-    CONSOLE << "CallBack 1";
-    m_mutex.lock();
+    QMutexLocker locker(&m_mutex);
     pair<cv::Mat, double> tmp;
     tmp.first=img_msg;
     tmp.second=t;
     img1_buf.push(tmp);
-    m_mutex.unlock();
 }
 
-void display2D(int frame_id, const Estimator &estimator, cv::Mat &visual)
+void QSLAM::display2D(int frame_id, const Estimator &estimator, cv::Mat &visual)
 {
     if (estimator.solver_flag == Estimator::SolverFlag::NON_LINEAR)
     {
+        CONSOLE << "Displaying ... ";
+
         nav_msgs::Odometry odometry;
 
         odometry.pose.pose.position.x = estimator.Ps[WINDOW_SIZE].x();
@@ -159,19 +146,21 @@ void display2D(int frame_id, const Estimator &estimator, cv::Mat &visual)
         // draw estimated trajectory
         int x = int(odometry.pose.pose.position.x) + 300;
         int y = int(odometry.pose.pose.position.y) + 100;
+
+        CONSOLE << "x: " << x << " " << "y: " << y;
+
         circle(visual, cv::Point(x, y) ,1, CV_RGB(255,0,0), 2);
 
-        cv::imshow( "Trajectory", visual);
+        cv::cvtColor(visual, visual, cv::COLOR_BGR2RGB);
 
-        cv::waitKey(1);
-    }
-    else
-    {
-        CONSOLE << "Initing ... ";
+        QImage result = QImage((const unsigned char*)(visual.data),
+                               visual.cols, visual.rows, QImage::Format_RGB888);
+
+        emit trajectoryUpdate(result);
     }
 }
 
-void sync_process()
+void sync_process(QSLAM *m_slam)
 {
     int frame_id = 0;
 
@@ -182,45 +171,39 @@ void sync_process()
         std_msgs::Header header;
         double time = 0;
 
-        m_mutex.lock();
+        QMutexLocker locker(&m_slam->m_mutex);
 
-        CONSOLE << "continue";
+//        CONSOLE << "continue -> " << (img0_buf.empty() && img1_buf.empty());
 
-        if (!img0_buf.empty() && !img1_buf.empty())
+        if (!m_slam->img0_buf.empty() && !m_slam->img1_buf.empty())
         {
             CONSOLE << "Check time";
 
-            double time0 = img0_buf.front().second;
-            double time1 = img1_buf.front().second;
+            double time0 = m_slam->img0_buf.front().second;
+            double time1 = m_slam->img1_buf.front().second;
 
             CONSOLE << time0;
 
             // 0.003s sync tolerance
             if(time0 < time1 - 0.003)
             {
-                img0_buf.pop();
+                m_slam->img0_buf.pop();
                 printf("throw img0\n");
             }
             else if(time0 > time1 + 0.003)
             {
-                img1_buf.pop();
+                m_slam->img1_buf.pop();
                 printf("throw img1\n");
             }
             else
             {
-                time = img0_buf.front().second;
-                image0 = img0_buf.front().first;
-                img0_buf.pop();
-                image1 = img1_buf.front().first;
-                img1_buf.pop();
+                time = m_slam->img0_buf.front().second;
+                image0 = m_slam->img0_buf.front().first;
+                m_slam->img0_buf.pop();
+                image1 = m_slam->img1_buf.front().first;
+                m_slam->img1_buf.pop();
             }
         }
-        else
-        {
-            CONSOLE << "Empty";
-        }
-
-        m_mutex.unlock();
 
         if(!image0.empty())
         {
@@ -228,16 +211,39 @@ void sync_process()
             estimator.inputImage(time, image0, image1);
         }
 
-        display2D(frame_id, estimator, visual);
+        if (estimator.solver_flag == Estimator::SolverFlag::NON_LINEAR)
+        {
+            CONSOLE << "Displaying ... ";
+
+            nav_msgs::Odometry odometry;
+
+            odometry.pose.pose.position.x = estimator.Ps[WINDOW_SIZE].x();
+            odometry.pose.pose.position.y = estimator.Ps[WINDOW_SIZE].y();
+            odometry.pose.pose.position.z = estimator.Ps[WINDOW_SIZE].z();
+
+            // draw estimated trajectory
+            int x = int(odometry.pose.pose.position.x) + 300;
+            int y = int(odometry.pose.pose.position.y) + 100;
+
+            CONSOLE << "x: " << x << " " << "y: " << y;
+
+            circle(m_slam->visual, cv::Point(x, y) ,1, CV_RGB(255,0,0), 2);
+
+            cv::cvtColor(m_slam->visual, m_slam->visual, cv::COLOR_BGR2RGB);
+
+            QImage result = QImage((const unsigned char*)(m_slam->visual.data),
+                                   m_slam->visual.cols, m_slam->visual.rows, QImage::Format_RGB888);
+
+            emit m_slam->trajectoryUpdate(result);
+        }
 
         frame_id++;
 
-        std::chrono::milliseconds dura(1);
-        std::this_thread::sleep_for(dura);
+//        QThread::msleep(1);
     }
 }
 
-void runSLAM(QStringList dataPath, QSLAM *m_slam)
+void QSLAM::runSLAM(QStringList dataPath)
 {
     CONSOLE << "Fucking thread";
 
@@ -275,10 +281,10 @@ void runSLAM(QStringList dataPath, QSLAM *m_slam)
 
     CONSOLE << "Fucking thread";
 
-//    QtConcurrent::run(sync_process);
+    QtConcurrent::run(sync_process, this);
 
-    std::thread measurement_process{sync_process};
-    measurement_process.detach();
+//    std::thread measurement_process{sync_process};
+//    measurement_process.detach();
 
     for(ni=0; ni<imageNum; ni++)
     {
@@ -297,7 +303,7 @@ void runSLAM(QStringList dataPath, QSLAM *m_slam)
         // read imu data
         LoadImus(fImus,image_timestamp); //TODO
 
-        CONSOLE << QString::fromStdString(vStrImagesFileNames[ni]);
+//        CONSOLE << QString::fromStdString(vStrImagesFileNames[ni]);
 
         //read image from file
         image = cv::imread(vStrImagesFileNames[ni],cv::IMREAD_UNCHANGED);
@@ -332,6 +338,6 @@ void runSLAM(QStringList dataPath, QSLAM *m_slam)
 
     if (ni >= imageNum)
     {
-        emit m_slam->slamComplete();
+        emit slamComplete();
     }
 }

@@ -106,6 +106,7 @@ void Estimator::setParameter()
     featureTracker.readIntrinsicParameter(CAM_NAMES);
 
     std::cout << "MULTIPLE_THREAD is " << MULTIPLE_THREAD << '\n';
+
     if (MULTIPLE_THREAD && !initThreadFlag)
     {
         initThreadFlag = true;
@@ -162,7 +163,8 @@ void Estimator::inputImage(double t, const cv::Mat &_img, const cv::Mat &_img1)
         featureFrame = featureTracker.trackImage(t, _img);
     else
         featureFrame = featureTracker.trackImage(t, _img, _img1);
-    printf("featureTracker time: %f\n", featureTrackerTime.toc());
+
+    std::cout << "featureTracker time: " << featureTrackerTime.toc() << "\n";
 
     if (SHOW_TRACK)
     {
@@ -453,6 +455,7 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
 
     if (solver_flag == INITIAL)
     {
+        std::cout << "Solver Flag " << solver_flag << "\n";
         // monocular + IMU initilization
         if (!STEREO && USE_IMU)
         {
@@ -501,7 +504,7 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
                 optimization();
                 slideWindow();
                 // ROS_INFO("Initialization finish!");
-                printf("Initialization finish! \n");
+                std::cout << "Initialization finish! \n";
             }
         }
 

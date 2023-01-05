@@ -41,7 +41,7 @@ body_T_cam1: !!opencv-matrix
           0, 0, 0, 1]
 
 #Multiple thread support
-multiple_thread: 8
+multiple_thread: 0
 use_gpu: 0
 use_gpu_acc_flow: 0
 
@@ -51,7 +51,7 @@ min_dist: 30            # min distance between two features
 freq: 0                # frequence (Hz) of publish tracking result. At least 10Hz for good estimation. If set 0, the frequence will be same as raw image 
 F_threshold: 1.0        # ransac threshold (pixel)
 show_track: 0           # publish tracking image as topic
-show_TMI? : 0
+show_TMI? : 1
 fisheye : 0
 fisheye_mask_name : "test.png" # has to be in same folder with this file.
 thread_affine : 1

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMutex>
+#include <QImage>
 
 #include "AppEnums.h"
 #include "QSLAM.h"
@@ -17,6 +18,9 @@ public:
 
 public slots:
     void SLAM_Run();
+
+signals:
+    void updateTrajactory(QImage image);
 
 private:
     AppModel(QObject* parent = nullptr);

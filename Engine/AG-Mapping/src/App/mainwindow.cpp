@@ -21,6 +21,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->system_config, &QPushButton::clicked, this->m_configDiaglog, &QConfigDialog::open);
     connect(m_configDiaglog, &QConfigDialog::configDone, this, &MainWindow::SLAMInforDisplay);
     connect(ui->run_action, &QPushButton::clicked, this->m_model, &AppModel::SLAM_Run);
+    connect(this->m_model, &AppModel::updateTrajactory, ui->trajectory_display, [this](QImage img)
+    {
+        CONSOLE << "set display";
+        this->ui->trajectory_display->setPixmap(QPixmap::fromImage(img));
+    });
 }
 
 MainWindow::~MainWindow()

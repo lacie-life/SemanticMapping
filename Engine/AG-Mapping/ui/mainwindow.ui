@@ -56,6 +56,19 @@
      <string>SLAM Type: </string>
     </property>
    </widget>
+   <widget class="QLabel" name="trajectory_display">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>40</y>
+      <width>591</width>
+      <height>461</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

@@ -6,6 +6,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QStringList>
+#include <QImage>
 
 #include <iostream>
 #include <pcl/io/pcd_io.h>
@@ -24,23 +25,35 @@ public:
 
     void run(QStringList dataPath);
 
+    void LoadImages(const string &strImagePath, const string &strTimesStampsPath,
+                    vector<string> &strImagesFileNames, vector<double> &timeStamps);
+    void LoadImus(ifstream & fImus, const ros::Time &imageTimestamp);
+
+    // Callback function
+    void imu_callback(const sensor_msgs::ImuConstPtr &imu_msg);
+    void img0_callback(const cv::Mat &img_msg, const double &t);
+    void img1_callback(const cv::Mat &img_msg, const double &t);
+
+    void runSLAM(QStringList dataPath);
+
+    void display2D(int frame_id, const Estimator &estimator, cv::Mat& visual);
+
 signals:
     void slamComplete();
+    void trajectoryUpdate(QImage img);
+
+public:
+    cv::Mat visual;
+
+    queue<sensor_msgs::ImuConstPtr> imu_buf;
+    queue<pair<cv::Mat, double>> img0_buf;
+    queue<pair<cv::Mat, double>> img1_buf;
+
+    QMutex m_mutex;
+
+    queue<sensor_msgs::PointCloudConstPtr> feature_buf;
 };
 
-void LoadImages(const string &strImagePath, const string &strTimesStampsPath,
-                vector<string> &strImagesFileNames, vector<double> &timeStamps);
-void LoadImus(ifstream & fImus, const ros::Time &imageTimestamp);
-
-// Callback function
-void imu_callback(const sensor_msgs::ImuConstPtr &imu_msg);
-void img0_callback(const cv::Mat &img_msg, const double &t);
-void img1_callback(const cv::Mat &img_msg, const double &t);
-
-void display2D(int frame_id, const Estimator &estimator, cv::Mat& visual);
-
-void runSLAM(QStringList dataPath, QSLAM *m_slam);
-
-void sync_process();
+static void sync_process(QSLAM *m_slam);
 
 #endif // QSLAM_H
