@@ -7,6 +7,16 @@
 
 static Estimator estimator;
 
+queue<sensor_msgs::ImuConstPtr> imu_buf;
+queue<pair<cv::Mat, double>> img0_buf;
+queue<pair<cv::Mat, double>> img1_buf;
+
+std::mutex m_mutex;
+
+queue<sensor_msgs::PointCloudConstPtr> feature_buf;
+
+cv::Mat visual = cv::Mat::zeros(600, 1200, CV_8UC3);
+
 QSLAM::QSLAM()
 {
 }
@@ -15,166 +25,20 @@ void QSLAM::init(QString settingPaths)
 {
     CONSOLE << "Init SLAM ";
 
+    CONSOLE << "Setting path: " << settingPaths;
+
     readParameters(settingPaths.toStdString());
 
     estimator.setParameter();
-
-    visual = cv::Mat::zeros(600, 1200, CV_8UC3);
 }
 
 void QSLAM::run(QStringList dataPath)
 {
-    CONSOLE << "Fucking thread";
-
-    //imu data file
-    ifstream fImus;
-    fImus.open(dataPath[0].toStdString()); // check
-
-    cv::Mat image;
-    cv::Mat image2;
-    int ni;//num image
-
-    vector<string> vStrImagesFileNames;
-    vector<string> vStrImagesFileNames2 ;
-    vector<double> vTimeStamps;
-    vector<double> vTimeStamps2;
-
-    CONSOLE << dataPath[0];
-    CONSOLE << dataPath[1];
-    CONSOLE << dataPath[2];
-    CONSOLE << dataPath[3];
-
-    LoadImages(string(dataPath[1].toStdString()),string(dataPath[3].toStdString()),vStrImagesFileNames,vTimeStamps); //left
-    LoadImages(string(dataPath[2].toStdString()),string(dataPath[3].toStdString()),vStrImagesFileNames2,vTimeStamps2); //right
-
-    int tmp_imageNum = vStrImagesFileNames.size();
-    int tmp_imageNum2 = vStrImagesFileNames2.size();
-    int imageNum = (tmp_imageNum<tmp_imageNum2)?tmp_imageNum2:tmp_imageNum; // I am good at coding. hahaha
-
-
-    if(imageNum<=0)
-    {
-        cerr << "ERROR: Failed to load images" << endl;
-        return;
-    }
-
-    CONSOLE << "Fucking thread";
-
-    auto sync_process = [](QSLAM *m_slam)
-    {
-        int frame_id = 0;
-
-        CONSOLE << "Start SLAM";
-
-        while (1) {
-            cv::Mat image0, image1;
-            std_msgs::Header header;
-            double time = 0;
-
-            QMutexLocker locker(&m_slam->m_mutex);
-
-            CONSOLE << "continue";
-
-            if (!m_slam->img0_buf.empty() && !m_slam->img1_buf.empty())
-            {
-                CONSOLE << "Check time";
-
-                double time0 = m_slam->img0_buf.front().second;
-                double time1 = m_slam->img1_buf.front().second;
-                // 0.003s sync tolerance
-                if(time0 < time1 - 0.003)
-                {
-                    m_slam->img0_buf.pop();
-                    printf("throw img0\n");
-                }
-                else if(time0 > time1 + 0.003)
-                {
-                    m_slam->img1_buf.pop();
-                    printf("throw img1\n");
-                }
-                else
-                {
-                    time = m_slam->img0_buf.front().second;
-                    image0 = m_slam->img0_buf.front().first;
-                    m_slam->img0_buf.pop();
-                    image1 = m_slam->img1_buf.front().first;
-                    m_slam->img1_buf.pop();
-                }
-            }
-            else
-            {
-                CONSOLE << "Empty";
-            }
-
-            if(!image0.empty())
-                estimator.inputImage(time, image0, image1);
-
-            m_slam->display2D(frame_id, estimator, m_slam->visual);
-
-            frame_id++;
-
-            std::chrono::milliseconds dura(1);
-            std::this_thread::sleep_for(dura);
-        }
-    };
-
-    QtConcurrent::run(sync_process, this);
-
-//    std::thread measurement_process{sync_process};
-//    measurement_process.detach();
-
-    for(ni=0; ni<imageNum; ni++)
-    {
-        CONSOLE << ni;
-        double  tframe = vTimeStamps[ni];   //timestamp
-        uint32_t  sec = tframe;
-        uint32_t nsec = (tframe-sec)*1e9;
-        nsec = (nsec/1000)*1000+500;
-        ros::Time image_timestamp = ros::Time(sec, nsec);
-        double  tframe2 = vTimeStamps2[ni];   //timestamp
-        uint32_t  sec2 = tframe2;
-        uint32_t nsec2 = (tframe2-sec2)*1e9;
-        nsec2 = (nsec2/1000)*1000+500;
-        ros::Time image_timestamp2 = ros::Time(sec2, nsec2);
-        // read imu data
-        LoadImus(fImus,image_timestamp); //TODO
-
-        //read image from file
-        image = cv::imread(vStrImagesFileNames[ni],cv::IMREAD_UNCHANGED);
-        image2 = cv::imread(vStrImagesFileNames2[ni],cv::IMREAD_UNCHANGED);
-
-        if(image.empty() or image2.empty())
-        {
-            cerr << endl << "Failed to load image: " << vStrImagesFileNames[ni] <<endl;
-            return;
-        }
-        std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
-        img0_callback(image, image_timestamp.toSec());
-        img1_callback(image2, image_timestamp2.toSec());
-        std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
-        double timeSpent =std::chrono::duration_cast<std::chrono::duration<double>>(t2-t1).count();
-
-        //wait to load the next frame image
-        double T=0;
-        if(ni < imageNum-1)
-            T = vTimeStamps[ni+1]-tframe; //interval time between two consecutive frames,unit:second
-        else if(ni>0)    //lastest frame
-            T = tframe-vTimeStamps[ni-1];
-
-        if(timeSpent < T)
-            usleep((T-timeSpent)*1e6); //sec->us:1e6
-        else
-            cerr << endl << "process image speed too slow, larger than interval time between two consecutive frames" << endl;
-    }
-
-    if (ni >= imageNum)
-    {
-        emit slamComplete();
-    }
+    runSLAM(dataPath, this);
 }
 
 
-void QSLAM::LoadImages(const string &strImagePath, const string &strTimesStampsPath, vector<string> &strImagesFileNames, vector<double> &timeStamps)
+void LoadImages(const string &strImagePath, const string &strTimesStampsPath, vector<string> &strImagesFileNames, vector<double> &timeStamps)
 {
     ifstream fTimes;
     fTimes.open(strTimesStampsPath.c_str());
@@ -198,8 +62,10 @@ void QSLAM::LoadImages(const string &strImagePath, const string &strTimesStampsP
 
 }
 
-void QSLAM::LoadImus(ifstream &fImus, const ros::Time &imageTimestamp)
+void LoadImus(ifstream &fImus, const ros::Time &imageTimestamp)
 {
+    CONSOLE << "Load IMU: " << imageTimestamp.toSec();
+
     while(!fImus.eof())
     {
         string s;
@@ -242,8 +108,9 @@ void QSLAM::LoadImus(ifstream &fImus, const ros::Time &imageTimestamp)
     }
 }
 
-void QSLAM::imu_callback(const sensor_msgs::ImuConstPtr &imu_msg)
+void imu_callback(const sensor_msgs::ImuConstPtr &imu_msg)
 {
+    CONSOLE << "CallBack IMU";
     double t = imu_msg->header.stamp.toSec();
     double dx = imu_msg->linear_acceleration.x;
     double dy = imu_msg->linear_acceleration.y;
@@ -257,25 +124,29 @@ void QSLAM::imu_callback(const sensor_msgs::ImuConstPtr &imu_msg)
     return;
 }
 
-void QSLAM::img0_callback(const cv::Mat &img_msg, const double &t)
+void img0_callback(const cv::Mat &img_msg, const double &t)
 {
-    QMutexLocker locker(&m_mutex);
+    CONSOLE << "CallBack 0";
+    m_mutex.lock();
     pair<cv::Mat, double> tmp;
     tmp.first=img_msg;
     tmp.second=t;
     img0_buf.push(tmp);
+    m_mutex.unlock();
 }
 
-void QSLAM::img1_callback(const cv::Mat &img_msg, const double &t)
+void img1_callback(const cv::Mat &img_msg, const double &t)
 {
-    QMutexLocker locker(&m_mutex);
+    CONSOLE << "CallBack 1";
+    m_mutex.lock();
     pair<cv::Mat, double> tmp;
     tmp.first=img_msg;
     tmp.second=t;
     img1_buf.push(tmp);
+    m_mutex.unlock();
 }
 
-void QSLAM::display2D(int frame_id, const Estimator &estimator, cv::Mat &visual)
+void display2D(int frame_id, const Estimator &estimator, cv::Mat &visual)
 {
     if (estimator.solver_flag == Estimator::SolverFlag::NON_LINEAR)
     {
@@ -293,5 +164,174 @@ void QSLAM::display2D(int frame_id, const Estimator &estimator, cv::Mat &visual)
         cv::imshow( "Trajectory", visual);
 
         cv::waitKey(1);
+    }
+    else
+    {
+        CONSOLE << "Initing ... ";
+    }
+}
+
+void sync_process()
+{
+    int frame_id = 0;
+
+    CONSOLE << "Start SLAM";
+
+    while (1) {
+        cv::Mat image0, image1;
+        std_msgs::Header header;
+        double time = 0;
+
+        m_mutex.lock();
+
+        CONSOLE << "continue";
+
+        if (!img0_buf.empty() && !img1_buf.empty())
+        {
+            CONSOLE << "Check time";
+
+            double time0 = img0_buf.front().second;
+            double time1 = img1_buf.front().second;
+
+            CONSOLE << time0;
+
+            // 0.003s sync tolerance
+            if(time0 < time1 - 0.003)
+            {
+                img0_buf.pop();
+                printf("throw img0\n");
+            }
+            else if(time0 > time1 + 0.003)
+            {
+                img1_buf.pop();
+                printf("throw img1\n");
+            }
+            else
+            {
+                time = img0_buf.front().second;
+                image0 = img0_buf.front().first;
+                img0_buf.pop();
+                image1 = img1_buf.front().first;
+                img1_buf.pop();
+            }
+        }
+        else
+        {
+            CONSOLE << "Empty";
+        }
+
+        m_mutex.unlock();
+
+        if(!image0.empty())
+        {
+            CONSOLE << "Process";
+            estimator.inputImage(time, image0, image1);
+        }
+
+        display2D(frame_id, estimator, visual);
+
+        frame_id++;
+
+        std::chrono::milliseconds dura(1);
+        std::this_thread::sleep_for(dura);
+    }
+}
+
+void runSLAM(QStringList dataPath, QSLAM *m_slam)
+{
+    CONSOLE << "Fucking thread";
+
+    //imu data file
+    ifstream fImus;
+    fImus.open(dataPath[0].toStdString()); // check
+
+    cv::Mat image;
+    cv::Mat image2;
+    int ni;//num image
+
+    vector<string> vStrImagesFileNames;
+    vector<string> vStrImagesFileNames2 ;
+    vector<double> vTimeStamps;
+    vector<double> vTimeStamps2;
+
+    CONSOLE << dataPath[0];
+    CONSOLE << dataPath[1];
+    CONSOLE << dataPath[2];
+    CONSOLE << dataPath[3];
+
+    LoadImages(dataPath[1].toStdString(), dataPath[3].toStdString(),vStrImagesFileNames,vTimeStamps); //left
+    LoadImages(dataPath[2].toStdString(), dataPath[3].toStdString(),vStrImagesFileNames2,vTimeStamps2); //right
+
+    int tmp_imageNum = vStrImagesFileNames.size();
+    int tmp_imageNum2 = vStrImagesFileNames2.size();
+    int imageNum = (tmp_imageNum<tmp_imageNum2)?tmp_imageNum2:tmp_imageNum; // I am good at coding. hahaha
+
+
+    if(imageNum<=0)
+    {
+        cerr << "ERROR: Failed to load images" << endl;
+        return;
+    }
+
+    CONSOLE << "Fucking thread";
+
+//    QtConcurrent::run(sync_process);
+
+    std::thread measurement_process{sync_process};
+    measurement_process.detach();
+
+    for(ni=0; ni<imageNum; ni++)
+    {
+        CONSOLE << ni;
+        double  tframe = vTimeStamps[ni];   //timestamp
+        uint32_t  sec = tframe;
+        uint32_t nsec = (tframe-sec)*1e9;
+        nsec = (nsec/1000)*1000+500;
+        ros::Time image_timestamp = ros::Time(sec, nsec);
+        double  tframe2 = vTimeStamps2[ni];   //timestamp
+        uint32_t  sec2 = tframe2;
+        uint32_t nsec2 = (tframe2-sec2)*1e9;
+        nsec2 = (nsec2/1000)*1000+500;
+        ros::Time image_timestamp2 = ros::Time(sec2, nsec2);
+
+        // read imu data
+        LoadImus(fImus,image_timestamp); //TODO
+
+        CONSOLE << QString::fromStdString(vStrImagesFileNames[ni]);
+
+        //read image from file
+        image = cv::imread(vStrImagesFileNames[ni],cv::IMREAD_UNCHANGED);
+        image2 = cv::imread(vStrImagesFileNames2[ni],cv::IMREAD_UNCHANGED);
+
+        if(image.empty() or image2.empty())
+        {
+            cerr << endl << "Failed to load image: " << vStrImagesFileNames[ni] <<endl;
+            return;
+        }
+
+        std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+
+        img0_callback(image, image_timestamp.toSec());
+        img1_callback(image2, image_timestamp2.toSec());
+
+        std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+        double timeSpent =std::chrono::duration_cast<std::chrono::duration<double>>(t2-t1).count();
+
+        //wait to load the next frame image
+        double T=0;
+        if(ni < imageNum-1)
+            T = vTimeStamps[ni+1]-tframe; //interval time between two consecutive frames,unit:second
+        else if(ni>0)    //lastest frame
+            T = tframe-vTimeStamps[ni-1];
+
+        if(timeSpent < T)
+            usleep((T-timeSpent)*1e6); //sec->us:1e6
+        else
+            cerr << endl << "process image speed too slow, larger than interval time between two consecutive frames" << endl;
+    }
+
+    if (ni >= imageNum)
+    {
+        emit m_slam->slamComplete();
     }
 }

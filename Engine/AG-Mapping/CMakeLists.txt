@@ -13,7 +13,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS "-std=c++14")
+set(CMAKE_CXX_FLAGS "-std=c++17")
 
 set(CMAKE_PREFIX_PATH "~/Qt/5.15.2/gcc_64")
 
@@ -106,8 +106,9 @@ target_link_libraries(AG-Mapping PRIVATE
     -lpthread
 )
 
-set_property(TARGET AG-Mapping PROPERTY CXX_STANDARD 14)
+# Ref: http://eigen.tuxfamily.org/dox-devel/group__TopicUnalignedArrayAssert.html
+set_property(TARGET AG-Mapping PROPERTY CXX_STANDARD 17)
 
-#file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data
-#     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/config
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
