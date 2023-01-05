@@ -14,29 +14,6 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QVTKOpenGLNativeWidget" name="pcl_widget" native="true">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>20</y>
-      <width>581</width>
-      <height>521</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="openPCD">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>20</y>
-      <width>101</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Open</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="system_config">
     <property name="geometry">
      <rect>
@@ -92,14 +69,6 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QVTKOpenGLNativeWidget</class>
-   <extends>QWidget</extends>
-   <header>QVTKOpenGLNativeWidget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -9,7 +9,6 @@ class AppEnums : public QObject
     Q_ENUMS(APP_STATE)
     Q_ENUMS(VSLAM_MODE)
     Q_ENUMS(VSLAM_STATE)
-    Q_ENUMS(PCL_VISUAL_MODE)
 
 public:
 
@@ -40,12 +39,6 @@ public:
         PAUSE_STATE,
         STOP_STATE,
         VSLAM_END_STATE,
-    };
-
-    enum PCL_VISUAL_MODE
-    {
-        INTERACTIVE_MODE,
-        RENDER_MODE,
     };
 
 signals:

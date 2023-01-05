@@ -19,6 +19,7 @@ cv::Mat visual = cv::Mat::zeros(600, 1200, CV_8UC3);
 
 QSLAM::QSLAM()
 {
+
 }
 
 void QSLAM::init(QString settingPaths)
@@ -36,7 +37,6 @@ void QSLAM::run(QStringList dataPath)
 {
     runSLAM(dataPath, this);
 }
-
 
 void LoadImages(const string &strImagePath, const string &strTimesStampsPath, vector<string> &strImagesFileNames, vector<double> &timeStamps)
 {

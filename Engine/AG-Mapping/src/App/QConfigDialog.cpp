@@ -31,8 +31,7 @@ QConfigDialog::~QConfigDialog()
 
 void QConfigDialog::display()
 {
-//    this->ui->imu_Num->setText(QString::number(USE_IMU));
-//    this->ui->cam_Num->setText(QString::number(NUM_OF_CAM));
+
 }
 
 void QConfigDialog::readSetting()
@@ -44,27 +43,6 @@ void QConfigDialog::readSetting()
     m_model->m_slamSettingPath = config_path;
 
     m_model->set_slam_type(AppEnums::VSLAM_TYPE::STEREO_IMU);
-
-//    readParameters(config_path.toStdString());
-
-//    if (USE_IMU == 1 && NUM_OF_CAM == 1)
-//    {
-//        m_model->set_slam_type(AppEnums::VSLAM_TYPE::MONO_IMU);
-//    }
-//    else if (USE_IMU == 0 && NUM_OF_CAM == 1)
-//    {
-//        m_model->set_slam_type(AppEnums::VSLAM_TYPE::MONO);
-//    }
-//    else if (USE_IMU == 0 && NUM_OF_CAM == 2)
-//    {
-//        m_model->set_slam_type(AppEnums::VSLAM_TYPE::STEREO);
-//    }
-//    else if (USE_IMU == 1 && NUM_OF_CAM == 2)
-//    {
-//        m_model->set_slam_type(AppEnums::VSLAM_TYPE::STEREO_IMU);
-//    }
-
-//    CONSOLE << m_model->get_slam_type();
 
     this->display();
 }
@@ -83,30 +61,6 @@ void QConfigDialog::readSeq()
     CONSOLE << m_model->m_LeftImgPath;
     CONSOLE << m_model->m_RightImgPath;
     CONSOLE << m_model->m_AssoPath;
-
-//    if(USE_IMU)
-//    {
-//        m_model->m_IMUPath = m_model->m_seqPath + "/imu0/data.csv";
-//        CONSOLE << m_model->m_IMUPath;
-//    }
-//    if (NUM_OF_CAM == 1)
-//    {
-//        m_model->m_ImgPath = m_model->m_seqPath + "/cam0/data";
-//        m_model->m_AssoPath = m_model->m_seqPath + "/timestamp/data/time.txt";
-
-//        CONSOLE << m_model->m_ImgPath;
-//        CONSOLE << m_model->m_AssoPath;
-//    }
-//    if(NUM_OF_CAM == 2)
-//    {
-//        m_model->m_LeftImgPath = m_model->m_seqPath + "/cam0/data";
-//        m_model->m_RightImgPath = m_model->m_seqPath + "/cam1/data";
-//        m_model->m_AssoPath = m_model->m_seqPath + "/timestamp/data/time.txt";
-
-//        CONSOLE << m_model->m_LeftImgPath;
-//        CONSOLE << m_model->m_RightImgPath;
-//        CONSOLE << m_model->m_AssoPath;
-//    }
 }
 
 void QConfigDialog::readGT()
@@ -145,7 +99,7 @@ void QConfigDialog::configReset()
 
 void QConfigDialog::configClose()
 {
-    // TODO: Check path/file availabel
+    // TODO: Check path/file available
     emit configDone();
     this->close();
 }

@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 
-#include "QPCLVisual.h"
 #include "QConfigDialog.h"
 #include "AppModel.h"
 
@@ -20,16 +19,12 @@ public:
     ~MainWindow();
 
 signals:
-    void pcdFile(QString path);
 
 public slots:
-    void chooseFile();
-    void updatePCLWidget();
     void SLAMInforDisplay();
 
 private:
     Ui::MainWindow *ui;
-    QPCLVisual *m_PCLWidget;
     QConfigDialog *m_configDiaglog;
 
     AppModel *m_model;
