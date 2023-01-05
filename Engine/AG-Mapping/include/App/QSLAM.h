@@ -38,11 +38,14 @@ public:
 
     void display2D(int frame_id, const Estimator &estimator, cv::Mat& visual);
 
-signals:
-    void slamComplete();
     void trajectoryUpdate(QImage img);
 
+signals:
+    void slamComplete();
+    void trajectoryUpdateNoti(QImage img);
+
 public:
+    QImage m_traj;
     cv::Mat visual;
 
     queue<sensor_msgs::ImuConstPtr> imu_buf;

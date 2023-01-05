@@ -28,7 +28,7 @@ AppModel::AppModel(QObject *parent)
         CONSOLE << "SLAM Completed !!";
     });
 
-    connect(m_slam, &QSLAM::trajectoryUpdate, m_slam, [this](QImage img)
+    connect(m_slam, &QSLAM::trajectoryUpdateNoti, m_slam, [this](QImage img)
     {
         CONSOLE << "Test ?";
         emit this->updateTrajactory(img);

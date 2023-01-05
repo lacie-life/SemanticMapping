@@ -156,8 +156,16 @@ void QSLAM::display2D(int frame_id, const Estimator &estimator, cv::Mat &visual)
         QImage result = QImage((const unsigned char*)(visual.data),
                                visual.cols, visual.rows, QImage::Format_RGB888);
 
-        emit trajectoryUpdate(result);
+        trajectoryUpdate(result);
     }
+}
+
+void QSLAM::trajectoryUpdate(QImage img)
+{
+//    QMutexLocker locker(&m_mutex);
+    m_traj = img;
+
+    emit trajectoryUpdateNoti(m_traj);
 }
 
 void sync_process(QSLAM *m_slam)
@@ -225,7 +233,9 @@ void sync_process(QSLAM *m_slam)
             int x = int(odometry.pose.pose.position.x) + 300;
             int y = int(odometry.pose.pose.position.y) + 100;
 
-            CONSOLE << "x: " << x << " " << "y: " << y;
+            CONSOLE << "x: " << estimator.Ps[WINDOW_SIZE].x() << " " << "y: " << estimator.Ps[WINDOW_SIZE].y() << "z: " << estimator.Ps[WINDOW_SIZE].z();
+
+//            QMutexLocker locker(&m_slam->m_mutex);
 
             circle(m_slam->visual, cv::Point(x, y) ,1, CV_RGB(255,0,0), 2);
 
@@ -234,7 +244,7 @@ void sync_process(QSLAM *m_slam)
             QImage result = QImage((const unsigned char*)(m_slam->visual.data),
                                    m_slam->visual.cols, m_slam->visual.rows, QImage::Format_RGB888);
 
-            emit m_slam->trajectoryUpdate(result);
+            m_slam->trajectoryUpdate(result);
         }
 
         frame_id++;
@@ -334,6 +344,7 @@ void QSLAM::runSLAM(QStringList dataPath)
             usleep((T-timeSpent)*1e6); //sec->us:1e6
         else
             cerr << endl << "process image speed too slow, larger than interval time between two consecutive frames" << endl;
+
     }
 
     if (ni >= imageNum)
