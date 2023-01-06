@@ -5,11 +5,9 @@
 
 #include "parameters.h"
 
-static Estimator estimator;
-
 QSLAM::QSLAM()
 {
-
+    m_estimator = new Estimator();
 }
 
 void QSLAM::init(QString settingPaths)
@@ -20,9 +18,9 @@ void QSLAM::init(QString settingPaths)
 
     readParameters(settingPaths.toStdString());
 
-    estimator.setParameter();
+    m_estimator->setParameter();
 
-    visual = cv::Mat::zeros(600, 1200, CV_8UC3);
+    visual = cv::Mat::zeros(600, 490, CV_8UC3);
 
 }
 
@@ -109,7 +107,7 @@ void QSLAM::imu_callback(const sensor_msgs::ImuConstPtr &imu_msg)
     double rz = imu_msg->angular_velocity.z;
     Vector3d acc(dx, dy, dz);
     Vector3d gyr(rx, ry, rz);
-    estimator.inputIMU(t, acc, gyr);
+    m_estimator->inputIMU(t, acc, gyr);
     return;
 }
 
@@ -162,10 +160,10 @@ void QSLAM::display2D(int frame_id, const Estimator &estimator, cv::Mat &visual)
 
 void QSLAM::trajectoryUpdate(QImage img)
 {
-    QMutexLocker locker(&m_mutex);
-    m_traj = img;
+//    QMutexLocker locker(&m_mutex);
+//    m_traj = img;
 
-    emit trajectoryUpdateNoti(m_traj);
+//    emit trajectoryUpdateNoti(m_traj);
 }
 
 void sync_process(QSLAM *m_slam)
@@ -213,40 +211,44 @@ void sync_process(QSLAM *m_slam)
             }
         }
 
+        locker.unlock();
+
         if(!image0.empty())
         {
             CONSOLE << "Process";
-            estimator.inputImage(time, image0, image1);
+            m_slam->m_estimator->inputImage(time, image0, image1);
         }
 
-        if (estimator.solver_flag == Estimator::SolverFlag::NON_LINEAR)
+        if (m_slam->m_estimator->solver_flag == Estimator::SolverFlag::NON_LINEAR)
         {
             CONSOLE << "Displaying ... ";
 
             nav_msgs::Odometry odometry;
 
-            odometry.pose.pose.position.x = estimator.Ps[WINDOW_SIZE].x();
-            odometry.pose.pose.position.y = estimator.Ps[WINDOW_SIZE].y();
-            odometry.pose.pose.position.z = estimator.Ps[WINDOW_SIZE].z();
+            odometry.pose.pose.position.x = m_slam->m_estimator->Ps[WINDOW_SIZE].x();
+            odometry.pose.pose.position.y = m_slam->m_estimator->Ps[WINDOW_SIZE].y();
+            odometry.pose.pose.position.z = m_slam->m_estimator->Ps[WINDOW_SIZE].z();
 
             // draw estimated trajectory
             int x = int(odometry.pose.pose.position.x) + 300;
             int y = int(odometry.pose.pose.position.y) + 100;
 
-            CONSOLE << "x: " << estimator.Ps[WINDOW_SIZE].x() << " "
-                    << "y: " << estimator.Ps[WINDOW_SIZE].y() << "z: "
-                    << estimator.Ps[WINDOW_SIZE].z();
+            CONSOLE << "x: " << m_slam->m_estimator->Ps[WINDOW_SIZE].x() << " "
+                    << "y: " << m_slam->m_estimator->Ps[WINDOW_SIZE].y() << "z: "
+                    << m_slam->m_estimator->Ps[WINDOW_SIZE].z();
+
+            QMutexLocker locker(&m_slam->m_mutex);
+
+            m_slam->traj_buf.push(odometry);
+
+            locker.unlock();
 
 //            QMutexLocker locker(&m_slam->m_mutex);
-
-            circle(m_slam->visual, cv::Point(x, y) ,1, CV_RGB(255,0,0), 2);
-
-            cv::cvtColor(m_slam->visual, m_slam->visual, cv::COLOR_BGR2RGB);
-
-            QImage result = QImage((const unsigned char*)(m_slam->visual.data),
-                                   m_slam->visual.cols, m_slam->visual.rows, QImage::Format_RGB888);
-
-            m_slam->m_traj = result;
+//            circle(m_slam->visual, cv::Point(x, y) ,1, CV_RGB(255,0,0), 2);
+//            cv::cvtColor(m_slam->visual, m_slam->visual, cv::COLOR_BGR2RGB);
+//            QImage result = QImage((const unsigned char*)(m_slam->visual.data),
+//                                   m_slam->visual.cols, m_slam->visual.rows, QImage::Format_RGB888);
+//            m_slam->m_traj = result;
         }
 
         frame_id++;
@@ -293,7 +295,8 @@ void QSLAM::runSLAM(QStringList dataPath)
 
     CONSOLE << "Fucking thread";
 
-    QtConcurrent::run(sync_process, this);
+//    QtConcurrent::run(sync_process, this);
+//    QtConcurrent::run(odom_pub, this);
 
 //    std::thread measurement_process{sync_process};
 //    measurement_process.detach();
@@ -335,6 +338,77 @@ void QSLAM::runSLAM(QStringList dataPath)
         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
         double timeSpent =std::chrono::duration_cast<std::chrono::duration<double>>(t2-t1).count();
 
+        {
+            cv::Mat image0, image1;
+            std_msgs::Header header;
+            double time = 0;
+
+            if (!img0_buf.empty() && !img1_buf.empty())
+            {
+                CONSOLE << "Check time";
+
+                double time0 = img0_buf.front().second;
+                double time1 = img1_buf.front().second;
+
+                CONSOLE << time0;
+
+                // 0.003s sync tolerance
+                if(time0 < time1 - 0.003)
+                {
+                    img0_buf.pop();
+                    printf("throw img0\n");
+                }
+                else if(time0 > time1 + 0.003)
+                {
+                    img1_buf.pop();
+                    printf("throw img1\n");
+                }
+                else
+                {
+                    time = img0_buf.front().second;
+                    image0 = img0_buf.front().first;
+                    img0_buf.pop();
+                    image1 = img1_buf.front().first;
+                    img1_buf.pop();
+                }
+            }
+
+            if(!image0.empty())
+            {
+                CONSOLE << "Process";
+                m_estimator->inputImage(time, image0, image1);
+            }
+
+            if (m_estimator->solver_flag == Estimator::SolverFlag::NON_LINEAR)
+            {
+                CONSOLE << "Displaying ... ";
+
+                nav_msgs::Odometry odometry;
+
+                odometry.pose.pose.position.x = m_estimator->Ps[WINDOW_SIZE].x();
+                odometry.pose.pose.position.y = m_estimator->Ps[WINDOW_SIZE].y();
+                odometry.pose.pose.position.z = m_estimator->Ps[WINDOW_SIZE].z();
+
+                // draw estimated trajectory
+                int x = int(odometry.pose.pose.position.x) + 300;
+                int y = int(odometry.pose.pose.position.y) + 100;
+
+                CONSOLE << "x: " << m_estimator->Ps[WINDOW_SIZE].x() << " "
+                        << "y: " << m_estimator->Ps[WINDOW_SIZE].y() << "z: "
+                        << m_estimator->Ps[WINDOW_SIZE].z();
+
+                circle(visual, cv::Point(x, y) ,1, CV_RGB(255,0,0), 2);
+                cv::cvtColor(visual, visual, cv::COLOR_BGR2RGB);
+                QImage result = QImage((const unsigned char*)(visual.data),
+                                       visual.cols, visual.rows, QImage::Format_RGB888);
+                m_traj = result;
+
+                emit trajectoryUpdateNoti(odometry);
+                emit trajectoryUpdateImg(m_traj);
+            }
+
+        }
+
         //wait to load the next frame image
         double T=0;
         if(ni < imageNum-1)
@@ -347,12 +421,20 @@ void QSLAM::runSLAM(QStringList dataPath)
         else
             cerr << endl << "process image speed too slow, larger than interval time between two consecutive frames" << endl;
 
-        emit trajectoryUpdateNoti(m_traj);
-
     }
 
     if (ni >= imageNum)
     {
         emit slamComplete();
+    }
+}
+
+void odom_pub(QSLAM *m_slam)
+{
+    while (1)
+    {
+        QMutexLocker locker(&m_slam->m_mutex);
+
+        emit m_slam->trajectoryUpdateNoti(m_slam->traj_buf.front());
     }
 }

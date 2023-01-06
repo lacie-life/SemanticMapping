@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStackedWidget>
 
 #include "QConfigDialog.h"
 #include "AppModel.h"
@@ -30,6 +31,7 @@ private:
     QConfigDialog *m_configDiaglog;
     QSLAMWidget *m_slamWidget;
     QIntroduction *m_intro;
+    QStackedWidget* m_stackWidget;
 
     AppModel *m_model;
 

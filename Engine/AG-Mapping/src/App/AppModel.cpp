@@ -16,6 +16,7 @@ AppModel::AppModel(QObject *parent)
     CONSOLE << "Init instance";
 
     m_slam = new QSLAM();
+    this->m_slam->moveToThread(&this->m_slamThread);
 
     m_slamSettingPath = PARAM_PATH;
     m_IMUPath = QString(IMAGE_PATH) + "/imu0/data.csv";
@@ -23,15 +24,16 @@ AppModel::AppModel(QObject *parent)
     m_RightImgPath = QString(IMAGE_PATH) + "/cam1/data";
     m_AssoPath = QString(IMAGE_PATH) + "/timestamp/data/time.txt";
 
-    connect(m_slam, &QSLAM::slamComplete, this, []()
+    connect(m_slam, &QSLAM::slamComplete, this, [=]()
     {
         CONSOLE << "SLAM Completed !!";
     });
 
-    connect(m_slam, &QSLAM::trajectoryUpdateNoti, m_slam, [this](QImage img)
+    connect(m_slam, &QSLAM::trajectoryUpdateImg, m_slam, [=](QImage img)
     {
-        CONSOLE << "Test ?";
-        emit this->updateTrajactory(img);
+        CONSOLE << "Test ? ";
+
+        emit updateTrajactory(img);
     });
 }
 
@@ -47,6 +49,8 @@ AppEnums::VSLAM_TYPE AppModel::get_slam_type()
 
 void AppModel::SLAM_Run()
 {
+    this->m_slamThread.start();
+
     m_slam->init(m_slamSettingPath);
 
     QStringList temp;

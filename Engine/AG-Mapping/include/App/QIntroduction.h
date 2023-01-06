@@ -15,6 +15,14 @@ public:
     explicit QIntroduction(QWidget *parent = nullptr);
     ~QIntroduction();
 
+signals:
+    void systemConfigOpen();
+    void actionRunClicked();
+
+public slots:
+    void actionRunClickedSlot();
+    void systemConfigOpenSlot();
+
 private:
     Ui::QIntroduction *ui;
 };

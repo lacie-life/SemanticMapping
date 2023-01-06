@@ -42,15 +42,19 @@ public:
 
 signals:
     void slamComplete();
-    void trajectoryUpdateNoti(QImage img);
+    void trajectoryUpdateNoti(nav_msgs::Odometry odom);
+    void trajectoryUpdateImg(QImage img);
 
 public:
     QImage m_traj;
     cv::Mat visual;
 
+    Estimator *m_estimator;
+
     queue<sensor_msgs::ImuConstPtr> imu_buf;
     queue<pair<cv::Mat, double>> img0_buf;
     queue<pair<cv::Mat, double>> img1_buf;
+    queue<nav_msgs::Odometry> traj_buf;
 
     QMutex m_mutex;
 
@@ -58,5 +62,6 @@ public:
 };
 
 static void sync_process(QSLAM *m_slam);
+static void odom_pub(QSLAM *m_slam);
 
 #endif // QSLAM_H

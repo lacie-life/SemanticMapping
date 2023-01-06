@@ -6,24 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>620</width>
+    <height>520</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="trajectory">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>100</y>
-     <width>151</width>
-     <height>61</height>
+     <x>10</x>
+     <y>10</y>
+     <width>601</width>
+     <height>491</height>
     </rect>
    </property>
    <property name="text">
-    <string>SLAM Widget</string>
+    <string/>
    </property>
   </widget>
  </widget>

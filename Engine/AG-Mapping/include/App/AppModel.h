@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMutex>
 #include <QImage>
+#include <QThread>
 
 #include "AppEnums.h"
 #include "QSLAM.h"
@@ -59,6 +60,7 @@ private:
     static AppEnums::SLAM_STATE m_slam_state;
 
     QSLAM *m_slam;
+    QThread m_slamThread;
 };
 
 #endif // APPMODEL_H
