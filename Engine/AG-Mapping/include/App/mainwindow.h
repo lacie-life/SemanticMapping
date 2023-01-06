@@ -5,6 +5,8 @@
 
 #include "QConfigDialog.h"
 #include "AppModel.h"
+#include "QSLAMWidget.h"
+#include "QIntroduction.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,6 +28,8 @@ public slots:
 private:
     Ui::MainWindow *ui;
     QConfigDialog *m_configDiaglog;
+    QSLAMWidget *m_slamWidget;
+    QIntroduction *m_intro;
 
     AppModel *m_model;
 

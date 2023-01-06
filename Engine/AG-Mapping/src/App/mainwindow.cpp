@@ -17,15 +17,21 @@ MainWindow::MainWindow(QWidget *parent)
     this->ui->run_action->hide();
 
     m_configDiaglog = new QConfigDialog(nullptr, m_model);
+    m_slamWidget = new QSLAMWidget(nullptr);
+    m_intro = new QIntroduction(nullptr);
+
+    ui->stackedWidget->addWidget(m_slamWidget);
+    ui->stackedWidget->addWidget(m_intro);
+
+    ui->stackedWidget->setCurrentWidget(m_intro);
 
     connect(ui->system_config, &QPushButton::clicked, this->m_configDiaglog, &QConfigDialog::open);
     connect(m_configDiaglog, &QConfigDialog::configDone, this, &MainWindow::SLAMInforDisplay);
-    connect(ui->run_action, &QPushButton::clicked, this->m_model, &AppModel::SLAM_Run);
-    connect(this->m_model, &AppModel::updateTrajactory, ui->trajectory_display, [this](QImage img)
+    connect(ui->run_action, &QPushButton::clicked, this, [this]()
     {
-        CONSOLE << "set display";
-        this->ui->trajectory_display->setPixmap(QPixmap::fromImage(img));
+        this->ui->stackedWidget->setCurrentWidget(m_slamWidget);
     });
+//    connect(ui->run_action, &QPushButton::clicked, this->m_model, &AppModel::SLAM_Run);
 }
 
 MainWindow::~MainWindow()

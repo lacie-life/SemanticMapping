@@ -74,6 +74,8 @@ source_group("Source Files" FILES ${SOURCES})
 set(UI
     ${CMAKE_CURRENT_LIST_DIR}/ui/mainwindow.ui
     ${CMAKE_CURRENT_LIST_DIR}/ui/qconfigdialog.ui
+    ${CMAKE_CURRENT_LIST_DIR}/ui/slamwidget.ui
+    ${CMAKE_CURRENT_LIST_DIR}/ui/introduction.ui
 )
 
 qt5_wrap_ui(UI_HEADERS ${UI})
