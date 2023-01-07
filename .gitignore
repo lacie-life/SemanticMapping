@@ -36,3 +36,4 @@ Slam/Thirdparty/DBoW2/build/
 Slam/Thirdparty/g2o/build/
 cmake-build-debug/
 /Slam/Vocabulary/ORBvoc.txt
+*.user
