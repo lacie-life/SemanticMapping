@@ -121,6 +121,9 @@ target_link_libraries(AG-Mapping PRIVATE
     freetype
 )
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/imgs
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 
 
 
