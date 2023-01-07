@@ -23,11 +23,10 @@ include_directories(
     ${EIGEN3_INCLUDE_DIR}
     ${Pangolin_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/include/CameraModels
-    ${CMAKE_SOURCE_DIR}/Thirdparty/g2o
-    ${CMAKE_SOURCE_DIR}/Thirdparty/Sophus
-    ${CMAKE_SOURCE_DIR}/Thirdparty/DBoW2
+    ${CMAKE_SOURCE_DIR}/Slam/include
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/Sophus
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2
 )
 
 file(GLOB HEADERS
@@ -53,8 +52,8 @@ target_link_libraries(${CONVENIENCE_LIB_NAME} PRIVATE
     ${OpenCV_LIBS}
     ${EIGEN3_LIBS}
     ${Pangolin_LIBRARIES}
-    ${CMAKE_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2_New.so
-    ${CMAKE_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2/lib/libDBoW2_New.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o.so
     -lboost_serialization
     -lcrypto
 )
