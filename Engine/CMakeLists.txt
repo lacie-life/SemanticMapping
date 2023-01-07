@@ -29,12 +29,12 @@ include_directories(
     ${EIGEN3_INCLUDE_DIR}
     ${Pangolin_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/../Slam
-    ${CMAKE_SOURCE_DIR}/../Slam/include
-    ${CMAKE_SOURCE_DIR}/../Slam/include/CameraModels
-    ${CMAKE_SOURCE_DIR}/../Slam/Thirdparty/g2o
-    ${CMAKE_SOURCE_DIR}/../Slam/Thirdparty/Sophus
-    ${CMAKE_SOURCE_DIR}/../Slam/Thirdparty/DBoW2
+    ${CMAKE_SOURCE_DIR}/Slam
+    ${CMAKE_SOURCE_DIR}/Slam/include
+    ${CMAKE_SOURCE_DIR}/Slam/include/CameraModels
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/Sophus
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2
 
     /usr/local/include
     /usr/include/gtk-2.0
@@ -98,9 +98,9 @@ target_link_libraries(AG-Mapping PRIVATE
     ${Pangolin_LIBRARIES}
     ${Boost_LIBRARIES}
     slam_lib
-    ${CMAKE_SOURCE_DIR}/../Slam/Thirdparty/DBoW2/lib/libDBoW2_New.so
-    ${CMAKE_SOURCE_DIR}/../Slam/Thirdparty/g2o/lib/libg2o.so
-    ${CMAKE_SOURCE_DIR}/../Model/yolov4-learn/lib/libdarknet.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2/lib/libDBoW2_New.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o.so
+    ${CMAKE_SOURCE_DIR}/Model/yolov4-learn/lib/libdarknet.so
     -lboost_serialization
     -lcrypto
     pthread

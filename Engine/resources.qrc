@@ -1,19 +1,14 @@
 <RCC>
     <qresource prefix="/images">
-        <file>data/imgs/android.png</file>
-        <file>data/imgs/b.png</file>
-        <file>data/imgs/d.png</file>
-        <file>data/imgs/g.png</file>
-        <file>data/imgs/ic.ico</file>
-        <file>data/imgs/ic.png</file>
-        <file>data/imgs/q.png</file>
-        <file>data/imgs/qrgbd.png</file>
-        <file>data/imgs/qrgbd-2.png</file>
-        <file>data/imgs/qrgbd-system.png</file>
-        <file>data/imgs/qrgbd-system-small.png</file>
-        <file>data/imgs/r.png</file>
-        <file>data/imgs/recognizer.png</file>
-        <file>data/imgs/ros-server.png</file>
-        <file>data/imgs/depth.png</file>
+        <file>imgs/recognizer.png</file>
+        <file>imgs/r.png</file>
+        <file>imgs/q.png</file>
+        <file>imgs/ic.png</file>
+        <file>imgs/ic.ico</file>
+        <file>imgs/g.png</file>
+        <file>imgs/depth.png</file>
+        <file>imgs/d.png</file>
+        <file>imgs/b.png</file>
+        <file>imgs/android.png</file>
     </qresource>
 </RCC>

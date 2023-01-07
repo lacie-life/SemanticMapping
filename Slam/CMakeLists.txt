@@ -37,6 +37,7 @@ file(GLOB HEADERS
 file(GLOB SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/CameraModels/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         )
 
 source_group("Header Files" FILES ${HEADERS})
