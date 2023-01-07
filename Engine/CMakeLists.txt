@@ -11,8 +11,8 @@ set(CMAKE_PREFIX_PATH "~/Qt/5.15.2/gcc_64")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Widgets REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Widgets REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Widgets Gui REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Widgets Gui REQUIRED)
 
 find_package(OpenCV 4.2 REQUIRED)
 find_package(Eigen3 REQUIRED)
@@ -29,12 +29,12 @@ include_directories(
     ${EIGEN3_INCLUDE_DIR}
     ${Pangolin_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/../Slam
-    ${CMAKE_SOURCE_DIR}/../Slam/include
-    ${CMAKE_SOURCE_DIR}/../Slam/include/CameraModels
-    ${CMAKE_SOURCE_DIR}/../Slam/Thirdparty/g2o
-    ${CMAKE_SOURCE_DIR}/../Slam/Thirdparty/Sophus
-    ${CMAKE_SOURCE_DIR}/../Slam/Thirdparty/DBoW2
+    ${CMAKE_SOURCE_DIR}/Slam
+    ${CMAKE_SOURCE_DIR}/Slam/include
+    ${CMAKE_SOURCE_DIR}/Slam/include/CameraModels
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/Sophus
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2
 
     /usr/local/include
     /usr/include/gtk-2.0
@@ -92,15 +92,16 @@ target_compile_definitions(AG-Mapping PRIVATE MESA_EGL_NO_X11_HEADERS)
 target_link_libraries(AG-Mapping PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Gui
     ${PCL_LIBRARIES}
     ${OpenCV_LIBS}
     ${EIGEN3_LIBS}
     ${Pangolin_LIBRARIES}
     ${Boost_LIBRARIES}
     slam_lib
-    ${CMAKE_SOURCE_DIR}/../Slam/Thirdparty/DBoW2/lib/libDBoW2_New.so
-    ${CMAKE_SOURCE_DIR}/../Slam/Thirdparty/g2o/lib/libg2o.so
-    ${CMAKE_SOURCE_DIR}/../Model/yolov4-learn/lib/libdarknet.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2/lib/libDBoW2_New.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o.so
+    ${CMAKE_SOURCE_DIR}/Model/yolov4-learn/lib/libdarknet.so
     -lboost_serialization
     -lcrypto
     pthread
@@ -119,6 +120,9 @@ target_link_libraries(AG-Mapping PRIVATE
     fontconfig
     freetype
 )
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/imgs
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 
 

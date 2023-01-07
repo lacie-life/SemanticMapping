@@ -1,3 +1,5 @@
+#define __USE_GTK2__
+
 #include "mainwindow.h"
 
 #include <QApplication>
