@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(GreenHouseAR LANGUAGES CXX)
-
 set(CMAKE_AUTOUIC OFF)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -61,9 +59,13 @@ include_directories(
 link_directories(${PCL_LIBRARY_DIRS})
 link_directories(${Boost_LIBRARY_DIR})
 
-file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
-file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+file(GLOB HEADERS
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
+        )
+file(GLOB SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+        )
 
 source_group("Header Files" FILES ${HEADERS})
 source_group("Source Files" FILES ${SOURCES})
@@ -78,16 +80,16 @@ list(APPEND RESOURCES ${CMAKE_CURRENT_LIST_DIR}/resources.qrc)
 
 qt5_add_resources(RCC_SOURCES ${RESOURCES})
 
-add_executable(GreenHouseAR
+add_executable(AG-Mapping
     ${HEADERS}
     ${SOURCES}
     ${UI_HEADERS}
     ${RCC_SOURCES}
 )
 
-target_compile_definitions(GreenHouseAR PRIVATE MESA_EGL_NO_X11_HEADERS)
+target_compile_definitions(AG-Mapping PRIVATE MESA_EGL_NO_X11_HEADERS)
 
-target_link_libraries(GreenHouseAR PRIVATE
+target_link_libraries(AG-Mapping PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Core
     ${PCL_LIBRARIES}
@@ -95,7 +97,7 @@ target_link_libraries(GreenHouseAR PRIVATE
     ${EIGEN3_LIBS}
     ${Pangolin_LIBRARIES}
     ${Boost_LIBRARIES}
-    ${CMAKE_SOURCE_DIR}/../Slam/lib/libORB_SLAM3.so
+    slam_lib
     ${CMAKE_SOURCE_DIR}/../Slam/Thirdparty/DBoW2/lib/libDBoW2_New.so
     ${CMAKE_SOURCE_DIR}/../Slam/Thirdparty/g2o/lib/libg2o.so
     ${CMAKE_SOURCE_DIR}/../Model/yolov4-learn/lib/libdarknet.so
@@ -118,8 +120,6 @@ target_link_libraries(GreenHouseAR PRIVATE
     freetype
 )
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data
-     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 
 

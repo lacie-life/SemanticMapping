@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(ORB_SLAM3 VERSION 0.1 LANGUAGES CXX)
-
 SET(CMAKE_BUILD_TYPE "Release")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
@@ -32,13 +30,26 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/Thirdparty/DBoW2
 )
 
-aux_source_directory(${CMAKE_SOURCE_DIR}/src SRC_FILES)
+file(GLOB HEADERS
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/CameraModels/*.h
+        )
 
-aux_source_directory(${CMAKE_SOURCE_DIR}/src/CameraModels SRC_SUB_FILES)
+file(GLOB SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/CameraModels/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc
+        )
 
-add_library(${CMAKE_PROJECT_NAME} SHARED ${SRC_FILES} ${SRC_SUB_FILES})
+source_group("Header Files" FILES ${HEADERS})
+source_group("Source Files" FILES ${SOURCES})
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
+set(CONVENIENCE_LIB_NAME "slam_lib")
+
+add_library(${CONVENIENCE_LIB_NAME} SHARED
+        ${HEADERS}
+        ${SOURCES})
+
+target_link_libraries(${CONVENIENCE_LIB_NAME} PRIVATE
     ${OpenCV_LIBS}
     ${EIGEN3_LIBS}
     ${Pangolin_LIBRARIES}
@@ -48,13 +59,3 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
     -lcrypto
 )
 
-# RGB-D examples
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Examples/RGB-D)
-
-add_executable(orb_test Examples/RGB-D/test_slam_system.cpp)
-
-target_link_libraries(orb_test PRIVATE ${CMAKE_PROJECT_NAME} 
-                                        ${OpenCV_LIBS}
-                                        ${EIGEN3_LIBS}
-                                        ${Pangolin_LIBRARIES}
-                                        )
