@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
       ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setWindowTitle("GreenHouseAR");
+    this->setWindowTitle("AG-Mapping");
     // create variables
     this->init();
     // build connections
