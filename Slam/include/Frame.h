@@ -20,7 +20,7 @@
 #ifndef FRAME_H
 #define FRAME_H
 
-#include<vector>
+#include <vector>
 
 #include "DBoW2/BowVector.h"
 #include "DBoW2/FeatureVector.h"

@@ -25,8 +25,6 @@
 
 #include "KeyFrame.h"
 
-
-
 namespace ORB_SLAM3
 {
 

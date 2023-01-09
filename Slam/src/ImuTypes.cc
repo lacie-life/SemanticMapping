@@ -21,7 +21,7 @@
 
 #include "GeometricTools.h"
 
-#include<iostream>
+#include <iostream>
 
 namespace ORB_SLAM3
 {
