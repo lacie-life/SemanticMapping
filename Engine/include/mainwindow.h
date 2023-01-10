@@ -58,6 +58,21 @@ signals:
 
     void signalInitRecoginzer(QConfigDialog *cof);
 
+public slots:
+    void saveCliked();
+
+    void createSLAMFinished(float scale);
+
+    void runSLAMClicked();
+
+    void processNewFrameFinishedDisplay(Sophus::SE3f pose);
+
+    void stopClicked();
+
+    void continueClicked();
+
+    void forcequitClicked();
+
 private slots:
     void on_actionrun_triggered();
 

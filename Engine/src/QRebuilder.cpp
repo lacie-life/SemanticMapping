@@ -118,11 +118,11 @@ void QRebuilder::init(QConfigDialog *cof) {
     this->m_pts = std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
     // pcl visual
     this->m_pcl_visual = std::make_shared<QPCLVisual>();
-    connect(this, &QRebuilder::signalPCLShowPointCloud, this->m_pcl_visual.get(), &QPCLVisual::showPointCloud);
-    connect(this->m_pcl_visual.get(), &QPCLVisual::signalShowPtsFinished, this, [=]() {
-        qDebug() << "WTFFF";
-        this->m_pcl_visual_need_data = true;
-    });
+//    connect(this, &QRebuilder::signalPCLShowPointCloud, this->m_pcl_visual.get(), &QPCLVisual::showPointCloud);
+//    connect(this->m_pcl_visual.get(), &QPCLVisual::signalShowPtsFinished, this, [=]() {
+//        qDebug() << "WTFFF";
+//        this->m_pcl_visual_need_data = true;
+//    });
 
     this->m_pcl_visual->moveToThread(&this->m_thread);
     this->m_thread.start();

@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QString>
-#include <QUrl>
 #include <QColor>
 #include <QMutex>
 #include <QCoreApplication>
@@ -26,11 +25,11 @@
 #ifdef Lacie
 
 // Dataset
-#define SEQ_PATH "/home/lacie/Github/Dataset/rgbd_dataset_freiburg2_large_no_loop"
-#define RGB_IMAGE_PATH "/home/lacie/Github/Dataset/rgbd_dataset_freiburg2_large_no_loop/rgb"
-#define DEPTH_IMAGE_PATH "/home/lacie/Github/Dataset/rgbd_dataset_freiburg2_large_no_loop/depth"
-#define ASSO_DEPTH_PATH "/home/lacie/Github/Dataset/rgbd_dataset_freiburg2_large_no_loop/depth.txt"
-#define ASSO_RGB_PATH "/home/lacie/Github/Dataset/rgbd_dataset_freiburg2_large_no_loop/rgb.txt"
+#define SEQ_PATH "/home/lacie/Github/Data/TUM/rgbd_dataset_freiburg3_long_office_household"
+#define RGB_IMAGE_PATH "/home/lacie/Github/Data/TUM/rgbd_dataset_freiburg3_long_office_household/rgb"
+#define DEPTH_IMAGE_PATH "/home/lacie/Github/Data/TUM/rgbd_dataset_freiburg3_long_office_household/depth"
+#define ASSO_DEPTH_PATH "/home/lacie/Github/Data/TUM/rgbd_dataset_freiburg3_long_office_household/depth.txt"
+#define ASSO_RGB_PATH "/home/lacie/Github/Data/TUM/rgbd_dataset_freiburg3_long_office_household/rgb.txt"
 
 #else
 
@@ -44,13 +43,13 @@
 #endif
 
 // SLAM System
-#define SETTING_PATH "data/config/rgbd.yaml"
-#define VOCABULARY_PATH "data/ORBvoc.txt"
+#define SETTING_PATH "../Data/config/rgbd.yaml"
+#define VOCABULARY_PATH "../Data/vocabulary/ORBvoc.txt"
 
 // Recognizer
-#define CLASSES_PATH "data/model/coco.names"
-#define MODEL_CONFIG "data/model/yolov4.cfg"
-#define MODEL_WEIGHTS "data/model/yolov4.weights"
+#define CLASSES_PATH "../Data/model/coco.names"
+#define MODEL_CONFIG "../Data/model/yolov4.cfg"
+#define MODEL_WEIGHTS "../Data/model/yolov4.weights"
 
 // GUI
 #define BACKGOUND ":/images/data/res/background.jpg"

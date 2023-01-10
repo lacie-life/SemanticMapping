@@ -3,6 +3,7 @@
 
 // attention here
 #undef HAVE_CUDA
+
 #include "System.h"
 #include "QConfigDialog.h"
 
@@ -36,7 +37,6 @@ private:
     QConfigDialog *m_config;
 
     std::shared_ptr<ORB_SLAM3::System> m_slamSystem;
-
 };
 
 #endif // QSLAM_H

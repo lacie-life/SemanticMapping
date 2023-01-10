@@ -1,2 +1,3 @@
-add_subdirectory(darknet-gpu)
-#add_subdirectory(darknet)
+#add_subdirectory(darknet-gpu)
+add_subdirectory(darknet)
+
