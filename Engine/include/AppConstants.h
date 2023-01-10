@@ -43,7 +43,7 @@
 #endif
 
 // SLAM System
-#define SETTING_PATH "../Data/config/rgbd.yaml"
+#define SETTING_PATH "../Data/test/tum/TUM3.yaml"
 #define VOCABULARY_PATH "../Data/vocabulary/ORBvoc.txt"
 
 // Recognizer
