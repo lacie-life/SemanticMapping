@@ -61,7 +61,16 @@ target_link_libraries(${CONVENIENCE_LIB_NAME} PRIVATE
     ${Pangolin_LIBRARIES}
     ${PCL_LIBRARIES}
     ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2/lib/libDBoW2_New.so
-    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_core.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_stuff.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_types_sba.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_solver_csparse.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_csparse_extension.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_solver_dense.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_solver_eigen.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_types_sim3.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_types_slam3d.so
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_types_slam2d.so
     -lboost_serialization
     -lcrypto
 )
