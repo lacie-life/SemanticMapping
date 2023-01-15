@@ -8,7 +8,7 @@ QSlam::QSlam(QObject *parent)
 void QSlam::shutdown()
 {
     this->m_slamSystem->Shutdown();
-    //    this->_slamSystem->mpViewer->RequestFinish();
+    //    this->m_slamSystem->mpViewer->RequestFinish();
     return;
 }
 
