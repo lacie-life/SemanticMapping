@@ -62,17 +62,19 @@ link_directories(${Boost_LIBRARY_DIR})
 file(GLOB HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
-        )
+)
+
 file(GLOB SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
-        )
+)
 
 source_group("Header Files" FILES ${HEADERS})
 source_group("Source Files" FILES ${SOURCES})
 
 set(UI ${CMAKE_CURRENT_LIST_DIR}/ui/mainwindow.ui
        ${CMAKE_CURRENT_LIST_DIR}/ui/qconfigdialog.ui
-       ${CMAKE_CURRENT_LIST_DIR}/ui/qhelpdialog.ui)
+       ${CMAKE_CURRENT_LIST_DIR}/ui/qhelpdialog.ui
+)
 
 qt5_wrap_ui(UI_HEADERS ${UI})
 

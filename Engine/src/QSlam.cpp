@@ -1,4 +1,5 @@
 #include "QSlam.h"
+#include "AppConstants.h"
 
 QSlam::QSlam(QObject *parent)
 {
@@ -7,7 +8,7 @@ QSlam::QSlam(QObject *parent)
 void QSlam::shutdown()
 {
     this->m_slamSystem->Shutdown();
-    //    this->_slamSystem->mpViewer->RequestFinish();
+    //    this->m_slamSystem->mpViewer->RequestFinish();
     return;
 }
 
@@ -28,6 +29,7 @@ void QSlam::createSlamSystem(QConfigDialog *config)
         this->m_config->m_settingPath.toStdString(),
         ORB_SLAM3::System::RGBD,
         true);
+
     // finished
     emit this->createSlamSystemFinished(this->m_slamSystem->GetImageScale());
 
@@ -37,6 +39,11 @@ void QSlam::createSlamSystem(QConfigDialog *config)
 void QSlam::processNewFrame(cv::Mat colorImg, cv::Mat depthImg, double tframe)
 {
     // track a new frame
+
+    if(this->m_slamSystem == nullptr)
+    {
+        CONSOLE << "?";
+    }
 
     Sophus::SE3f pose = this->m_slamSystem->TrackRGBD(colorImg, depthImg, tframe);
 

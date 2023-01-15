@@ -58,24 +58,20 @@ signals:
 
     void signalInitRecoginzer(QConfigDialog *cof);
 
-private slots:
-    void on_actionrun_triggered();
+public slots:
+    void saveCliked();
 
-    void on_actionstop_triggered();
+    void createSLAMFinished(float scale);
 
-    void on_actioncontinue_triggered();
+    void runSLAMClicked();
 
-    void on_actionforce_quit_triggered();
+    void processNewFrameFinishedDisplay(Sophus::SE3f pose);
 
-    void on_actionhelp_triggered();
+    void stopClicked();
 
-    void on_actionback_triggered();
+    void continueClicked();
 
-    void on_actionsave_triggered();
-
-    void on_actionquit_triggered();
-
-    void on_actionstart_triggered();
+    void forcequitClicked();
 
 private:
     Ui::MainWindow *ui;
