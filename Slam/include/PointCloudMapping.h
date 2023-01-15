@@ -7,9 +7,11 @@
 
 #include "System.h"
 
-#include <pcl/common/transforms.h>
-#include <pcl/point_types.h>
-#include <pcl/filters/voxel_grid.h>
+#include "pcl/point_cloud.h"
+#include "pcl/common/transforms.h"
+#include "pcl/point_types.h"
+#include "pcl/filters/voxel_grid.h"
+
 #include <condition_variable>
 
 #include <boost/make_shared.hpp>

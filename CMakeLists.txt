@@ -33,6 +33,11 @@ link_directories(${Boost_LIBRARY_DIR})
 find_package(Pangolin REQUIRED)
 include_directories(${Pangolin_INCLUDE_DIRS})
 
+find_package(PCL 1.12 REQUIRED)
+add_definitions(${PCL_DEFINITIONS})
+include_directories(${PCL_INCLUDE_DIRS})
+message("PCL Include Directory: ${PCL_INCLUDE_DIRS}")
+
 include_directories(
         ${CMAKE_SOURCE_DIR}/Slam
         ${CMAKE_SOURCE_DIR}/Slam/include
@@ -41,6 +46,8 @@ include_directories(
         ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/Sophus
         ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2
 )
+
+link_directories(${PCL_LIBRARY_DIRS})
 
 add_subdirectory(Slam)
 #add_subdirectory(Model)

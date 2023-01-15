@@ -38,9 +38,12 @@
 #include "Settings.h"
 
 #include "CameraModels/GeometricCamera.h"
+#include "PointCloudMapping.h"
 
 #include <mutex>
 #include <unordered_set>
+
+class PointCloudMapping;
 
 namespace ORB_SLAM3
 {
@@ -58,7 +61,7 @@ class Tracking
 
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    Tracking(System* pSys, ORBVocabulary* pVoc, FrameDrawer* pFrameDrawer, MapDrawer* pMapDrawer, Atlas* pAtlas,
+    Tracking(System* pSys, ORBVocabulary* pVoc, FrameDrawer* pFrameDrawer, MapDrawer* pMapDrawer, Atlas* pAtlas, shared_ptr<PointCloudMapping> pPointCloud,
              KeyFrameDatabase* pKFDB, const string &strSettingPath, const int sensor, Settings* settings, const string &_nameSeq=std::string());
 
     ~Tracking();
@@ -139,6 +142,8 @@ public:
     Frame mLastFrame;
 
     cv::Mat mImGray;
+    cv::Mat mImRGB;
+    cv::Mat mImDepth;
 
     // Initialization Variables (Monocular)
     std::vector<int> mvIniLastMatches;
@@ -336,6 +341,8 @@ protected:
     bool mbRGB;
 
     list<MapPoint*> mlpTemporalPoints;
+
+    shared_ptr<PointCloudMapping>  mpPointCloudMapping;
 
     //int nMapChangeIndex;
 

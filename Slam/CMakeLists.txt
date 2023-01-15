@@ -12,13 +12,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
+set(CMAKE_PREFIX_PATH "~/Qt/5.15.2/gcc_64")
+
 add_definitions(-w)
 
 find_package(OpenCV 4.2 REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Pangolin 0.6 REQUIRED)
-find_package( PCL 1.12 REQUIRED)
 find_package(g2o REQUIRED)
+find_package(PCL 1.12 REQUIRED)
+
+add_definitions(${PCL_DEFINITIONS})
+message("PCL Include Directory: ${PCL_INCLUDE_DIRS}")
 
 include_directories(
     ${OpenCV_INCLUDE_DIRS}
@@ -32,7 +37,6 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2
 )
 
-add_definitions(${PCL_DEFINITIONS})
 link_directories(${PCL_LIBRARY_DIRS})
 
 file(GLOB HEADERS
