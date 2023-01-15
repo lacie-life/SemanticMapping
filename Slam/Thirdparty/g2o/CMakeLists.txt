@@ -180,7 +180,7 @@ CMAKE_DEPENDENT_OPTION(G2O_BUILD_LINKED_APPS "Build apps linked with the librari
   "G2O_BUILD_APPS" OFF)
 
 # shall we build the examples
-SET(G2O_BUILD_EXAMPLES ON CACHE BOOL "Build g2o examples")
+SET(G2O_BUILD_EXAMPLES OFF CACHE BOOL "Build g2o examples")
 IF(G2O_BUILD_EXAMPLES)
   MESSAGE(STATUS "Compiling g2o examples")
 ENDIF(G2O_BUILD_EXAMPLES)
