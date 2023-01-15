@@ -40,6 +40,9 @@
 #include "ImuTypes.h"
 #include "Settings.h"
 
+#include "PointCloudMapping.h"
+
+class PointCloudMapping;
 
 namespace ORB_SLAM3
 {
@@ -262,6 +265,9 @@ public:
     string mStrVocabularyFilePath;
 
     Settings* settings_;
+
+    // point cloud mapping
+    std::shared_ptr<PointCloudMapping>  mpPointCloudMapping;
 };
 
 }// namespace ORB_SLAM

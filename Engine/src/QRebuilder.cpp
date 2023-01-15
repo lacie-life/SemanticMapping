@@ -1,5 +1,6 @@
 #include <QDebug>
 
+#include "AppConstants.h"
 #include "QRebuilder.h"
 #include "QColorPrj.h"
 #include "QEmbeddedWindow.h"
@@ -42,24 +43,36 @@ void QRebuilder::changeToRenderMode() {
 void QRebuilder::processNewDepthFrame(cv::Mat colorImg, cv::Mat depthImg, Sophus::SE3f Tcw) {
 
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr frameCloud(new pcl::PointCloud<pcl::PointXYZRGB>());
+
     frameCloud->reserve(depthImg.rows * depthImg.cols * 0.9);
 
-    cv::Mat color(depthImg.rows, depthImg.cols, CV_8UC3);
+    if(this->m_pcl_visual->m_mode == PCL_VISUAL_MODE::RENDER_MODE)
+    {
+        CONSOLE << "RENDER MODE";
+    }
+    else
+    {
+        CONSOLE << "INTERACTIVE MODE";
+    }
+
+//    cv::Mat color(depthImg.rows, depthImg.cols, CV_8UC3);
+
     // Tcw -> Twc
     auto Twc = Tcw.inverse();
     auto quat = Twc.unit_quaternion();
     auto trans = Twc.translation();
 
     for (int v = 0; v < depthImg.rows; v++) {
-        auto colorPtr = color.ptr<uchar>(v);
+//        auto colorPtr = m_colorDisplay->ptr<uchar>(v);
         for (int u = 0; u < depthImg.cols; u++) {
             unsigned int d = depthImg.ptr<unsigned short>(v)[u];
             if (d == 0) {
-                colorPtr[3 * u + 0] = 255;
-                colorPtr[3 * u + 1] = 255;
-                colorPtr[3 * u + 2] = 255;
+                m_colorDisplay->ptr<uchar>(v)[3 * u + 0] = 255;
+                m_colorDisplay->ptr<uchar>(v)[3 * u + 1] = 255;
+                m_colorDisplay->ptr<uchar>(v)[3 * u + 2] = 255;
                 continue;
             }
+
             // --- for cloud point ---
             float scalar = float(d) / depthScale;
             Eigen::Vector3f p((u - cx) * scalar / fx, (v - cy) * scalar / fy, scalar);
@@ -71,31 +84,35 @@ void QRebuilder::processNewDepthFrame(cv::Mat colorImg, cv::Mat depthImg, Sophus
 
             // --- for color projection ---
             auto rgb = ns_clp::project(d / 1000.0, 0.0, 4, false, 0, ns_clp::Color::panchromatic);
-            colorPtr[3 * u + 0] = std::get<2>(rgb);
-            colorPtr[3 * u + 1] = std::get<1>(rgb);
-            colorPtr[3 * u + 2] = std::get<0>(rgb);
+            m_colorDisplay->ptr<uchar>(v)[3 * u + 0] = std::get<2>(rgb);
+            m_colorDisplay->ptr<uchar>(v)[3 * u + 1] = std::get<1>(rgb);
+            m_colorDisplay->ptr<uchar>(v)[3 * u + 2] = std::get<0>(rgb);
         }
     }
 
     pcl::VoxelGrid<pcl::PointXYZRGB> filter;
-    filter.setLeafSize(0.2f, 0.2f, 0.2f);
+    filter.setLeafSize(0.01f, 0.01f, 0.01f);
     filter.setInputCloud(frameCloud);
     filter.filter(*frameCloud);
 
     // show image and point cloud
-    emit this->signalProcessNewFrameFinished(color);
+    emit this->signalProcessNewFrameFinished(*m_colorDisplay);
 
     this->m_pts->resize(this->m_pts->size() + frameCloud->size());
     std::copy(frameCloud->begin(), frameCloud->end(), this->m_pts->end() - frameCloud->size());
+
     this->m_curTcw = Tcw;
 
+    CONSOLE << "Cloud: " << this->m_pts->size();
+
     if (this->m_pcl_visual_need_data) {
+        CONSOLE << "Need data pls ...";
         auto tempPts = std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
         tempPts->resize(this->m_pts->size());
         std::copy(this->m_pts->begin(), this->m_pts->end(), tempPts->begin());
         {
             pcl::VoxelGrid<pcl::PointXYZRGB> filter;
-            filter.setLeafSize(0.2f, 0.2f, 0.2f);
+            filter.setLeafSize(0.01f, 0.01f, 0.01f);
             filter.setInputCloud(tempPts);
             filter.filter(*tempPts);
         }
@@ -114,15 +131,21 @@ void QRebuilder::init(QConfigDialog *cof) {
     config["Camera1.cx"] >> this->cx;
     config["Camera1.cy"] >> this->cy;
     config["RGBD.DepthMapFactor"] >> this->depthScale;
+    m_colorDisplay = new cv::Mat(config["Camera.height"], config["Camera.width"], CV_8UC3);
     config.release();
+
     this->m_pts = std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
+
     // pcl visual
     this->m_pcl_visual = std::make_shared<QPCLVisual>();
-//    connect(this, &QRebuilder::signalPCLShowPointCloud, this->m_pcl_visual.get(), &QPCLVisual::showPointCloud);
-//    connect(this->m_pcl_visual.get(), &QPCLVisual::signalShowPtsFinished, this, [=]() {
-//        qDebug() << "WTFFF";
-//        this->m_pcl_visual_need_data = true;
-//    });
+
+    this->m_pcl_visual->m_mode = PCL_VISUAL_MODE::RENDER_MODE;
+
+    connect(this, &QRebuilder::signalPCLShowPointCloud, this->m_pcl_visual.get(), &QPCLVisual::showPointCloud);
+
+    connect(this->m_pcl_visual.get(), &QPCLVisual::signalShowPtsFinished, this, [=]() {
+        this->m_pcl_visual_need_data = true;
+    });
 
     this->m_pcl_visual->moveToThread(&this->m_thread);
     this->m_thread.start();

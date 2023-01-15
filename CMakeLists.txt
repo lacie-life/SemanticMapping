@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.21)
 project(AG_Mapping)
 
-set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+set(CMAKE_PREFIX_PATH "/home/lacie/Qt/5.15.2/gcc_64")
 
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 include_directories(${EIGEN3_INCLUDE_DIR})
@@ -31,6 +33,11 @@ link_directories(${Boost_LIBRARY_DIR})
 find_package(Pangolin REQUIRED)
 include_directories(${Pangolin_INCLUDE_DIRS})
 
+find_package(PCL 1.12 REQUIRED)
+add_definitions(${PCL_DEFINITIONS})
+include_directories(${PCL_INCLUDE_DIRS})
+message("PCL Include Directory: ${PCL_INCLUDE_DIRS}")
+
 include_directories(
         ${CMAKE_SOURCE_DIR}/Slam
         ${CMAKE_SOURCE_DIR}/Slam/include
@@ -39,6 +46,8 @@ include_directories(
         ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/Sophus
         ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2
 )
+
+link_directories(${PCL_LIBRARY_DIRS})
 
 add_subdirectory(Slam)
 #add_subdirectory(Model)

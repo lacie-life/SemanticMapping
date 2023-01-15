@@ -24,14 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Modified Raul Mur Artal (2014)
-// - Stop criterium (solve function)
-
 #include "optimization_algorithm_levenberg.h"
 
 #include <iostream>
 
-#include "../stuff/timeutil.h"
+#include "g2o/stuff/timeutil.h"
 
 #include "sparse_optimizer.h"
 #include "solver.h"
@@ -44,14 +41,13 @@ namespace g2o {
     OptimizationAlgorithmWithHessian(solver)
   {
     _currentLambda = -1.;
-    _tau = 1e-5; // Carlos: originally 1e-5
+    _tau = 1e-5;
     _goodStepUpperScale = 2./3.;
     _goodStepLowerScale = 1./3.;
     _userLambdaInit = _properties.makeProperty<Property<double> >("initialLambda", 0.);
-    _maxTrialsAfterFailure = _properties.makeProperty<Property<int> >("maxTrialsAfterFailure", 10); // Carlos: Originally 10 iterations
+    _maxTrialsAfterFailure = _properties.makeProperty<Property<int> >("maxTrialsAfterFailure", 10);
     _ni=2.;
     _levenbergIterations = 0;
-    _nBad = 0;
   }
 
   OptimizationAlgorithmLevenberg::~OptimizationAlgorithmLevenberg()
@@ -82,18 +78,15 @@ namespace g2o {
     double currentChi = _optimizer->activeRobustChi2();
     double tempChi=currentChi;
 
-    double iniChi = currentChi;
-
     _solver->buildSystem();
     if (globalStats) {
       globalStats->timeQuadraticForm = get_monotonic_time()-t;
     }
 
     // core part of the Levenbarg algorithm
-    if (iteration == 0) {       
+    if (iteration == 0) {
       _currentLambda = computeLambdaInit();
       _ni = 2;
-      _nBad = 0;
     }
 
     double rho=0;
@@ -122,7 +115,7 @@ namespace g2o {
 
       _optimizer->computeActiveErrors();
       tempChi = _optimizer->activeRobustChi2();
-      // cout << "tempChi: " << tempChi << endl;
+
       if (! ok2)
         tempChi=std::numeric_limits<double>::max();
 
@@ -149,22 +142,7 @@ namespace g2o {
     } while (rho<0 && qmax < _maxTrialsAfterFailure->value() && ! _optimizer->terminate());
 
     if (qmax == _maxTrialsAfterFailure->value() || rho==0)
-    {
-      // cout << "qmax = " << qmax << "             rho = " << rho << endl;
       return Terminate;
-    }
-
-    //Stop criterium (Raul)
-    if((iniChi-currentChi)*1e3<iniChi)
-        _nBad++;
-    else
-        _nBad=0;
-
-    if(_nBad>=3)
-    {
-        return Terminate;
-    }
-
     return OK;
   }
 
