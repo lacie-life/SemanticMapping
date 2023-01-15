@@ -1,7 +1,6 @@
 #include "QPCLVisual.h"
 #include "AppConstants.h"
 #include "QTimerHelper.h"
-#include "QOptimize.h"
 #include <thread>
 #include <QDebug>
 
@@ -33,7 +32,10 @@ QPCLVisual::~QPCLVisual()
 
 void QPCLVisual::showPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr frameCloud, Sophus::SE3f Tcw) {
 
-    std::cout << "Size:" << frameCloud->size() << std::endl;
+    if(frameCloud != nullptr)
+    {
+        CONSOLE << "Size:" << frameCloud->size();
+    }
 
     if (this->m_mode == PCL_VISUAL_MODE::RENDER_MODE)
     {
@@ -82,9 +84,10 @@ double QPCLVisual::curTime() {
 
 void QPCLVisual::renderMode(pcl::PointCloud<pcl::PointXYZRGB>::Ptr frameCloud, Sophus::SE3f Tcw) {
 
-    qDebug() << this->m_count;
+    CONSOLE << this->m_count;
 
     ++this->m_count;
+
     if (Tcw.log() == Sophus::SE3f().log()) {
         // remove pts
         this->m_allPts->clear();
@@ -95,16 +98,18 @@ void QPCLVisual::renderMode(pcl::PointCloud<pcl::PointXYZRGB>::Ptr frameCloud, S
         emit this->signalShowPtsFinished();
         return;
     }
+
     auto Twc = Tcw.inverse();
     auto quat = Twc.unit_quaternion();
     auto trans = Twc.translation();
+
     // add new point cloud
     this->m_allPts->resize(this->m_allPts->size() + frameCloud->size());
     std::copy(frameCloud->begin(), frameCloud->end(), this->m_allPts->end() - frameCloud->size());
 
     if (this->m_count % 20 == 0) {
         pcl::VoxelGrid<pcl::PointXYZRGB> filter;
-        filter.setLeafSize(0.02, 0.02, 0.02);
+        filter.setLeafSize(0.01, 0.01, 0.01);
         filter.setInputCloud(m_allPts);
         filter.filter(*m_allPts);
         viewer->removeAllPointClouds();

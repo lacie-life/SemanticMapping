@@ -46,6 +46,15 @@ void QRebuilder::processNewDepthFrame(cv::Mat colorImg, cv::Mat depthImg, Sophus
 
     frameCloud->reserve(depthImg.rows * depthImg.cols * 0.9);
 
+    if(this->m_pcl_visual->m_mode == PCL_VISUAL_MODE::RENDER_MODE)
+    {
+        CONSOLE << "RENDER MODE";
+    }
+    else
+    {
+        CONSOLE << "INTERACTIVE MODE";
+    }
+
 //    cv::Mat color(depthImg.rows, depthImg.cols, CV_8UC3);
 
     // Tcw -> Twc
@@ -97,6 +106,7 @@ void QRebuilder::processNewDepthFrame(cv::Mat colorImg, cv::Mat depthImg, Sophus
     CONSOLE << "Cloud: " << this->m_pts->size();
 
     if (this->m_pcl_visual_need_data) {
+        CONSOLE << "Need data pls ...";
         auto tempPts = std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
         tempPts->resize(this->m_pts->size());
         std::copy(this->m_pts->begin(), this->m_pts->end(), tempPts->begin());
@@ -128,6 +138,8 @@ void QRebuilder::init(QConfigDialog *cof) {
 
     // pcl visual
     this->m_pcl_visual = std::make_shared<QPCLVisual>();
+
+    this->m_pcl_visual->m_mode = PCL_VISUAL_MODE::RENDER_MODE;
 
     connect(this, &QRebuilder::signalPCLShowPointCloud, this->m_pcl_visual.get(), &QPCLVisual::showPointCloud);
 

@@ -38,5 +38,5 @@ cmake-build-debug/
 /Data/vocabulary/ORBvoc.txt
 CMakeLists.txt.user
 Data/model/yolov4.weights
-
+bin
 
