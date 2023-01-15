@@ -17,17 +17,22 @@ add_definitions(-w)
 find_package(OpenCV 4.2 REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Pangolin 0.6 REQUIRED)
+find_package( PCL 1.12 REQUIRED)
 
 include_directories(
     ${OpenCV_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
     ${Pangolin_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/Slam/include
     ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o
     ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/Sophus
     ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2
 )
+
+add_definitions(${PCL_DEFINITIONS})
+link_directories(${PCL_LIBRARY_DIRS})
 
 file(GLOB HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
@@ -47,12 +52,14 @@ set(CONVENIENCE_LIB_NAME "slam_lib")
 
 add_library(${CONVENIENCE_LIB_NAME} SHARED
         ${HEADERS}
-        ${SOURCES})
+        ${SOURCES}
+        )
 
 target_link_libraries(${CONVENIENCE_LIB_NAME} PRIVATE
     ${OpenCV_LIBS}
     ${EIGEN3_LIBS}
     ${Pangolin_LIBRARIES}
+    ${PCL_LIBRARIES}
     ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2/lib/libDBoW2_New.so
     ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o.so
     -lboost_serialization
