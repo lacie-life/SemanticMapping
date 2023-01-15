@@ -57,7 +57,8 @@ void MainWindow::connection() {
             });
 
     // for save button
-    connect(ui->btn_save, &QPushButton::clicked, this, &MainWindow::saveCliked);
+    connect(ui->btn_save, &QPushButton::clicked,
+            this, &MainWindow::saveCliked);
 
     // for quit button
     connect(ui->btn_quit, &QPushButton::clicked,
@@ -234,7 +235,9 @@ void MainWindow::processNewFrame() {
 
     CONSOLE << QString::fromStdString(m_vstrImageFilenamesD[this->m_curFrameIdx]);
 
+    CONSOLE << QString(this->m_configDig.m_seqPath + "/" + QString::fromStdString(m_vstrImageFilenamesRGB[this->m_curFrameIdx]));
     CONSOLE << QString(this->m_configDig.m_seqPath + "/" + QString::fromStdString(m_vstrImageFilenamesD[this->m_curFrameIdx]));
+
 
     // load color and depth images
     this->m_imD = cv::imread(this->m_configDig.m_seqPath.toStdString() + "/" +

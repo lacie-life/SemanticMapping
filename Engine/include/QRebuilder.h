@@ -60,6 +60,8 @@ public:
 
     bool m_pcl_visual_need_data = true;
 
+    cv::Mat *m_colorDisplay;
+
 public:
     const std::string m_cvWinName = "Rebuilder";
 

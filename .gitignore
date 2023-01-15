@@ -35,5 +35,8 @@ build-Engine-Desktop_Qt_5_15_2_GCC_64bit-Debug/
 Slam/Thirdparty/DBoW2/build/
 Slam/Thirdparty/g2o/build/
 cmake-build-debug/
-/Slam/Vocabulary/ORBvoc.txt
+/Data/vocabulary/ORBvoc.txt
 CMakeLists.txt.user
+Data/model/yolov4.weights
+
+

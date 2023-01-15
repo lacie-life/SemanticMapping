@@ -10,9 +10,11 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
     qRegisterMetaType<cv::Mat>("cv::Mat");
     qRegisterMetaType<Sophus::SE3f>("Sophus::SE3f");
     qRegisterMetaType<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>("pcl::PointCloud<pcl::PointXYZRGB>::Ptr");
+
     MainWindow w;
     w.show();
     return a.exec();

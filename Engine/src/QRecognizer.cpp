@@ -22,7 +22,7 @@ void QRecognizer::processNewColorFrame(cv::Mat srcImg) {
 
     // do process
     // TODO: Update YoLov5 TensorRT version
-//    yoloDetector(dstImg, this->m_classesVec, *(this->m_detector));
+    yoloDetector(dstImg, this->m_classesVec, *(this->m_detector));
 
     // show image
     emit this->signalProcessNewFrameFinished(dstImg);

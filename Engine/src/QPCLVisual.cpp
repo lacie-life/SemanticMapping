@@ -1,4 +1,5 @@
 #include "QPCLVisual.h"
+#include "AppConstants.h"
 #include "QTimerHelper.h"
 #include "QOptimize.h"
 #include <thread>
@@ -34,12 +35,16 @@ void QPCLVisual::showPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr frameClou
 
     std::cout << "Size:" << frameCloud->size() << std::endl;
 
-    if (this->m_mode == PCL_VISUAL_MODE::RENDER_MODE) {
+    if (this->m_mode == PCL_VISUAL_MODE::RENDER_MODE)
+    {
+        CONSOLE << "Rendering ... ";
         this->renderMode(frameCloud, Tcw);
-    } else if (this->m_mode == PCL_VISUAL_MODE::INTERACTIVE_MODE) {
+    }
+    else if (this->m_mode == PCL_VISUAL_MODE::INTERACTIVE_MODE)
+    {
         {
             pcl::VoxelGrid<pcl::PointXYZRGB> filter;
-            filter.setLeafSize(0.2f, 0.2f, 0.2f);
+            filter.setLeafSize(0.01f, 0.01f, 0.01f);
             filter.setInputCloud(m_allPts);
             filter.filter(*m_allPts);
             viewer->removeAllPointClouds();
