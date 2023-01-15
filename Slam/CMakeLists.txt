@@ -18,6 +18,7 @@ find_package(OpenCV 4.2 REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Pangolin 0.6 REQUIRED)
 find_package( PCL 1.12 REQUIRED)
+find_package(g2o REQUIRED)
 
 include_directories(
     ${OpenCV_INCLUDE_DIRS}
@@ -56,22 +57,19 @@ add_library(${CONVENIENCE_LIB_NAME} SHARED
         )
 
 target_link_libraries(${CONVENIENCE_LIB_NAME} PRIVATE
-    ${OpenCV_LIBS}
-    ${EIGEN3_LIBS}
-    ${Pangolin_LIBRARIES}
-    ${PCL_LIBRARIES}
-    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2/lib/libDBoW2_New.so
-    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_core.so
-    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_stuff.so
-    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_types_sba.so
-    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_solver_csparse.so
-    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_csparse_extension.so
-    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_solver_dense.so
-    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_solver_eigen.so
-    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_types_sim3.so
-    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_types_slam3d.so
-    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o/lib/libg2o_types_slam2d.so
-    -lboost_serialization
-    -lcrypto
+        ${OpenCV_LIBS}
+        ${EIGEN3_LIBS}
+        ${Pangolin_LIBRARIES}
+        ${PCL_LIBRARIES}
+        ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2/lib/libDBoW2_New.so
+        g2o_core
+        g2o_types_slam3d
+        g2o_solver_csparse
+        g2o_stuff
+        g2o_csparse_extension
+        g2o_types_sim3
+        g2o_types_sba
+        -lboost_serialization
+        -lcrypto
 )
 
