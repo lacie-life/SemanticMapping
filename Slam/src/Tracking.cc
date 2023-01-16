@@ -1365,7 +1365,6 @@ vdStereoMatch_ms.push_back(mCurrentFrame.mTimeStereoMatch);
         cv::Mat imDepth = imD;
 
         mImRGB = imRGB;
-        mImGray = imRGB;
         mImDepth = imD;
 
         if (mImGray.channels() == 3) {
@@ -1406,7 +1405,7 @@ vdStereoMatch_ms.push_back(mCurrentFrame.mTimeStereoMatch);
 
     Sophus::SE3f Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp, string filename) {
         mImGray = im;
-        // 将图片转化为灰度图片
+
         if (mImGray.channels() == 3) {
             if (mbRGB)
                 cvtColor(mImGray, mImGray, cv::COLOR_RGB2GRAY);
@@ -1418,13 +1417,13 @@ vdStereoMatch_ms.push_back(mCurrentFrame.mTimeStereoMatch);
             else
                 cvtColor(mImGray, mImGray, cv::COLOR_BGRA2GRAY);
         }
-        // 如果是单目相机
+
         if (mSensor == System::MONOCULAR) {
-            // 如果没有完成初始化
+
             if (mState == NOT_INITIALIZED || mState == NO_IMAGES_YET || (lastID - initID) < mMaxFrames)
                 mCurrentFrame = Frame(mImGray, timestamp, mpIniORBextractor, mpORBVocabulary, mpCamera, mDistCoef, mbf,
                                       mThDepth);
-                // 如果已经完成了初始化
+
             else
                 mCurrentFrame = Frame(mImGray, timestamp, mpORBextractorLeft, mpORBVocabulary, mpCamera, mDistCoef, mbf,
                                       mThDepth);

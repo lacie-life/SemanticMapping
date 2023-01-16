@@ -21,7 +21,7 @@ using namespace  ORB_SLAM3;
 class PointCloudMapping {
 
 public:
-    typedef pcl::PointXYZRGBA PointT;
+    typedef pcl::PointXYZRGB PointT;
     typedef pcl::PointCloud<PointT> PointCloud;
 
     PointCloudMapping(double resolution_);
