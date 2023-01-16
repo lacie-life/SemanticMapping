@@ -14,7 +14,7 @@
 PointCloudMapping::PointCloudMapping(double resolution_)
 {
     this->resolution = resolution_;
-    voxel.setLeafSize( resolution, resolution, resolution);
+    voxel.setLeafSize(resolution, resolution, resolution);
     globalMap = std::make_shared<PointCloud>();
 
     viewerThread = make_shared<thread>(bind(&PointCloudMapping::viewer, this));
@@ -45,6 +45,11 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
 {
     PointCloud::Ptr tmp(new PointCloud());
 
+    auto Twc = kf->GetPose().inverse();
+    auto quat = Twc.unit_quaternion();
+    auto trans = Twc.translation();
+
+    // TODO: Convert point cloud
     // point cloud is null ptr
     for (int m = 0; m < depth.rows; m+=3)
     {
@@ -53,6 +58,12 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
             float d = depth.ptr<float>(m)[n];
             if (d < 0.01 || d>10)
                 continue;
+
+            // --- for cloud point ---
+//            float scalar = float(d) / 5000.0;
+//            Eigen::Vector3f p((n - kf->cx) * scalar / kf->fx, (m - kf->cy) * scalar / kf->fy, scalar);
+//            Eigen::Vector3f p_w = quat * p + trans;
+
             PointT p;
             p.z = d;
             p.x = (n - kf->cx) * p.z / kf->fx;
@@ -68,24 +79,25 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
 
     std::cout << tmp->size() << std::endl;
 
-    Eigen::Isometry3d T = ORB_SLAM3::Converter::toSE3Quat(kf->GetPose());
+//    Eigen::Isometry3d T = ORB_SLAM3::Converter::toSE3Quat(kf->GetPose());
+//    std::cout << T.inverse().matrix() << std::endl;
 
     PointCloud::Ptr cloud(new PointCloud);
+    cloud->resize(tmp->size());
 
-    pcl::transformPointCloud( *tmp, *tmp, T.inverse().matrix());
+    pcl::transformPointCloud( *tmp, *cloud, Twc.matrix());
 
-    std::cout << T.inverse().matrix() << std::endl;
+    cloud->is_dense = false;
 
-    tmp->is_dense = false;
+    cout << "generate point cloud for kf " << kf->mnId << ", size=" << cloud->points.size() << endl;
 
-    cout << "generate point cloud for kf " << kf->mnId << ", size=" << tmp->points.size() << endl;
-
-    return tmp;
+    return cloud;
 }
 
 void PointCloudMapping::viewer()
 {
     pcl::visualization::CloudViewer viewer("viewer");
+
     while(1)
     {
         {
@@ -124,5 +136,8 @@ void PointCloudMapping::viewer()
 
         lastKeyframeSize = N;
     }
+
+    pcl::io::savePCDFile("result.pcd", *globalMap);
+    std::cout << "Final point cloud saved!!!" << std::endl;
 }
 
