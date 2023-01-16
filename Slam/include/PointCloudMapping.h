@@ -36,18 +36,18 @@ protected:
     PointCloud::Ptr globalMap;
     std::shared_ptr<thread>  viewerThread;
 
-    bool    shutDownFlag    =false;
-    mutex   shutDownMutex;
+    bool shutDownFlag = false;
+    mutex shutDownMutex;
 
-    condition_variable  keyFrameUpdated;
-    mutex               keyFrameUpdateMutex;
+    condition_variable keyFrameUpdated;
+    mutex keyFrameUpdateMutex;
 
     // data to generate point clouds
-    vector<KeyFrame*>       keyframes;
-    vector<cv::Mat>         colorImgs;
-    vector<cv::Mat>         depthImgs;
-    mutex                   keyframeMutex;
-    uint16_t                lastKeyframeSize = 0;
+    vector<KeyFrame*> keyframes;
+    vector<cv::Mat> colorImgs;
+    vector<cv::Mat> depthImgs;
+    mutex keyframeMutex;
+    uint16_t lastKeyframeSize = 0;
 
     double resolution = 0.04;
     pcl::VoxelGrid<PointT>  voxel;

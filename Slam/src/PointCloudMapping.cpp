@@ -9,6 +9,7 @@
 #include <pcl/visualization/cloud_viewer.h>
 #include <pcl/common/projection_matrix.h>
 #include <pcl/io/pcd_io.h>
+
 #include "Converter.h"
 
 PointCloudMapping::PointCloudMapping(double resolution_)
@@ -45,15 +46,24 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
 {
     PointCloud::Ptr tmp(new PointCloud());
 
+    tmp->reserve(depth.rows * depth.cols * 0.9);
+
+    if(kf->GetPose().log() == Sophus::SE3f().log())
+    {
+        globalMap->clear();
+        globalMap->reserve(0);
+        return tmp;
+    }
+
     auto Twc = kf->GetPose().inverse();
     auto quat = Twc.unit_quaternion();
     auto trans = Twc.translation();
 
     // TODO: Convert point cloud
     // point cloud is null ptr
-    for (int m = 0; m < depth.rows; m+=3)
+    for (int m = 0; m < depth.rows; m++)
     {
-        for (int n = 0; n < depth.cols; n+=3)
+        for (int n = 0; n < depth.cols; n++)
         {
             float d = depth.ptr<float>(m)[n];
             if (d < 0.01 || d>10)
@@ -68,6 +78,11 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
             _p.z = p_w(0);
             _p.x = p_w(1);
             _p.y = p_w(2);
+
+//            PointT _p;
+//            _p.z = d;
+//            _p.x = ( n - kf->cx) * _p.z / kf->fx;
+//            _p.y = ( m - kf->cy) * _p.z / kf->fy;
 
             _p.b = color.ptr<uchar>(m)[n*3];
             _p.g = color.ptr<uchar>(m)[n*3+1];
@@ -87,13 +102,14 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
 
     std::copy(tmp->begin(), tmp->end(), cloud->begin());
 
-//    pcl::transformPointCloud( *tmp, *cloud, Twc.matrix());
+//    pcl::transformPointCloud( *tmp, *cloud, T.inverse().matrix(), true);
 
     cloud->is_dense = false;
 
     cout << "generate point cloud for kf " << kf->mnId << ", size=" << cloud->points.size() << endl;
 
     return cloud;
+
 }
 
 void PointCloudMapping::viewer()
@@ -126,11 +142,11 @@ void PointCloudMapping::viewer()
             PointCloud::Ptr p = generatePointCloud(keyframes[i], colorImgs[i], depthImgs[i]);
             *globalMap += *p;
         }
-        PointCloud::Ptr tmp(new PointCloud());
-
-        voxel.setInputCloud(globalMap);
-        voxel.filter(*tmp);
-        globalMap->swap(*tmp);
+//        PointCloud::Ptr tmp(new PointCloud());
+//
+//        voxel.setInputCloud(globalMap);
+//        voxel.filter(*tmp);
+//        globalMap->swap(*tmp);
 
         viewer.showCloud(globalMap);
 
