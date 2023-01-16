@@ -32,7 +32,7 @@ void PointCloudMapping::shutdown()
 
 void PointCloudMapping::insertKeyFrame(KeyFrame* kf, cv::Mat& color, cv::Mat& depth)
 {
-    cout<<"receive a keyframe, id = "<<kf->mnId<<endl;
+    cout << "receive a keyframe, id = " << kf->mnId << endl;
     unique_lock<mutex> lck(keyframeMutex);
     keyframes.push_back( kf );
     colorImgs.push_back( color.clone() );
@@ -60,20 +60,20 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
                 continue;
 
             // --- for cloud point ---
-//            float scalar = float(d) / 5000.0;
-//            Eigen::Vector3f p((n - kf->cx) * scalar / kf->fx, (m - kf->cy) * scalar / kf->fy, scalar);
-//            Eigen::Vector3f p_w = quat * p + trans;
+            float scalar = float(d);
+            Eigen::Vector3f p((n - kf->cx) * scalar / kf->fx, (m - kf->cy) * scalar / kf->fy, scalar);
+            Eigen::Vector3f p_w = quat * p + trans;
 
-            PointT p;
-            p.z = d;
-            p.x = (n - kf->cx) * p.z / kf->fx;
-            p.y = (m - kf->cy) * p.z / kf->fy;
+            PointT _p;
+            _p.z = p_w(0);
+            _p.x = p_w(1);
+            _p.y = p_w(2);
 
-            p.b = color.ptr<uchar>(m)[n*3];
-            p.g = color.ptr<uchar>(m)[n*3+1];
-            p.r = color.ptr<uchar>(m)[n*3+2];
+            _p.b = color.ptr<uchar>(m)[n*3];
+            _p.g = color.ptr<uchar>(m)[n*3+1];
+            _p.r = color.ptr<uchar>(m)[n*3+2];
 
-            tmp->points.push_back(p);
+            tmp->points.push_back(_p);
         }
     }
 
@@ -85,7 +85,9 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
     PointCloud::Ptr cloud(new PointCloud);
     cloud->resize(tmp->size());
 
-    pcl::transformPointCloud( *tmp, *cloud, Twc.matrix());
+    std::copy(tmp->begin(), tmp->end(), cloud->begin());
+
+//    pcl::transformPointCloud( *tmp, *cloud, Twc.matrix());
 
     cloud->is_dense = false;
 
