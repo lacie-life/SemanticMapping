@@ -212,7 +212,7 @@ void Viewer::Run()
     Twc.SetIdentity();
     pangolin::OpenGlMatrix Ow; // Oriented with g in the z axis
     Ow.SetIdentity();
-    // cv::namedWindow("ORB-SLAM3: Current Frame");
+    cv::namedWindow("ORB-SLAM3: Current Frame");
 
     bool bFollow = true;
     bool bLocalizationMode = false;
@@ -342,8 +342,8 @@ void Viewer::Run()
             cv::resize(toShow, toShow, cv::Size(width, height));
         }
 
-        // cv::imshow("ORB-SLAM3: Current Frame",toShow);
-        // cv::waitKey(mT);
+         cv::imshow("ORB-SLAM3: Current Frame",toShow);
+         cv::waitKey(mT);
 
         if(menuReset)
         {
@@ -453,9 +453,9 @@ void Viewer::Release()
     mbStopped = false;
 }
 
-/*void Viewer::SetTrackingPause()
-{
-    mbStopTrack = true;
-}*/
+//void Viewer::SetTrackingPause()
+//{
+//    mbStopTrack = true;
+//}
 
 }

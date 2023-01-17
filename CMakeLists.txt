@@ -33,7 +33,7 @@ link_directories(${Boost_LIBRARY_DIR})
 find_package(Pangolin REQUIRED)
 include_directories(${Pangolin_INCLUDE_DIRS})
 
-find_package(PCL 1.12 REQUIRED)
+find_package(PCL 1.10 REQUIRED)
 add_definitions(${PCL_DEFINITIONS})
 include_directories(${PCL_INCLUDE_DIRS})
 message("PCL Include Directory: ${PCL_INCLUDE_DIRS}")
@@ -53,6 +53,7 @@ add_subdirectory(Slam)
 #add_subdirectory(Model)
 add_subdirectory(Engine)
 add_subdirectory(Test)
+add_subdirectory(Tools)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Data
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

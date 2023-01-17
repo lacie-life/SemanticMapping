@@ -1348,7 +1348,7 @@ namespace ORB_SLAM3 {
 
 #ifdef REGISTER_TIMES
         vdORBExtract_ms.push_back(mCurrentFrame.mTimeORB_Ext);
-vdStereoMatch_ms.push_back(mCurrentFrame.mTimeStereoMatch);
+        vdStereoMatch_ms.push_back(mCurrentFrame.mTimeStereoMatch);
 #endif
 
         //cout << "Tracking start" << endl;

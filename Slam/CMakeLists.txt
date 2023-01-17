@@ -20,7 +20,7 @@ find_package(OpenCV 4.2 REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Pangolin 0.6 REQUIRED)
 find_package(g2o REQUIRED)
-find_package(PCL 1.12 REQUIRED)
+find_package(PCL 1.10 REQUIRED)
 
 add_definitions(${PCL_DEFINITIONS})
 message("PCL Include Directory: ${PCL_INCLUDE_DIRS}")
