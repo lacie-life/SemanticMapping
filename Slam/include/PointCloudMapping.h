@@ -2,24 +2,21 @@
 // Created by lacie on 15/01/2023.
 //
 
-#ifndef AG_MAPPING_POINTCLOUDMAPPING_H
-#define AG_MAPPING_POINTCLOUDMAPPING_H
+#ifndef POINTCLOUDMAPPING_H
+#define POINTCLOUDMAPPING_H
 
 #include "System.h"
 
-#include "pcl/point_cloud.h"
-#include "pcl/common/transforms.h"
-#include "pcl/point_types.h"
-#include "pcl/filters/voxel_grid.h"
-
+#include <pcl/common/transforms.h>
+#include <pcl/point_types.h>
+#include <pcl/filters/voxel_grid.h>
 #include <condition_variable>
+#include <pcl/visualization/cloud_viewer.h>
 
-#include <boost/make_shared.hpp>
+using namespace ORB_SLAM2;
 
-using namespace  ORB_SLAM3;
-
-class PointCloudMapping {
-
+class PointCloudMapping
+{
 public:
     typedef pcl::PointXYZRGB PointT;
     typedef pcl::PointCloud<PointT> PointCloud;
@@ -34,7 +31,10 @@ protected:
     PointCloud::Ptr generatePointCloud(KeyFrame* kf, cv::Mat& color, cv::Mat& depth);
 
     PointCloud::Ptr globalMap;
-    std::shared_ptr<thread>  viewerThread;
+    shared_ptr<thread> viewerThread;
+
+    pcl::visualization::PCLVisualizer::Ptr m_viewer;
+    std::size_t m_count;
 
     bool shutDownFlag = false;
     mutex shutDownMutex;
@@ -47,10 +47,10 @@ protected:
     vector<cv::Mat> colorImgs;
     vector<cv::Mat> depthImgs;
     mutex keyframeMutex;
-    uint16_t lastKeyframeSize = 0;
+    uint16_t lastKeyframeSize =0;
 
     double resolution = 0.04;
     pcl::VoxelGrid<PointT>  voxel;
 };
 
-#endif //AG_MAPPING_POINTCLOUDMAPPING_H
+#endif // POINTCLOUDMAPPING_H

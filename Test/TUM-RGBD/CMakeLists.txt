@@ -4,5 +4,6 @@ target_link_libraries(tum-rgbd-test
         slam_lib
         ${Pangolin_LIBRARIES}
         ${OpenCV_LIBS}
+        ${PCL_LIBRARIES}
 )
 

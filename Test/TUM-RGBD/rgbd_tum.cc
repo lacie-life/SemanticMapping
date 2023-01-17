@@ -59,8 +59,8 @@ int main(int argc, char **argv)
     }
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM3::System SLAM(argv[1], argv[2], ORB_SLAM3::System::RGBD, true);
-    float imageScale = SLAM.GetImageScale();
+    ORB_SLAM2::System SLAM(argv[1], argv[2], ORB_SLAM2::System::RGBD, true);
+//    float imageScale = SLAM.GetImageScale();
 
     // Vector for tracking time statistics
     vector<float> vTimesTrack;
@@ -86,13 +86,13 @@ int main(int argc, char **argv)
             return 1;
         }
 
-        if(imageScale != 1.f)
-        {
-            int width = imRGB.cols * imageScale;
-            int height = imRGB.rows * imageScale;
-            cv::resize(imRGB, imRGB, cv::Size(width, height));
-            cv::resize(imD, imD, cv::Size(width, height));
-        }
+//        if(imageScale != 1.f)
+//        {
+//            int width = imRGB.cols * imageScale;
+//            int height = imRGB.rows * imageScale;
+//            cv::resize(imRGB, imRGB, cv::Size(width, height));
+//            cv::resize(imD, imD, cv::Size(width, height));
+//        }
 
         std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
