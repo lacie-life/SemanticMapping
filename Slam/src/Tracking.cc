@@ -1361,10 +1361,11 @@ namespace ORB_SLAM3 {
 
     Sophus::SE3f
     Tracking::GrabImageRGBD(const cv::Mat &imRGB, const cv::Mat &imD, const double &timestamp, string filename) {
-        mImGray = imRGB;
+
         cv::Mat imDepth = imD;
 
         mImRGB = imRGB;
+        mImGray = imRGB;
         mImDepth = imD;
 
         if (mImGray.channels() == 3) {
@@ -2974,11 +2975,8 @@ usleep(3000);
             }
         }
 
-
         mpLocalMapper->InsertKeyFrame(pKF);
-
         mpLocalMapper->SetNotStop(false);
-
         mpPointCloudMapping->insertKeyFrame( pKF, this->mImRGB, this->mImDepth);
 
         mnLastKeyFrameId = mCurrentFrame.mnId;

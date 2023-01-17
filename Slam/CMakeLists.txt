@@ -23,6 +23,7 @@ find_package(g2o REQUIRED)
 find_package(PCL 1.10 REQUIRED)
 
 add_definitions(${PCL_DEFINITIONS})
+link_directories(${PCL_LIBRARY_DIRS})
 message("PCL Include Directory: ${PCL_INCLUDE_DIRS}")
 
 include_directories(
@@ -36,8 +37,6 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/Sophus
     ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2
 )
-
-link_directories(${PCL_LIBRARY_DIRS})
 
 file(GLOB HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h

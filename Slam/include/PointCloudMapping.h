@@ -11,6 +11,7 @@
 #include "pcl/common/transforms.h"
 #include "pcl/point_types.h"
 #include "pcl/filters/voxel_grid.h"
+#include "pcl/visualization/cloud_viewer.h"
 
 #include <condition_variable>
 
@@ -34,7 +35,10 @@ protected:
     PointCloud::Ptr generatePointCloud(KeyFrame* kf, cv::Mat& color, cv::Mat& depth);
 
     PointCloud::Ptr globalMap;
-    std::shared_ptr<thread>  viewerThread;
+    shared_ptr<thread>  viewerThread;
+
+    pcl::visualization::PCLVisualizer::Ptr m_viewer;
+    std::size_t m_count;
 
     bool shutDownFlag = false;
     mutex shutDownMutex;
