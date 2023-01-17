@@ -12,11 +12,13 @@
 
 #include "Converter.h"
 
+#include <boost/make_shared.hpp>
+
 PointCloudMapping::PointCloudMapping(double resolution_)
 {
     this->resolution = resolution_;
     voxel.setLeafSize(resolution, resolution, resolution);
-    globalMap = std::make_shared<PointCloud>();
+    globalMap = boost::make_shared<PointCloud>();
 
     viewerThread = make_shared<thread>(bind(&PointCloudMapping::viewer, this));
 }
@@ -45,7 +47,6 @@ void PointCloudMapping::insertKeyFrame(KeyFrame* kf, cv::Mat& color, cv::Mat& de
 pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePointCloud(KeyFrame* kf, cv::Mat& color, cv::Mat& depth)
 {
     PointCloud::Ptr tmp(new PointCloud());
-
     tmp->reserve(depth.rows * depth.cols * 0.9);
 
     if(kf->GetPose().log() == Sophus::SE3f().log())
@@ -70,19 +71,19 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
                 continue;
 
             // --- for cloud point ---
-            float scalar = float(d);
-            Eigen::Vector3f p((n - kf->cx) * scalar / kf->fx, (m - kf->cy) * scalar / kf->fy, scalar);
-            Eigen::Vector3f p_w = quat * p + trans;
+//            float scalar = float(d);
+//            Eigen::Vector3f p((n - kf->cx) * scalar / kf->fx, (m - kf->cy) * scalar / kf->fy, scalar);
+//            Eigen::Vector3f p_w = quat * p + trans;
+//
+//            PointT _p;
+//            _p.z = p_w(0);
+//            _p.x = p_w(1);
+//            _p.y = p_w(2);
 
             PointT _p;
-            _p.z = p_w(0);
-            _p.x = p_w(1);
-            _p.y = p_w(2);
-
-//            PointT _p;
-//            _p.z = d;
-//            _p.x = ( n - kf->cx) * _p.z / kf->fx;
-//            _p.y = ( m - kf->cy) * _p.z / kf->fy;
+            _p.z = d;
+            _p.x = ( n - kf->cx) * _p.z / kf->fx;
+            _p.y = ( m - kf->cy) * _p.z / kf->fy;
 
             _p.b = color.ptr<uchar>(m)[n*3];
             _p.g = color.ptr<uchar>(m)[n*3+1];
@@ -94,15 +95,15 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
 
     std::cout << tmp->size() << std::endl;
 
-//    Eigen::Isometry3d T = ORB_SLAM3::Converter::toSE3Quat(kf->GetPose());
-//    std::cout << T.inverse().matrix() << std::endl;
+    Eigen::Isometry3d T = ORB_SLAM3::Converter::toSE3Quat(kf->GetPose());
+    std::cout << T.inverse().matrix() << std::endl;
 
     PointCloud::Ptr cloud(new PointCloud);
     cloud->resize(tmp->size());
 
-    std::copy(tmp->begin(), tmp->end(), cloud->begin());
+//    std::copy(tmp->begin(), tmp->end(), cloud->begin());
 
-//    pcl::transformPointCloud( *tmp, *cloud, T.inverse().matrix(), true);
+    pcl::transformPointCloud( *tmp, *cloud, T.inverse().matrix(), true);
 
     cloud->is_dense = false;
 
