@@ -1380,14 +1380,14 @@ namespace ORB_SLAM3 {
                 cvtColor(mImGray, mImGray, cv::COLOR_BGRA2GRAY);
         }
 
-        if ((fabs(mDepthMapFactor - 1.0f) > 1e-5) || imDepth.type() != CV_32F)
-            imDepth.convertTo(imDepth, CV_32F, mDepthMapFactor);
+        if ((fabs(mDepthMapFactor - 1.0f) > 1e-5) || mImDepth.type() != CV_32F)
+            mImDepth.convertTo(mImDepth, CV_32F, mDepthMapFactor);
 
         if (mSensor == System::RGBD)
-            mCurrentFrame = Frame(mImGray, imDepth, timestamp, mpORBextractorLeft, mpORBVocabulary, mK, mDistCoef, mbf,
+            mCurrentFrame = Frame(mImGray, mImDepth, timestamp, mpORBextractorLeft, mpORBVocabulary, mK, mDistCoef, mbf,
                                   mThDepth, mpCamera);
         else if (mSensor == System::IMU_RGBD)
-            mCurrentFrame = Frame(mImGray, imDepth, timestamp, mpORBextractorLeft, mpORBVocabulary, mK, mDistCoef, mbf,
+            mCurrentFrame = Frame(mImGray, mImDepth, timestamp, mpORBextractorLeft, mpORBVocabulary, mK, mDistCoef, mbf,
                                   mThDepth, mpCamera, &mLastFrame, *mpImuCalib);
 
 
@@ -2977,6 +2977,14 @@ usleep(3000);
 
         mpLocalMapper->InsertKeyFrame(pKF);
         mpLocalMapper->SetNotStop(false);
+
+        double minT, maxT;
+        cv::minMaxIdx(mImDepth, &minT, &maxT);
+
+        cout << "Depth mat type " << mImDepth.type() << endl;
+        cout << "DepthMapFactor" << mDepthMapFactor << endl;
+        cout << "BEFORE +++ (" << minT << ", " << maxT << ") ";
+
         mpPointCloudMapping->insertKeyFrame( pKF, this->mImRGB, this->mImDepth);
 
         mnLastKeyFrameId = mCurrentFrame.mnId;
