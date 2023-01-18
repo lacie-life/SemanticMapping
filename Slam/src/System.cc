@@ -108,6 +108,16 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     }
 
     float resolution = fsSettings["PointCloudMapping.Resolution"];
+    int model = fsSettings["Semantic.Model"];
+
+    if(model == 0)
+    {
+        isYoloDetection = true;
+    }
+    else
+    {
+        isYoloDetection = false;
+    }
 
     node = fsSettings["loopClosing"];
     bool activeLC = true;

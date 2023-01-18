@@ -268,6 +268,9 @@ public:
 
     // point cloud mapping
     std::shared_ptr<PointCloudMapping>  mpPointCloudMapping;
+
+    // Semantic model
+    bool isYoloDetection;
 };
 
 }// namespace ORB_SLAM
