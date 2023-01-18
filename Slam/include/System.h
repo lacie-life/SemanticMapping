@@ -271,7 +271,7 @@ public:
     std::shared_ptr<PointCloudMapping>  mpPointCloudMapping;
 
     // Semantic model
-    bool isYoloDetection;
+    bool isYoloDetection = true;
     YoloDetection* mpDetector;
 };
 

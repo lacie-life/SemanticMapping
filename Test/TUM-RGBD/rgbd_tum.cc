@@ -27,14 +27,14 @@
 
 using namespace std;
 
-void LoadImages(const string &strAssociationFilename, vector<string> &vstrImageFilenamesRGB,
+void LoadImages(const string &strAssociationFilenameDepth, const string &strAssociationFilenameRGB, vector<string> &vstrImageFilenamesRGB,
                 vector<string> &vstrImageFilenamesD, vector<double> &vTimestamps);
 
 int main(int argc, char **argv)
 {
-    if(argc != 5)
+    if(argc != 6)
     {
-        cerr << endl << "Usage: ./rgbd_tum path_to_vocabulary path_to_settings path_to_sequence path_to_association" << endl;
+        cerr << endl << "Usage: ./rgbd_tum path_to_vocabulary path_to_settings path_to_sequence path_to_association_depth path_to_association_rgb" << endl;
         return 1;
     }
 
@@ -42,8 +42,9 @@ int main(int argc, char **argv)
     vector<string> vstrImageFilenamesRGB;
     vector<string> vstrImageFilenamesD;
     vector<double> vTimestamps;
-    string strAssociationFilename = string(argv[4]);
-    LoadImages(strAssociationFilename, vstrImageFilenamesRGB, vstrImageFilenamesD, vTimestamps);
+    string strAssociationFilenameDepth = string(argv[4]);
+    string strAssociationFilenameRGB = string(argv[5]);
+    LoadImages(strAssociationFilenameDepth, strAssociationFilenameRGB,vstrImageFilenamesRGB, vstrImageFilenamesD, vTimestamps);
 
     // Check consistency in the number of images and depthmaps
     int nImages = vstrImageFilenamesRGB.size();
@@ -138,28 +139,40 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void LoadImages(const string &strAssociationFilename, vector<string> &vstrImageFilenamesRGB,
+void LoadImages(const string &strAssociationFilenameDepth, const string &strAssociationFilenameRGB, vector<string> &vstrImageFilenamesRGB,
                 vector<string> &vstrImageFilenamesD, vector<double> &vTimestamps)
 {
-    ifstream fAssociation;
-    fAssociation.open(strAssociationFilename.c_str());
-    while(!fAssociation.eof())
+    ifstream fAssociationD;
+    ifstream fAssociationRGB;
+    fAssociationD.open(strAssociationFilenameDepth.c_str());
+    fAssociationRGB.open(strAssociationFilenameRGB.c_str());
+    while(!fAssociationD.eof())
     {
         string s;
-        getline(fAssociation,s);
+        getline(fAssociationD,s);
         if(!s.empty())
         {
             stringstream ss;
             ss << s;
             double t;
             string sRGB, sD;
+
             ss >> t;
             vTimestamps.push_back(t);
-            ss >> sRGB;
-            vstrImageFilenamesRGB.push_back(sRGB);
-            ss >> t;
             ss >> sD;
             vstrImageFilenamesD.push_back(sD);
+
+            cout << sD << endl;
+
+            string _s;
+            stringstream _ss;
+            getline(fAssociationRGB, _s);
+            _ss << _s;
+            _ss >> t;
+            _ss >> sRGB;
+            vstrImageFilenamesRGB.push_back(sRGB);
+
+            cout << sRGB << endl;
 
         }
     }

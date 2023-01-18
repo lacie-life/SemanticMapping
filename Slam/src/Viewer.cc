@@ -212,7 +212,7 @@ void Viewer::Run()
     Twc.SetIdentity();
     pangolin::OpenGlMatrix Ow; // Oriented with g in the z axis
     Ow.SetIdentity();
-    cv::namedWindow("ORB-SLAM3: Current Frame");
+    cv::namedWindow("AG-Mapping: Current Frame");
 
     bool bFollow = true;
     bool bLocalizationMode = false;
@@ -342,7 +342,26 @@ void Viewer::Run()
             cv::resize(toShow, toShow, cv::Size(width, height));
         }
 
-         cv::imshow("ORB-SLAM3: Current Frame",toShow);
+        {
+            std::unique_lock<std::mutex> lock(mMutexPAFinsh);
+            for (auto vit = mmDetectMap.begin(); vit != mmDetectMap.end(); vit++)
+            {
+                if (vit->second.size() != 0)
+                {
+                    for (auto area : vit->second)
+                    {
+                        cv::rectangle(toShow, area, cv::Scalar(0, 0, 255), 1);
+                        cv::putText(toShow,
+                                    vit->first,
+                                    cv::Point(area.x, area.y),
+                                    cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 0), 2);
+                    }
+                }
+
+            }
+        }
+
+         cv::imshow("AG-Mapping: Current Frame",toShow);
          cv::waitKey(mT);
 
         if(menuReset)

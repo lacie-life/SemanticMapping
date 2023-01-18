@@ -1893,8 +1893,8 @@ vdIMUInteg_ms.push_back(timePreImu);
 #ifdef REGISTER_TIMES
             std::chrono::steady_clock::time_point time_EndPosePred = std::chrono::steady_clock::now();
 
-double timePosePred = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndPosePred - time_StartPosePred).count();
-vdPosePred_ms.push_back(timePosePred);
+            double timePosePred = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndPosePred - time_StartPosePred).count();
+            vdPosePred_ms.push_back(timePosePred);
 #endif
 
 
@@ -1964,8 +1964,8 @@ vdPosePred_ms.push_back(timePosePred);
 #ifdef REGISTER_TIMES
             std::chrono::steady_clock::time_point time_EndLMTrack = std::chrono::steady_clock::now();
 
-double timeLMTrack = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndLMTrack - time_StartLMTrack).count();
-vdLMTrack_ms.push_back(timeLMTrack);
+            double timeLMTrack = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndLMTrack - time_StartLMTrack).count();
+            vdLMTrack_ms.push_back(timeLMTrack);
 #endif
 
             // Update drawer
@@ -2019,8 +2019,8 @@ vdLMTrack_ms.push_back(timeLMTrack);
 #ifdef REGISTER_TIMES
                 std::chrono::steady_clock::time_point time_EndNewKF = std::chrono::steady_clock::now();
 
-double timeNewKF = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndNewKF - time_StartNewKF).count();
-vdNewKF_ms.push_back(timeNewKF);
+                double timeNewKF = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndNewKF - time_StartNewKF).count();
+                vdNewKF_ms.push_back(timeNewKF);
 #endif
 
                 // We allow points with high innovation (considererd outliers by the Huber Function)
@@ -2080,11 +2080,11 @@ vdNewKF_ms.push_back(timeNewKF);
 #ifdef REGISTER_LOOP
         if (Stop()) {
 
-// Safe area to stop
-while(isStopped())
-{
-usleep(3000);
-}
+        // Safe area to stop
+        while(isStopped())
+        {
+            usleep(3000);
+        }
 }
 #endif
     }
@@ -2358,7 +2358,6 @@ usleep(3000);
             mpImuPreintegratedFromLastKF = new IMU::Preintegrated(pKFcur->mpImuPreintegrated->GetUpdatedBias(),
                                                                   pKFcur->mImuCalib);
         }
-
 
         mpLocalMapper->InsertKeyFrame(pKFini);
         mpLocalMapper->InsertKeyFrame(pKFcur);
@@ -2995,6 +2994,7 @@ usleep(3000);
             }
         }
 
+        pKF->mvDynamicArea = mCurrentFrame.mvDynamicArea;
         mpLocalMapper->InsertKeyFrame(pKF);
         mpLocalMapper->SetNotStop(false);
 
