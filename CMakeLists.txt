@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.10)
+
 project(AG_Mapping)
 
 #set(CMAKE_BUILD_TYPE Release)
@@ -38,6 +39,10 @@ add_definitions(${PCL_DEFINITIONS})
 include_directories(${PCL_INCLUDE_DIRS})
 message("PCL Include Directory: ${PCL_INCLUDE_DIRS}")
 
+list(APPEND CMAKE_PREFIX_PATH "~/Github/libtorch/")
+find_package(Torch REQUIRED)
+include_directories(${TORCH_INCLUDE_DIRS})
+
 include_directories(
         ${CMAKE_SOURCE_DIR}/Slam
         ${CMAKE_SOURCE_DIR}/Slam/include
@@ -48,6 +53,24 @@ include_directories(
 )
 
 link_directories(${PCL_LIBRARY_DIRS})
+
+set(THIRDPARTY_LIBS
+        ${OpenCV_LIBS}
+        ${EIGEN3_LIBS}
+        ${Pangolin_LIBRARIES}
+        ${PCL_LIBRARIES}
+        ${TORCH_LIBRARIES}
+        ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2/lib/libDBoW2_New.so
+        g2o_core
+        g2o_types_slam3d
+        g2o_solver_csparse
+        g2o_stuff
+        g2o_csparse_extension
+        g2o_types_sim3
+        g2o_types_sba
+        -lboost_serialization
+        -lcrypto
+)
 
 add_subdirectory(Slam)
 #add_subdirectory(Model)

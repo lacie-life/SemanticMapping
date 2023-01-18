@@ -118,6 +118,51 @@ pcl::PointCloud<PointT>::Ptr PointCloudMapping::generatePointCloud(KeyFrame* kf,
 
 }
 
+PointCloud::Ptr PointCloudMapping::generatePointCloudWithDynamicObject(KeyFrame* kf, cv::Mat& color, cv::Mat& depth)
+{
+    PointCloud::Ptr pointCloud_temp(new PointCloud);
+
+    if(kf->GetPose().log() == Sophus::SE3f().log())
+    {
+        globalMap->clear();
+        globalMap->reserve(0);
+        return pointCloud_temp;
+    }
+
+    for (int v=0; v<color.rows; v++)
+    {
+        for (int u=0; u<color.cols; u++)
+        {
+            cv::Point2i pt(u, v);
+            bool IsDynamic = false;
+            for (auto area : kf->mvDynamicArea)
+                if (area.contains(pt)) IsDynamic = true;
+            if (!IsDynamic)
+            {
+                float d = depth.ptr<float>(v)[u];
+                if (d<0.01 || d>10)
+                    continue;
+                PointT p;
+                p.z = d;
+                p.x = ( u - kf->cx) * p.z / kf->fx;
+                p.y = ( v - kf->cy) * p.z / kf->fy;
+
+                p.b = color.ptr<cv::Vec3b>(v)[u][0];
+                p.g = color.ptr<cv::Vec3b>(v)[u][1];
+                p.r = color.ptr<cv::Vec3b>(v)[u][2];
+                pointCloud_temp->push_back(p);
+            }
+        }
+    }
+
+    Eigen::Isometry3d T = ORB_SLAM3::Converter::toSE3Quat(kf->GetPose());
+    PointCloud::Ptr pointCloud(new PointCloud);
+    pointCloud->resize(pointCloud_temp->size());
+    pcl::transformPointCloud(*pointCloud_temp, *pointCloud, T.inverse().matrix());
+    pointCloud->is_dense = false;
+    return pointCloud;
+}
+
 void PointCloudMapping::viewer()
 {
     pcl::visualization::CloudViewer viewer("viewer");
@@ -149,7 +194,7 @@ void PointCloudMapping::viewer()
         {
             PointCloud::Ptr p(new PointCloud);
             std::cout << keyframes[i]->mnOriginMapId << endl;
-            p = generatePointCloud(keyframes[i], colorImgs[i], depthImgs[i]);
+            p = generatePointCloudWithDynamicObject(keyframes[i], colorImgs[i], depthImgs[i]);
             *globalMap += *p;
         }
 

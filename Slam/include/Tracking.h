@@ -38,6 +38,8 @@
 #include "Settings.h"
 
 #include "CameraModels/GeometricCamera.h"
+
+#include "YoloDetection.h"
 #include "PointCloudMapping.h"
 
 #include <mutex>
@@ -81,6 +83,7 @@ public:
     void SetLocalMapper(LocalMapping* pLocalMapper);
     void SetLoopClosing(LoopClosing* pLoopClosing);
     void SetViewer(Viewer* pViewer);
+    void SetDetector(YoloDetection* pDetector);
     void SetStepByStep(bool bSet);
     bool GetStepByStep();
 
@@ -343,6 +346,7 @@ protected:
     list<MapPoint*> mlpTemporalPoints;
 
     shared_ptr<PointCloudMapping>  mpPointCloudMapping;
+    YoloDetection* mpDetector;
 
     //int nMapChangeIndex;
 

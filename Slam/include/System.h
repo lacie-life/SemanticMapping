@@ -40,6 +40,7 @@
 #include "ImuTypes.h"
 #include "Settings.h"
 
+#include "YoloDetection.h"
 #include "PointCloudMapping.h"
 
 class PointCloudMapping;
@@ -268,6 +269,10 @@ public:
 
     // point cloud mapping
     std::shared_ptr<PointCloudMapping>  mpPointCloudMapping;
+
+    // Semantic model
+    bool isYoloDetection = true;
+    YoloDetection* mpDetector;
 };
 
 }// namespace ORB_SLAM

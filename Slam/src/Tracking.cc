@@ -1368,6 +1368,20 @@ namespace ORB_SLAM3 {
         mImGray = imRGB;
         mImDepth = imD;
 
+        if (mpSystem->isYoloDetection)
+        {
+            // Yolo
+            cv::Mat InputImage;
+            InputImage = imRGB.clone();
+            mpDetector->GetImage(InputImage);
+            mpDetector->Detect();
+            mpORBextractorLeft->mvDynamicArea = mpDetector->mvDynamicArea;
+            {
+                std::unique_lock<std::mutex> lock(mpViewer->mMutexPAFinsh);
+                mpViewer->mmDetectMap = mpDetector->mmDetectMap;
+            }
+        }
+
         if (mImGray.channels() == 3) {
             if (mbRGB)
                 cvtColor(mImGray, mImGray, cv::COLOR_RGB2GRAY);
@@ -1390,6 +1404,12 @@ namespace ORB_SLAM3 {
             mCurrentFrame = Frame(mImGray, mImDepth, timestamp, mpORBextractorLeft, mpORBVocabulary, mK, mDistCoef, mbf,
                                   mThDepth, mpCamera, &mLastFrame, *mpImuCalib);
 
+        if(mpSystem->isYoloDetection)
+        {
+            mCurrentFrame.mvDynamicArea = mpDetector->mvDynamicArea;
+            mpDetector->mmDetectMap.clear();
+            mpDetector->mvDynamicArea.clear();
+        }
 
         mCurrentFrame.mNameFile = filename;
         mCurrentFrame.mnDataset = mnNumDataset;
@@ -1873,8 +1893,8 @@ vdIMUInteg_ms.push_back(timePreImu);
 #ifdef REGISTER_TIMES
             std::chrono::steady_clock::time_point time_EndPosePred = std::chrono::steady_clock::now();
 
-double timePosePred = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndPosePred - time_StartPosePred).count();
-vdPosePred_ms.push_back(timePosePred);
+            double timePosePred = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndPosePred - time_StartPosePred).count();
+            vdPosePred_ms.push_back(timePosePred);
 #endif
 
 
@@ -1944,8 +1964,8 @@ vdPosePred_ms.push_back(timePosePred);
 #ifdef REGISTER_TIMES
             std::chrono::steady_clock::time_point time_EndLMTrack = std::chrono::steady_clock::now();
 
-double timeLMTrack = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndLMTrack - time_StartLMTrack).count();
-vdLMTrack_ms.push_back(timeLMTrack);
+            double timeLMTrack = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndLMTrack - time_StartLMTrack).count();
+            vdLMTrack_ms.push_back(timeLMTrack);
 #endif
 
             // Update drawer
@@ -1999,8 +2019,8 @@ vdLMTrack_ms.push_back(timeLMTrack);
 #ifdef REGISTER_TIMES
                 std::chrono::steady_clock::time_point time_EndNewKF = std::chrono::steady_clock::now();
 
-double timeNewKF = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndNewKF - time_StartNewKF).count();
-vdNewKF_ms.push_back(timeNewKF);
+                double timeNewKF = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndNewKF - time_StartNewKF).count();
+                vdNewKF_ms.push_back(timeNewKF);
 #endif
 
                 // We allow points with high innovation (considererd outliers by the Huber Function)
@@ -2060,11 +2080,11 @@ vdNewKF_ms.push_back(timeNewKF);
 #ifdef REGISTER_LOOP
         if (Stop()) {
 
-// Safe area to stop
-while(isStopped())
-{
-usleep(3000);
-}
+        // Safe area to stop
+        while(isStopped())
+        {
+            usleep(3000);
+        }
 }
 #endif
     }
@@ -2338,7 +2358,6 @@ usleep(3000);
             mpImuPreintegratedFromLastKF = new IMU::Preintegrated(pKFcur->mpImuPreintegrated->GetUpdatedBias(),
                                                                   pKFcur->mImuCalib);
         }
-
 
         mpLocalMapper->InsertKeyFrame(pKFini);
         mpLocalMapper->InsertKeyFrame(pKFcur);
@@ -2975,6 +2994,7 @@ usleep(3000);
             }
         }
 
+        pKF->mvDynamicArea = mCurrentFrame.mvDynamicArea;
         mpLocalMapper->InsertKeyFrame(pKF);
         mpLocalMapper->SetNotStop(false);
 
@@ -3698,5 +3718,10 @@ mbStopped = false;
 mbStopRequested = false;
 }
 #endif
+
+    void Tracking::SetDetector(YoloDetection* pDetector)
+    {
+        mpDetector = pDetector;
+    }
 
 } //namespace ORB_SLAM

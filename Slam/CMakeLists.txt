@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.1)
 
 SET(CMAKE_BUILD_TYPE "Release")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3 -march=native")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3 -march=native")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -march=native")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -march=native")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 
@@ -57,22 +57,9 @@ set(CONVENIENCE_LIB_NAME "slam_lib")
 add_library(${CONVENIENCE_LIB_NAME} SHARED
         ${HEADERS}
         ${SOURCES}
-        )
+)
 
 target_link_libraries(${CONVENIENCE_LIB_NAME} PRIVATE
-        ${OpenCV_LIBS}
-        ${EIGEN3_LIBS}
-        ${Pangolin_LIBRARIES}
-        ${PCL_LIBRARIES}
-        ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2/lib/libDBoW2_New.so
-        g2o_core
-        g2o_types_slam3d
-        g2o_solver_csparse
-        g2o_stuff
-        g2o_csparse_extension
-        g2o_types_sim3
-        g2o_types_sba
-        -lboost_serialization
-        -lcrypto
+        ${THIRDPARTY_LIBS}
 )
 
