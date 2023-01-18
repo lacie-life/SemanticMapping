@@ -304,7 +304,7 @@ int main(int argc, char **argv) {
 
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::IMU_RGBD, true, 0, file_name);
+    ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::RGBD, true, 0, file_name);
     float imageScale = SLAM.GetImageScale();
 
     double timestamp;
@@ -383,13 +383,13 @@ int main(int argc, char **argv) {
         depthCV.convertTo(depthCV_8U,CV_8U,0.01);
         cv::imshow("depth image", depthCV_8U);*/
 
-        for(int i=0; i<vGyro.size(); ++i)
-        {
-            ORB_SLAM3::IMU::Point lastPoint(vAccel[i].x, vAccel[i].y, vAccel[i].z,
-                                            vGyro[i].x, vGyro[i].y, vGyro[i].z,
-                                            vGyro_times[i]);
-            vImuMeas.push_back(lastPoint);
-        }
+//        for(int i=0; i<vGyro.size(); ++i)
+//        {
+//            ORB_SLAM3::IMU::Point lastPoint(vAccel[i].x, vAccel[i].y, vAccel[i].z,
+//                                            vGyro[i].x, vGyro[i].y, vGyro[i].z,
+//                                            vGyro_times[i]);
+//            vImuMeas.push_back(lastPoint);
+//        }
 
         if(imageScale != 1.f)
         {
@@ -424,7 +424,7 @@ int main(int argc, char **argv) {
     #endif
 #endif
         // Pass the image to the SLAM system
-        SLAM.TrackRGBD(im, depth, timestamp, vImuMeas);
+        SLAM.TrackRGBD(im, depth, timestamp);
 
 #ifdef REGISTER_TIMES
         #ifdef COMPILEDWITHC11

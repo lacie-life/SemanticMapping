@@ -42,6 +42,9 @@ protected:
     PointCloud::Ptr globalMap;
     shared_ptr<thread>  viewerThread;
 
+    int mCurrentMapId;
+    int mLastMpId;
+
     std::size_t m_count;
 
     bool shutDownFlag = false;
