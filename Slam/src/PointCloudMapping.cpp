@@ -38,38 +38,23 @@ void PointCloudMapping::insertKeyFrame(KeyFrame* kf, cv::Mat& color, cv::Mat& de
 {
     cout << "receive a keyframe, id = " << kf->mnId << endl;
     unique_lock<mutex> lck(keyframeMutex);
-    keyframes.push_back( kf );
-    colorImgs.push_back( color.clone() );
-    depthImgs.push_back( depth.clone() );
+    keyframes.push_back(kf);
+    colorImgs.push_back(color.clone());
+    depthImgs.push_back(depth.clone());
 
     keyFrameUpdated.notify_one();
 }
 
-pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePointCloud(KeyFrame* kf, cv::Mat& color, cv::Mat& depth)
+pcl::PointCloud<PointT>::Ptr PointCloudMapping::generatePointCloud(KeyFrame* kf, cv::Mat& color, cv::Mat& depth)
 {
     PointCloud::Ptr tmp(new PointCloud());
-    tmp->reserve(depth.rows * depth.cols * 0.9);
 
     if(kf->GetPose().log() == Sophus::SE3f().log())
     {
         globalMap->clear();
         globalMap->reserve(0);
-        // camera
-        this->m_viewer->setCameraPosition(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
-        this->m_viewer->spinOnce();
         return tmp;
     }
-
-//    auto Twc = kf->GetPose().inverse();
-//    auto quat = Twc.unit_quaternion().matrix();
-//    auto trans = Twc.translation();
-//
-//    double test[4][4] = {{quat(0,0), quat(0,1), quat(0,2), trans(0,0)},
-//                         {quat(1,0), quat(1,1), quat(1,2), trans(1,0)},
-//                         {quat(2,0), quat(2,1), quat(2,2), trans(2,0)},
-//                         {0, 0, 0, 1}};
-//
-//    cv::Mat _Twc = cv::Mat(cv::Size(4, 4), CV_32F, test);
 
     // TODO: Convert point cloud
     // point cloud is null ptr
@@ -81,20 +66,10 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
             if (d < 0.01 || d>10)
                 continue;
 
-            // --- for cloud point ---
-//            float scalar = float(d) / 1000.0;
-//            Eigen::Vector3f p((n - kf->cx) * scalar / kf->fx, (m - kf->cy) * scalar / kf->fy, scalar);
-//            Eigen::Vector3f p_w = quat * p + trans;
-//
-//            PointT _p;
-//            _p.z = p_w(0);
-//            _p.x = p_w(1);
-//            _p.y = p_w(2);
-
             PointT _p;
             _p.z = d;
-            _p.x = (n - kf->cx) * _p.z / kf->fx;
-            _p.y = (m - kf->cy) * _p.z / kf->fy;
+            _p.x = (n - kf->cx) * _p.z * kf->invfx;
+            _p.y = (m - kf->cy) * _p.z * kf->invfy;
 
             _p.b = color.ptr<uchar>(m)[n*3];
             _p.g = color.ptr<uchar>(m)[n*3+1];
@@ -106,19 +81,12 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
 
     std::cout << tmp->size() << std::endl;
 
-    g2o::SE3Quat testSE3 = ORB_SLAM3::Converter::toSE3Quat(kf->GetImuPose()); // Sophus::SE3f to g2o::SE3Quat
-    cv::Mat testMat = ORB_SLAM3::Converter::toCvMat(testSE3); // g2o::SE3Quat to cv::Mat (like ORB_SLAM2)
-
-    Eigen::Isometry3d T = ORB_SLAM3::Converter::toSE3Quat(testMat);
-
-    std::cout << T.matrix() << std::endl;
+    Eigen::Isometry3d T = ORB_SLAM3::Converter::toSE3Quat(kf->GetPose());
 
     PointCloud::Ptr cloud(new PointCloud);
     cloud->resize(tmp->size());
 
-//    std::copy(tmp->begin(), tmp->end(), cloud->begin());
-
-    pcl::transformPointCloud( *tmp, *cloud, T.matrix(), true);
+    pcl::transformPointCloud( *tmp, *cloud, T.inverse().matrix(), true);
 
     cloud->is_dense = false;
 
@@ -130,21 +98,7 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
 
 void PointCloudMapping::viewer()
 {
-//    pcl::visualization::CloudViewer viewer("viewer");
-    this->m_viewer = boost::make_shared<pcl::visualization::PCLVisualizer>();
-
-    m_viewer->removeAllPointClouds();
-
-    this->m_viewer->setSize(1000, 640);
-    this->m_viewer->setBackgroundColor(0.9f, 0.9f, 0.9f);
-    this->m_count = 0;
-
-    Eigen::Isometry3f origin(Eigen::Quaternionf::Identity());
-    origin.pretranslate(Eigen::Vector3f::Zero());
-    this->m_viewer->addCoordinateSystem(0.5, Eigen::Affine3f(origin.affine()), "origin");
-
-    m_viewer->setCameraPosition(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
-    m_viewer->spinOnce();
+    pcl::visualization::CloudViewer viewer("viewer");
 
     while(1)
     {
@@ -170,22 +124,17 @@ void PointCloudMapping::viewer()
 
         for ( size_t i = lastKeyframeSize; i < N ; i++ )
         {
-            PointCloud::Ptr p = generatePointCloud(keyframes[i], colorImgs[i], depthImgs[i]);
-            this->globalMap->resize(this->globalMap->size() + p->size());
-            std::copy(p->begin(), p->end(), this->globalMap->end() - p->size());
-//            *globalMap += *p;
+            PointCloud::Ptr p(new PointCloud);
+            p = generatePointCloud(keyframes[i], colorImgs[i], depthImgs[i]);
+            *globalMap += *p;
         }
 
-        this->m_viewer->removeAllPointClouds();
-        this->m_viewer->addPointCloud(globalMap);
-//        this->globalMap->clear();
-        this->m_viewer->spinOnce();
-
-//        PointCloud::Ptr tmp(new PointCloud());
-//        voxel.setInputCloud(globalMap);
-//        voxel.filter(*tmp);
-//        globalMap->swap(*tmp);
-//        viewer.showCloud(globalMap);
+        PointCloud::Ptr tmp(new PointCloud());
+        tmp->resize(globalMap->size());
+        voxel.setInputCloud(globalMap);
+        voxel.filter(*tmp);
+        globalMap->swap(*tmp);
+        viewer.showCloud(globalMap);
 
         cout << "show global map, size=" << globalMap->points.size() << endl;
 

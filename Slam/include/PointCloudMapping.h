@@ -6,6 +6,7 @@
 #define AG_MAPPING_POINTCLOUDMAPPING_H
 
 #include "System.h"
+#include "KeyFrame.h"
 
 #include "pcl/point_cloud.h"
 #include "pcl/common/transforms.h"
@@ -16,14 +17,18 @@
 #include <condition_variable>
 
 #include <boost/make_shared.hpp>
+#include <boost//format.hpp>
+#include <Eigen/Geometry>
 
 using namespace  ORB_SLAM3;
+using namespace std;
+
+typedef pcl::PointXYZRGB PointT;
+typedef pcl::PointCloud<PointT> PointCloud;
 
 class PointCloudMapping {
 
 public:
-    typedef pcl::PointXYZRGB PointT;
-    typedef pcl::PointCloud<PointT> PointCloud;
 
     PointCloudMapping(double resolution_);
 
@@ -37,7 +42,6 @@ protected:
     PointCloud::Ptr globalMap;
     shared_ptr<thread>  viewerThread;
 
-    pcl::visualization::PCLVisualizer::Ptr m_viewer;
     std::size_t m_count;
 
     bool shutDownFlag = false;
@@ -47,10 +51,11 @@ protected:
     mutex keyFrameUpdateMutex;
 
     // data to generate point clouds
-    vector<KeyFrame*> keyframes;
-    vector<cv::Mat> colorImgs;
-    vector<cv::Mat> depthImgs;
-    mutex keyframeMutex;
+    std::vector<KeyFrame*> keyframes;
+    std::vector<cv::Mat> colorImgs;
+    std::vector<cv::Mat> depthImgs;
+
+    std::mutex keyframeMutex;
     uint16_t lastKeyframeSize = 0;
 
     double resolution = 0.04;
