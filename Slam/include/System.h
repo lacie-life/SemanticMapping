@@ -40,6 +40,7 @@
 #include "ImuTypes.h"
 #include "Settings.h"
 
+#include "YoloDetection.h"
 #include "PointCloudMapping.h"
 
 class PointCloudMapping;
@@ -271,6 +272,7 @@ public:
 
     // Semantic model
     bool isYoloDetection;
+    YoloDetection* mpDetector;
 };
 
 }// namespace ORB_SLAM

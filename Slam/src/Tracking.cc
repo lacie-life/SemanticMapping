@@ -1368,6 +1368,20 @@ namespace ORB_SLAM3 {
         mImGray = imRGB;
         mImDepth = imD;
 
+        if (mpSystem->isYoloDetection)
+        {
+            // Yolo
+            cv::Mat InputImage;
+            InputImage = imRGB.clone();
+            mpDetector->GetImage(InputImage);
+            mpDetector->Detect();
+            mpORBextractorLeft->mvDynamicArea = mpDetector->mvDynamicArea;
+            {
+                std::unique_lock<std::mutex> lock(mpViewer->mMutexPAFinsh);
+                mpViewer->mmDetectMap = mpDetector->mmDetectMap;
+            }
+        }
+
         if (mImGray.channels() == 3) {
             if (mbRGB)
                 cvtColor(mImGray, mImGray, cv::COLOR_RGB2GRAY);
@@ -1390,6 +1404,12 @@ namespace ORB_SLAM3 {
             mCurrentFrame = Frame(mImGray, mImDepth, timestamp, mpORBextractorLeft, mpORBVocabulary, mK, mDistCoef, mbf,
                                   mThDepth, mpCamera, &mLastFrame, *mpImuCalib);
 
+        if(mpSystem->isYoloDetection)
+        {
+            mCurrentFrame.mvDynamicArea = mpDetector->mvDynamicArea;
+            mpDetector->mmDetectMap.clear();
+            mpDetector->mvDynamicArea.clear();
+        }
 
         mCurrentFrame.mNameFile = filename;
         mCurrentFrame.mnDataset = mnNumDataset;
@@ -3698,5 +3718,10 @@ mbStopped = false;
 mbStopRequested = false;
 }
 #endif
+
+    void Tracking::SetDetector(YoloDetection* pDetector)
+    {
+        mpDetector = pDetector;
+    }
 
 } //namespace ORB_SLAM
