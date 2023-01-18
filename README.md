@@ -16,7 +16,8 @@ An application for 3D mapping tasks in agriculture uses object-based Visual SLAM
 # TODO
 
 - [x] Test SLAM module with TUM RGB-D dataset
-  - [ ] Point Cloud viewer
+  - [x] Point Cloud viewer
+  - [ ] Add segment layer
 - [ ] Test Qt Gui display
     - [ ] Point Cloud view
     - [ ] Trajectory view
