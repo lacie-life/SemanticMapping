@@ -9,4 +9,5 @@ target_link_libraries(d435i-test
         ${OpenCV_LIBS}
         ${realsense2_LIBRARY}
         ${Pangolin_LIBRARIES}
+        ${PCL_LIBRARIES}
 )

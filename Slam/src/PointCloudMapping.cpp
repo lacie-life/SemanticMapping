@@ -21,6 +21,9 @@ PointCloudMapping::PointCloudMapping(double resolution_)
     voxel.setLeafSize(resolution, resolution, resolution);
     globalMap = boost::make_shared<PointCloud>();
 
+    mCurrentMapId = 0;
+    mLastMpId = 0;
+
     viewerThread = make_shared<thread>(bind(&PointCloudMapping::viewer, this));
 }
 
@@ -36,11 +39,31 @@ void PointCloudMapping::shutdown()
 
 void PointCloudMapping::insertKeyFrame(KeyFrame* kf, cv::Mat& color, cv::Mat& depth)
 {
-    cout << "receive a keyframe, id = " << kf->mnId << endl;
-    unique_lock<mutex> lck(keyframeMutex);
-    keyframes.push_back(kf);
-    colorImgs.push_back(color.clone());
-    depthImgs.push_back(depth.clone());
+    cout << "receive a keyframe, id = " << kf->mnId << " in Map: " << kf->mnOriginMapId << endl;
+
+    // TODO: Need verify
+    if(mCurrentMapId != kf->mnOriginMapId)
+    {
+        mLastMpId = mCurrentMapId;
+        mCurrentMapId = kf->mnOriginMapId;
+
+        std::cout << "Lost tracking => Map changed !!!! \n";
+
+        unique_lock<mutex> lck(keyframeMutex);
+        keyframes.clear();
+        colorImgs.clear();
+        depthImgs.clear();
+
+        keyframes.push_back(kf);
+        colorImgs.push_back(color.clone());
+        depthImgs.push_back(depth.clone());
+    }
+    else{
+        unique_lock<mutex> lck(keyframeMutex);
+        keyframes.push_back(kf);
+        colorImgs.push_back(color.clone());
+        depthImgs.push_back(depth.clone());
+    }
 
     keyFrameUpdated.notify_one();
 }
@@ -56,7 +79,6 @@ pcl::PointCloud<PointT>::Ptr PointCloudMapping::generatePointCloud(KeyFrame* kf,
         return tmp;
     }
 
-    // TODO: Convert point cloud
     // point cloud is null ptr
     for (int m = 0; m < depth.rows; m++)
     {
@@ -122,9 +144,11 @@ void PointCloudMapping::viewer()
             N = keyframes.size();
         }
 
+        // TODO: Alats problem
         for ( size_t i = lastKeyframeSize; i < N ; i++ )
         {
             PointCloud::Ptr p(new PointCloud);
+            std::cout << keyframes[i]->mnOriginMapId << endl;
             p = generatePointCloud(keyframes[i], colorImgs[i], depthImgs[i]);
             *globalMap += *p;
         }
