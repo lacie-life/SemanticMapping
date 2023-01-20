@@ -19,7 +19,10 @@ An application for 3D mapping tasks in agriculture uses object-based Visual SLAM
 - [x] Test SLAM module with TUM RGB-D dataset
   - [x] Point Cloud viewer
   - [ ] Yolo test (remove/bounding box a class => object?)
-  - [ ] Segment model => 3D bounding box
+  	- [ ] Improve by TensorRT
+  - [ ] 2D bounding box => 3D bounding box
+  	- [ ] CudeSLAM?
+  	- [ ] Convert map to OctoMap => path planning?
   - [ ] Optimize point cloud
 - [ ] Test Qt Gui display
     - [ ] Point Cloud view
