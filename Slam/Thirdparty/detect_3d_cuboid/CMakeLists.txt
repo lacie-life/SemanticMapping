@@ -1,14 +1,19 @@
 cmake_minimum_required(VERSION 3.0.0)
 SET(CMAKE_BUILD_TYPE Release)
+
 project(detect_3d_cuboid)
 
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+
 find_package(Eigen3 REQUIRED)
-find_package(OpenCV 3.2 REQUIRED)
+find_package(OpenCV 4.2 REQUIRED)
 
 set(CUBOID_SOURCE_FILES
-    ${PROJECT_SOURCE_DIR}/object_3d_util.cpp
-    ${PROJECT_SOURCE_DIR}/matrix_utils.cpp
-    ${PROJECT_SOURCE_DIR}/box_proposal_detail.cpp
+    object_3d_util.cpp
+    matrix_utils.cpp
+    box_proposal_detail.cpp
+    matrix_utils.h
+    object_3d_util.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${CUBOID_SOURCE_FILES})

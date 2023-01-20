@@ -36,6 +36,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o
     ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/Sophus
     ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2
+    ${CMAKE_SOURCE_DIR}/Slam/Thirdparty
 )
 
 file(GLOB HEADERS

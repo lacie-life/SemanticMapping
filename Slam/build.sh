@@ -24,6 +24,13 @@ cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j
 
+
+cd ../../detect_3d_cuboid
+mkdir build
+cd build
+cmake ..
+make -j
+
 cd ../../../
 
 echo "Uncompress vocabulary ..."
