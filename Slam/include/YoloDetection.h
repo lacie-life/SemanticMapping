@@ -16,7 +16,7 @@ using namespace std;
 
 class YoloDetection {
 public:
-    YoloDetection();
+    YoloDetection(std::string modelPath);
     ~YoloDetection();
 
     void GetImage(cv::Mat& RGB);

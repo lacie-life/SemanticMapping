@@ -162,7 +162,7 @@ void LoadImages(const string &strAssociationFilenameDepth, const string &strAsso
             ss >> sD;
             vstrImageFilenamesD.push_back(sD);
 
-            cout << sD << endl;
+//            cout << sD << endl;
 
             string _s;
             stringstream _ss;
@@ -172,7 +172,7 @@ void LoadImages(const string &strAssociationFilenameDepth, const string &strAsso
             _ss >> sRGB;
             vstrImageFilenamesRGB.push_back(sRGB);
 
-            cout << sRGB << endl;
+//            cout << sRGB << endl;
 
         }
     }

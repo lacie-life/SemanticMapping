@@ -4,11 +4,11 @@
 
 #include "YoloDetection.h"
 
-YoloDetection::YoloDetection()
+YoloDetection::YoloDetection(std::string modelPath)
 {
-    mModule = torch::jit::load("../Data/model/yolov5s.torchscript.pt");
+    mModule = torch::jit::load(modelPath + "/yolov5s.torchscript.pt");
 
-    std::ifstream f("../Data/model/coco.names");
+    std::ifstream f(modelPath + "/coco.names");
     std::string name = "";
     while (std::getline(f, name))
     {
