@@ -58,7 +58,7 @@ set(CONVENIENCE_LIB_NAME "slam_lib")
 add_library(${CONVENIENCE_LIB_NAME} SHARED
         ${HEADERS}
         ${SOURCES}
-)
+        src/Tracking_util.cpp)
 
 target_link_libraries(${CONVENIENCE_LIB_NAME} PRIVATE
         ${THIRDPARTY_LIBS}

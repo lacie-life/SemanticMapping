@@ -24,11 +24,16 @@
 #include "ORBextractor.h"
 #include "Converter.h"
 #include "ORBmatcher.h"
-#include "CameraModels/GeometricCamera.h"
 
-#include <thread>
 #include "CameraModels/Pinhole.h"
 #include "CameraModels/KannalaBrandt8.h"
+#include "CameraModels/GeometricCamera.h"
+
+#include "Config.h"
+#include "ros_moc.h"
+#include "detect_3d_cuboid/matrix_utils.h"
+
+#include <thread>
 
 namespace ORB_SLAM3
 {
@@ -88,6 +93,20 @@ Frame::Frame(const Frame &frame)
         SetVelocity(frame.GetVelocity());
     }
 
+    // detect 3d cuboid
+    if (whether_detect_object)
+        raw_img = frame.raw_img.clone();
+    if (whether_dynamic_object)
+    {
+        KeysStatic = frame.KeysStatic;
+        keypoint_associate_objectID = frame.keypoint_associate_objectID;
+        numobject = frame.numobject;
+        objmask_img = frame.objmask_img;
+        mvKeysHarris = frame.mvKeysHarris;
+        mvpMapPointsHarris = frame.mvpMapPointsHarris;
+        keypoint_associate_objectID_harris = frame.keypoint_associate_objectID_harris;
+    }
+
     mmProjectPoints = frame.mmProjectPoints;
     mmMatchedInImage = frame.mmMatchedInImage;
 
@@ -97,7 +116,7 @@ Frame::Frame(const Frame &frame)
 #endif
 }
 
-
+// for stereo
 Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeStamp, ORBextractor* extractorLeft, ORBextractor* extractorRight, ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth, GeometricCamera* pCamera, Frame* pPrevF, const IMU::Calib &ImuCalib)
     :mpcpi(NULL), mpORBvocabulary(voc),mpORBextractorLeft(extractorLeft),mpORBextractorRight(extractorRight), mTimeStamp(timeStamp), mK(K.clone()), mK_(Converter::toMatrix3f(K)), mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth),
      mImuCalib(ImuCalib), mpImuPreintegrated(NULL), mpPrevFrame(pPrevF),mpImuPreintegratedFrame(NULL), mpReferenceKF(static_cast<KeyFrame*>(NULL)), mbIsSet(false), mbImuPreintegrated(false),
@@ -197,6 +216,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
     AssignFeaturesToGrid();
 }
 
+// for RGBD
 Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth, GeometricCamera* pCamera,Frame* pPrevF, const IMU::Calib &ImuCalib)
     :mpcpi(NULL),mpORBvocabulary(voc),mpORBextractorLeft(extractor),mpORBextractorRight(static_cast<ORBextractor*>(NULL)),
      mTimeStamp(timeStamp), mK(K.clone()), mK_(Converter::toMatrix3f(K)),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth),
@@ -225,6 +245,56 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
 
     mTimeORB_Ext = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndExtORB - time_StartExtORB).count();
 #endif
+
+    if (whether_dynamic_object) {
+        char frame_index_c[256];
+        sprintf(frame_index_c, "%06d", (int) mnId); // format into 6 digit
+        std::string pred_mask_img_name = data_folder + "/vehicle_segmaps/" + frame_index_c + ".png";
+        objmask_img = cv::imread(
+                    pred_mask_img_name,
+                    cv::IMREAD_UNCHANGED); // uint8  sometimes read image might take long time....
+        if (objmask_img.empty()) {
+            ROS_WARN_STREAM("cannot read dynamic object mask for frame "
+                                        << frame_index_c << ", assuming no dynamic object");
+        }
+
+        KeysStatic = vector<bool>(mvKeys.size(), true); // all points are static now.
+        keypoint_associate_objectID = vector<int>(mvKeys.size(), -1);
+        numobject = 0;
+
+        if (remove_dynamic_features) // directly delete dynamic region features
+        {
+            std::vector<cv::KeyPoint> mvKeys_cp;
+            cv::Mat mDescriptors_cp;
+
+            for (size_t i = 0; i < mvKeys.size(); i++) {
+                int maskval = objmask_img.empty()
+                        ? 0
+                        : int(objmask_img.at<uint8_t>(mvKeys[i].pt.y, mvKeys[i].pt.x));
+                bool delete_feature = maskval > 0;
+
+                if (!delete_feature) {
+                    mvKeys_cp.push_back(mvKeys[i]);
+                    mDescriptors_cp.push_back(mDescriptors.row(i));
+                }
+            }
+            std::cout << "Delete dynamic feature points  " << mvKeys.size() - mvKeys_cp.size()
+                << std::endl;
+
+            mvKeys = mvKeys_cp;
+            mDescriptors = mDescriptors_cp.clone();
+        } else {
+            for (size_t i = 0; i < mvKeys.size(); i++) {
+                int maskval = objmask_img.empty()
+                        ? 0
+                        : int(objmask_img.at<uint8_t>(mvKeys[i].pt.y, mvKeys[i].pt.x));
+                KeysStatic[i] = (maskval == 0); // 0 is background, static >0 object id
+                numobject = max(numobject, maskval);
+                if (maskval > 0)
+                    keypoint_associate_objectID[i] = maskval - 1;
+            }
+        }
+    }
 
 
     N = mvKeys.size();
@@ -285,7 +355,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
     AssignFeaturesToGrid();
 }
 
-
+// for monocular
 Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, GeometricCamera* pCamera, cv::Mat &distCoef, const float &bf, const float &thDepth, Frame* pPrevF, const IMU::Calib &ImuCalib)
     :mpcpi(NULL),mpORBvocabulary(voc),mpORBextractorLeft(extractor),mpORBextractorRight(static_cast<ORBextractor*>(NULL)),
      mTimeStamp(timeStamp), mK(static_cast<Pinhole*>(pCamera)->toK()), mK_(static_cast<Pinhole*>(pCamera)->toK_()), mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth),
@@ -308,7 +378,7 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
 #ifdef REGISTER_TIMES
     std::chrono::steady_clock::time_point time_StartExtORB = std::chrono::steady_clock::now();
 #endif
-    // 提取ORB特征
+    // Extract ORB features
     ExtractORB(0,imGray,0,1000);
 #ifdef REGISTER_TIMES
     std::chrono::steady_clock::time_point time_EndExtORB = std::chrono::steady_clock::now();
@@ -316,11 +386,61 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
     mTimeORB_Ext = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndExtORB - time_StartExtORB).count();
 #endif
 
+    if (whether_dynamic_object) {
+        char frame_index_c[256];
+        sprintf(frame_index_c, "%06d", (int) mnId); // format into 6 digit
+        std::string pred_mask_img_name = data_folder + "/vehicle_segmaps/" + frame_index_c + ".png";
+        objmask_img = cv::imread(
+                pred_mask_img_name,
+                cv::IMREAD_UNCHANGED); // uint8  sometimes read image might take long time....
+        if (objmask_img.empty()) {
+            ROS_WARN_STREAM("cannot read dynamic object mask for frame "
+                << frame_index_c << ", assuming no dynamic object");
+        }
+
+        KeysStatic = vector<bool>(mvKeys.size(), true); // all points are static now.
+        keypoint_associate_objectID = vector<int>(mvKeys.size(), -1);
+        numobject = 0;
+
+        if (remove_dynamic_features) // directly delete dynamic region features
+        {
+            std::vector<cv::KeyPoint> mvKeys_cp;
+            cv::Mat mDescriptors_cp;
+
+            for (size_t i = 0; i < mvKeys.size(); i++) {
+                int maskval = objmask_img.empty()
+                        ? 0
+                        : int(objmask_img.at<uint8_t>(mvKeys[i].pt.y, mvKeys[i].pt.x));
+                bool delete_feature = maskval > 0;
+
+                if (!delete_feature) {
+                    mvKeys_cp.push_back(mvKeys[i]);
+                    mDescriptors_cp.push_back(mDescriptors.row(i));
+                }
+            }
+            std::cout << "Delete dynamic feature points  " << mvKeys.size() - mvKeys_cp.size()
+                          << std::endl;
+
+            mvKeys = mvKeys_cp;
+            mDescriptors = mDescriptors_cp.clone();
+        } else {
+            for (size_t i = 0; i < mvKeys.size(); i++) {
+                int maskval = objmask_img.empty()
+                        ? 0
+                        : int(objmask_img.at<uint8_t>(mvKeys[i].pt.y, mvKeys[i].pt.x));
+                KeysStatic[i] = (maskval == 0); // 0 is background, static >0 object id
+                numobject = max(numobject, maskval);
+                if (maskval > 0)
+                    keypoint_associate_objectID[i] = maskval - 1;
+            }
+        }
+    }
+
 
     N = mvKeys.size();
     if(mvKeys.empty())
         return;
-    // 将特征点进行去畸变
+    // Undistort the feature points
     UndistortKeyPoints();
 
     // Set no stereo information
@@ -338,9 +458,10 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
     // This is done only for the first Frame (or after a change in the calibration)
     if(mbInitialComputations)
     {
-        // 计算去畸变之后的图像有效区域
+        // Calculate the effective area of the image after undistortion
         ComputeImageBounds(imGray);
-        // 图像小块的宽度和高度的倒数
+
+        // The reciprocal of the width and height of the image tile
         mfGridElementWidthInv=static_cast<float>(FRAME_GRID_COLS)/static_cast<float>(mnMaxX-mnMinX);
         mfGridElementHeightInv=static_cast<float>(FRAME_GRID_ROWS)/static_cast<float>(mnMaxY-mnMinY);
 
@@ -365,7 +486,7 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
     mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
     monoLeft = -1;
     monoRight = -1;
-    // 将特征点分配到图像对应的每一个小块
+    // Assign feature points to each small block corresponding to the image
     AssignFeaturesToGrid();
 
     if(pPrevF)
@@ -703,6 +824,10 @@ vector<size_t> Frame::GetFeaturesInArea(const float &x, const float  &y, const f
                 const cv::KeyPoint &kpUn = (Nleft == -1) ? mvKeysUn[vCell[j]]
                                                          : (!bRight) ? mvKeys[vCell[j]]
                                                                      : mvKeysRight[vCell[j]];
+                if (KeysStatic.size() > 0 &&
+                    !KeysStatic[vCell[j]]) // this function is for static point
+                    continue;
+
                 if(bCheckLevels)
                 {
                     if(kpUn.octave<minLevel)
@@ -723,6 +848,74 @@ vector<size_t> Frame::GetFeaturesInArea(const float &x, const float  &y, const f
 
     return vIndices;
 }
+
+    size_t Frame::GetCloestFeaturesInArea(const float &x, const float &y, const float &r,
+                                          const int minLevel, const int maxLevel) const
+    {
+        size_t vIndices = N + 1;
+
+        const int nMinCellX = max(0, (int)floor((x - mnMinX - r) * mfGridElementWidthInv));
+        if (nMinCellX >= FRAME_GRID_COLS)
+            return vIndices;
+
+        const int nMaxCellX =
+                min((int)FRAME_GRID_COLS - 1, (int)ceil((x - mnMinX + r) * mfGridElementWidthInv));
+        if (nMaxCellX < 0)
+            return vIndices;
+
+        const int nMinCellY = max(0, (int)floor((y - mnMinY - r) * mfGridElementHeightInv));
+        if (nMinCellY >= FRAME_GRID_ROWS)
+            return vIndices;
+
+        const int nMaxCellY =
+                min((int)FRAME_GRID_ROWS - 1, (int)ceil((y - mnMinY + r) * mfGridElementHeightInv));
+        if (nMaxCellY < 0)
+            return vIndices;
+
+        const bool bCheckLevels = (minLevel > 0) || (maxLevel >= 0);
+        float min_dist = -1;
+        for (int ix = nMinCellX; ix <= nMaxCellX; ix++)
+        {
+            for (int iy = nMinCellY; iy <= nMaxCellY; iy++)
+            {
+                const vector<size_t> vCell = mGrid[ix][iy];
+                if (vCell.empty())
+                    continue;
+
+                for (size_t j = 0, jend = vCell.size(); j < jend; j++)
+                {
+                    if (KeysStatic.size() > 0 &&
+                        KeysStatic[vCell[j]]) // this function is for dynamic point
+                        continue;
+
+                    const cv::KeyPoint &kpUn = mvKeysUn[vCell[j]];
+                    if (bCheckLevels)
+                    {
+                        if (kpUn.octave < minLevel)
+                            continue;
+                        if (maxLevel >= 0)
+                            if (kpUn.octave > maxLevel)
+                                continue;
+                    }
+
+                    const float distx = kpUn.pt.x - x;
+                    const float disty = kpUn.pt.y - y;
+
+                    if (fabs(distx) < r && fabs(disty) < r)
+                    {
+                        float dist = distx * distx + disty * disty;
+                        if (min_dist == -1 || dist < min_dist)
+                        {
+                            min_dist = dist;
+                            vIndices = vCell[j];
+                        }
+                    }
+                }
+            }
+        }
+
+        return vIndices;
+    }
 
 bool Frame::PosInGrid(const cv::KeyPoint &kp, int &posX, int &posY)
 {
@@ -785,19 +978,19 @@ void Frame::ComputeImageBounds(const cv::Mat &imLeft)
 {
     if(mDistCoef.at<float>(0)!=0.0)
     {
-        // 四个角点
+        // four corners
         cv::Mat mat(4,2,CV_32F);
         mat.at<float>(0,0)=0.0; mat.at<float>(0,1)=0.0;
         mat.at<float>(1,0)=imLeft.cols; mat.at<float>(1,1)=0.0;
         mat.at<float>(2,0)=0.0; mat.at<float>(2,1)=imLeft.rows;
         mat.at<float>(3,0)=imLeft.cols; mat.at<float>(3,1)=imLeft.rows;
 
-        // 对角点进行去畸变
+        // Undistort the corners
         mat=mat.reshape(2);
         cv::undistortPoints(mat,mat,static_cast<Pinhole*>(mpCamera)->toK(),mDistCoef,cv::Mat(),mK);
         mat=mat.reshape(1);
         
-        // 获得图像的有效区域
+        // Get the valid area of the image
         // Undistort corners
         mnMinX = min(mat.at<float>(0,0),mat.at<float>(2,0));
         mnMaxX = max(mat.at<float>(1,0),mat.at<float>(3,0));

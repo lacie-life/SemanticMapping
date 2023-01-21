@@ -50,6 +50,11 @@ namespace ORB_SLAM3
         // Used to track from previous frame (Tracking)
         int SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, const float th, const bool bMono);
 
+        // track dynamic orb features in last frame, to currentframe by KLT
+        int SearchByTracking(Frame &CurrentFrame, const Frame &LastFrame, const float th, const bool bMono);
+        // track dynamic harris features in last frame, to current frame, by KLT.  not using MapPoints
+        int SearchByTrackingHarris(Frame &CurrentFrame, const Frame &LastFrame, const float th, const bool bMono);
+
         // Project MapPoints seen in KeyFrame into the Frame and search matches.
         // Used in relocalisation (Tracking)
         int SearchByProjection(Frame &CurrentFrame, KeyFrame* pKF, const std::set<MapPoint*> &sAlreadyFound, const float th, const int ORBdist);

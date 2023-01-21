@@ -50,6 +50,7 @@ include_directories(
         ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/g2o
         ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/Sophus
         ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2
+        ${CMAKE_SOURCE_DIR}/Slam/Thirdparty
 )
 
 link_directories(${PCL_LIBRARY_DIRS})
@@ -61,6 +62,7 @@ set(THIRDPARTY_LIBS
         ${PCL_LIBRARIES}
         ${TORCH_LIBRARIES}
         ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/DBoW2/lib/libDBoW2_New.so
+        ${CMAKE_SOURCE_DIR}/Slam/Thirdparty/detect_3d_cuboid/lib/libdetect_3d_cuboid.so
         g2o_core
         g2o_types_slam3d
         g2o_solver_csparse

@@ -18,6 +18,8 @@
 
 
 #include "ORBmatcher.h"
+#include "ros_moc.h"
+#include "Frame.h"
 
 #include <limits.h>
 
@@ -1884,6 +1886,233 @@ namespace ORB_SLAM3
         }
 
         return nmatches;
+    }
+
+    int ORBmatcher::SearchByTrackingHarris(Frame &CurrentFrame, const Frame &LastFrame, const float th,
+                                           const bool bMono)
+    {
+        int numlastfeatures = LastFrame.mvKeysHarris.size();
+
+        if (numlastfeatures == 0)
+            return 0;
+
+        vector<cv::Point2f> currobjpts;
+
+        vector<uchar> status;
+        vector<float> err;
+
+        if (LastFrame.raw_img.rows == 0 || LastFrame.raw_img.cols == 0)
+        {
+            ROS_ERROR_STREAM("Matcher feature tracking  zero image size");
+            return 0;
+        }
+
+        vector<cv::Point2f> lastobjpts(numlastfeatures);
+        for (int i = 0; i < numlastfeatures; i++)
+        {
+            lastobjpts[i] = LastFrame.mvKeysHarris[i].pt; // use last frame's harris features
+        }
+
+        cv::calcOpticalFlowPyrLK(LastFrame.raw_img, CurrentFrame.raw_img, lastobjpts, currobjpts,
+                                 status, err, cv::Size(21, 21),
+                                 3); // could also do a Backward optical flow.
+
+        CurrentFrame.mvKeysHarris.reserve(
+                numlastfeatures); // reserve not resize! Push tracked features, not all of them. new
+        // features' number smaller than before!
+        CurrentFrame.mvpMapPointsHarris.reserve(numlastfeatures);
+        CurrentFrame.keypoint_associate_objectID_harris.reserve(numlastfeatures);
+
+        int goodmatches = 0;
+
+        for (size_t i = 0; i < status.size(); i++)
+        {
+            if (status[i])
+            {
+                cv::Point2f ppt = currobjpts[i];
+                if (ppt.x >= 0 && ppt.y >= 0 && ppt.x < CurrentFrame.objmask_img.cols &&
+                    ppt.y < CurrentFrame.objmask_img.rows)
+                {
+                    // if in dynamic area?
+                    int maskval = int(CurrentFrame.objmask_img.at<uchar>(
+                            currobjpts[i])); // 0 background, >0 object id
+                    if (maskval == 0)    // not in boundary
+                        continue;
+                    goodmatches++;
+                    int pixelcubeid = maskval - 1;
+                    cv::KeyPoint keypt;
+                    keypt.pt = currobjpts[i];
+                    CurrentFrame.mvKeysHarris.push_back(keypt);
+                    CurrentFrame.keypoint_associate_objectID_harris.push_back(pixelcubeid);
+                    CurrentFrame.mvpMapPointsHarris.push_back(LastFrame.mvpMapPointsHarris[i]);
+                }
+            }
+        }
+
+        CurrentFrame.featuresklt_lastframe = lastobjpts;
+        CurrentFrame.featuresklt_thisframe = currobjpts;
+    }
+
+    int ORBmatcher::SearchByTracking(Frame &CurrentFrame, const Frame &LastFrame, const float th,
+                                     const bool bMono)
+    {
+        if (LastFrame.KeysStatic.size() == 0)
+            return 0;
+
+        vector<cv::Point2f> lastobjpts;
+        lastobjpts.reserve(LastFrame.N);
+        vector<int> lastptsinds;
+        lastptsinds.reserve(LastFrame.N);
+        for (int i = 0; i < LastFrame.N; i++)
+        {
+            if (LastFrame.mvpMapPoints[i]) // last map point should exist, otherwise no need to track it
+                // anymore.
+                if (LastFrame.mvKeys[i].octave < 3) // KLT tracking is not suitable for other octave
+                    if (LastFrame.KeysStatic.size() > 0 && !LastFrame.KeysStatic[i])
+                    {
+                        if (LastFrame.mvpMapPoints[i]->is_dynamic)
+                        {
+                            lastobjpts.push_back(LastFrame.mvKeys[i].pt);
+                            lastptsinds.push_back(i);
+                        }
+                    }
+        }
+
+        if (lastobjpts.size() == 0)
+            return 0;
+
+        vector<cv::Point2f> currobjpts;
+
+        vector<uchar> status;
+        vector<float> err;
+
+        if (LastFrame.raw_img.rows == 0 || LastFrame.raw_img.cols == 0)
+        {
+            ROS_ERROR_STREAM("Matcher  feature tracking  zero image size");
+            return 0;
+        }
+
+        // KLT predict the tracked feature points. then find the closest ORB features to the predicted
+        // position.
+        cv::calcOpticalFlowPyrLK(LastFrame.raw_img, CurrentFrame.raw_img, lastobjpts, currobjpts,
+                                 status, err, cv::Size(21, 21), 3);
+
+        int kltmatches = 0;
+        int goodmatches = 0;
+        int findfeaturematches = 0;
+        int uniquematches = 0;
+
+        // filter out some bad matches. based on mean flow for each object instance.
+        {
+            vector<float> obj_mean_delta_x(LastFrame.numobject, 0);
+            vector<float> obj_mean_delta_y(LastFrame.numobject, 0);
+            vector<float> obj_mean_delta_norm(LastFrame.numobject, 0);
+            vector<int> obj_matches(LastFrame.numobject, 0);
+            for (size_t i = 0; i < status.size(); i++)
+            {
+                if (status[i])
+                {
+                    int last_obj_ind = LastFrame.keypoint_associate_objectID[lastptsinds[i]];
+                    if (last_obj_ind >= LastFrame.numobject)
+                        ROS_ERROR_STREAM("Matcher  Found large object id   " << last_obj_ind << "  "
+                                                                             << LastFrame.numobject);
+
+                    if (last_obj_ind >= 0)
+                    {
+                        obj_matches[last_obj_ind]++;
+                        obj_mean_delta_x[last_obj_ind] += currobjpts[i].x - lastobjpts[i].x;
+                        obj_mean_delta_y[last_obj_ind] += currobjpts[i].y - lastobjpts[i].y;
+                    }
+                    else
+                    {
+                        ROS_ERROR_STREAM("Matcher  Found bad object id   " << last_obj_ind);
+                    }
+                }
+            }
+            for (size_t i = 0; i < obj_matches.size(); i++)
+            {
+                if (obj_matches[i] > 0)
+                {
+                    obj_mean_delta_x[i] /= float(obj_matches[i]);
+                    obj_mean_delta_y[i] /= float(obj_matches[i]);
+                    float mean_move_norm = sqrt(obj_mean_delta_x[i] * obj_mean_delta_x[i] +
+                                                obj_mean_delta_y[i] * obj_mean_delta_y[i]);
+                    obj_mean_delta_norm[i] = mean_move_norm;
+                    obj_mean_delta_x[i] /= mean_move_norm;
+                    obj_mean_delta_y[i] /= mean_move_norm;
+                }
+            }
+
+            int outlier_matches = 0;
+            for (size_t i = 0; i < status.size(); i++)
+            {
+                if (status[i])
+                {
+                    kltmatches++;
+                    int last_obj_ind = LastFrame.keypoint_associate_objectID[lastptsinds[i]];
+
+                    // if angle/norm is two far from mean flow, delete it?
+                    float direct_x = currobjpts[i].x - lastobjpts[i].x;
+                    float direct_y = currobjpts[i].y - lastobjpts[i].y;
+                    float move_norm = sqrt(direct_x * direct_x + direct_y * direct_y);
+                    direct_x /= move_norm;
+                    direct_y /= move_norm;
+
+                    // if mean_flow is very small, comparing angle is meaningless.
+                    if (obj_mean_delta_norm[last_obj_ind] > 20 && move_norm > 20)
+                    {
+                        if ((direct_x * obj_mean_delta_x[last_obj_ind] +
+                             direct_y * obj_mean_delta_y[last_obj_ind]) <
+                            0.85) // cos45'=0.7 cos30=0.86  0.85  or 0.80
+                        {
+                            currobjpts[i] = cv::Point2f(0, 0);
+                            continue;
+                        }
+                    }
+                    goodmatches++;
+
+                    // find the closet orb features.
+                    int nLastOctave = LastFrame.mvKeys[lastptsinds[i]].octave;
+                    float radius =
+                            th *
+                            CurrentFrame
+                                    .mvScaleFactors[nLastOctave]; // same as other feature matching threshold
+                    // [15 53] higher octave -> large radius
+                    size_t best_ind = CurrentFrame.GetCloestFeaturesInArea(
+                            currobjpts[i].x, currobjpts[i].y, radius, nLastOctave, 2); // only want 0 octave
+
+                    if (best_ind < CurrentFrame.N)
+                    {
+                        if (CurrentFrame.KeysStatic.size() > 0 && CurrentFrame.KeysStatic[best_ind])
+                        {
+                            currobjpts[i] = cv::Point2f(0, 0);
+                            continue;
+                        }
+                        findfeaturematches++;
+                        if (!CurrentFrame.mvpMapPoints[best_ind])
+                            uniquematches++;
+                        CurrentFrame.mvpMapPoints[best_ind] =
+                                LastFrame
+                                        .mvpMapPoints[lastptsinds[i]]; // what if multiple associations... frame
+                        // observation is added in localmapping
+                    }
+                    else
+                    {
+                        currobjpts[i] = cv::Point2f(0, 0);
+                    }
+                }
+                else
+                    currobjpts[i] = cv::Point2f(0, 0);
+            }
+            // 	cout<<"KLT tracking   good/total   allpts  "<<status.size()<<"   klt matched
+            // "<<kltmatches<<"   good matches  "<<goodmatches
+            // 			<<"    finalfeatures  "<<findfeaturematches<<"   "<<uniquematches<<endl;
+        }
+
+        CurrentFrame.featuresklt_lastframe = lastobjpts;
+        CurrentFrame.featuresklt_thisframe = currobjpts;
+
+        return 0;
     }
 
     int ORBmatcher::SearchByProjection(Frame &CurrentFrame, KeyFrame *pKF, const set<MapPoint*> &sAlreadyFound, const float th , const int ORBdist)

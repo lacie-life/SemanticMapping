@@ -18,6 +18,7 @@
 
 
 #include "Tracking.h"
+#include "ros_moc.h"
 
 #include "ORBmatcher.h"
 #include "FrameDrawer.h"
@@ -29,7 +30,23 @@
 #include "MLPnPsolver.h"
 #include "GeometricTools.h"
 
+// Semantic path
 #include "PointCloudMapping.h"
+#include "MapObject.h"
+#include "Config.h"
+#include "detect_3d_cuboid/detect_3d_cuboid.h"
+#include "detect_3d_cuboid/object_3d_util.h"
+#include <algorithm>
+#include <boost/filesystem.hpp>
+#include <ctime>
+#include <math.h>
+
+#include <pcl/ModelCoefficients.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl/sample_consensus/method_types.h>
+#include <pcl/sample_consensus/model_types.h>
+#include <pcl/segmentation/sac_segmentation.h>
 
 #include <iostream>
 

@@ -111,6 +111,10 @@ public:
 
     std::vector<size_t> GetFeaturesInArea(const float &x, const float  &y, const float  &r, const int minLevel=-1, const int maxLevel=-1, const bool bRight = false) const;
 
+    // Semantic path
+    size_t GetCloestFeaturesInArea(const float &x, const float &y, const float &r,
+                                   const int minLevel = -1, const int maxLevel = -1) const;
+
     // Search a match for each keypoint in the left image to a keypoint in the right image.
     // If there is a match, depth is computed and the right coordinate associated to the left keypoint is stored.
     void ComputeStereoMatches();
@@ -188,6 +192,29 @@ private:
 
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+    // detect_3d_cuboid needs raw image
+    cv::Mat raw_img;
+    std::vector<bool> KeysStatic;
+    std::vector<int> keypoint_associate_objectID;
+    int numobject;
+    cv::Mat objmask_img; // there is only two object of frame in whole system
+    // (curentFrame/lastFrame), so no worry of a big matrix here.
+
+    // detect harris corners for dynamic objects
+    std::vector<int>
+            keypoint_associate_objectID_harris; // all point's object id, by looking up objmask_img
+    // tracked + new created (if keyframe)
+    std::vector<cv::KeyPoint>
+            mvKeysHarris; // all harris features    tracked + new created (if keyframe)
+    std::vector<MapPoint *>
+            mvpMapPointsHarris; // all mappoints, 	  tracked + new created (if keyframe)
+
+    // for harris debug
+    std::vector<MapPoint *> mvpMapPoints_lasttracked;
+    std::vector<cv::KeyPoint> mvpMapPoints_inlastframe;
+    std::vector<cv::Point2f> featuresklt_lastframe;
+    std::vector<cv::Point2f> featuresklt_thisframe;
 
     // Vocabulary used for relocalization.
     ORBVocabulary* mpORBvocabulary;
