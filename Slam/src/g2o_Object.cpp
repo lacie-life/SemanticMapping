@@ -4,7 +4,7 @@
 * Copyright (C) 2018  Shichao Yang (Carnegie Mellon Univ)
 */
 
-#include "Thirdparty/g2o/g2o/types/types_six_dof_expmap.h"
+#include "g2o/types/sba/types_six_dof_expmap.h"
 #include "detect_3d_cuboid/matrix_utils.h"
 
 #include "g2o_Object.h"
@@ -249,10 +249,10 @@ void EdgeObjectMotion::computeError()
 
     // predict motion x y yaw and compute measurement.
     SE3Quat posefrom = cuboidVertexfrom->estimate().pose;
-    double yaw_from = posefrom.toXYZPRYVector()(5);
+    double yaw_from = posefrom.toMinimalVector()(5);
 
     SE3Quat poseto = cuboidVertexto->estimate().pose;
-    double yaw_to = poseto.toXYZPRYVector()(5);
+    double yaw_to = poseto.toMinimalVector()(5);
 
     Vector2d velocity = velocityVertex->estimate(); //v w   linear velocity and steer angle
 

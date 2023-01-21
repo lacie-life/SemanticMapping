@@ -46,6 +46,7 @@ class Map;
 class MapPoint;
 class Frame;
 class KeyFrameDatabase;
+class MapObject;
 
 class GeometricCamera;
 
@@ -246,6 +247,9 @@ public:
     void AddMergeEdge(KeyFrame* pKF);
     set<KeyFrame*> GetMergeEdges();
 
+    // detect 3d cuboid. create simple map points, using 3D position.
+    void SetupSimpleMapPoints(MapPoint *pNewMP, int point_ind);
+
     // MapPoint observation functions
     int GetNumberMPs();
     void AddMapPoint(MapPoint* pMP, const size_t &idx);
@@ -260,6 +264,7 @@ public:
     // KeyPoint functions
     std::vector<size_t> GetFeaturesInArea(const float &x, const float  &y, const float  &r, const bool bRight = false) const;
     bool UnprojectStereo(int i, Eigen::Vector3f &x3D);
+    cv::Mat UnprojectDepth(int i, float depth); // return world point
 
     // Image
     bool IsInImage(const float &x, const float &y) const;
@@ -308,11 +313,61 @@ public:
     // The following variables are accesed from only 1 thread or never change (no mutex needed).
 public:
 
+    // detect_3d_cuboid needs canny edge.
+    cv::Mat raw_img;
+
+    // NOTE the object_landmark vector need to push back, not pre-allocated vector
+    // landmarks are copied from local cubes, not new-created
+
+    // generated 3d cuboid, might be shorted than yolo 2d boxes. because some 2d box might not
+    // generate 3d object.
+    std::vector<MapObject *> local_cuboids;    // actual local generated cuboid from this frame. not
+    // associated yet. measurement is important
+    std::vector<MapObject *> cuboids_landmark; // check if exist or bad before use. associated SLAM
+    // map landmark, might be shorter than local_cuboids.
+    // copied from local_cuboids pointer. push when need
+    std::vector<int>
+            keypoint_associate_objectID; // same length as keypoints. point-object associations  -1: no
+    // associated object, 0,1...  associated object ID in local
+    // cubes.  one keypoint uniquely associate a object.
+    std::vector<cv::Rect>
+            object_2d_rectangles; // all local_cuboids's 2d rectangles  mainly utility/debug use
+
+    // dynamic
+    std::vector<cv::KeyPoint>
+            mvKeysHarris; // only, extra, dynamic keypoints   Harris corner, not orb features.
+    std::vector<MapPoint *> mvpMapPointsHarris; // only, extra, dynamic mappoints.
+    std::vector<int> keypoint_associate_objectID_harris;
+    std::vector<MapPoint *> GetHarrisMapPointMatches();
+
+    std::vector<bool> KeysStatic; // whether point is static
+
+    cv::Mat UnprojectPixelDepth(cv::Point2f &pt, float depth);
+
+    // compute depth in an image region.
+    std::vector<std::vector<float>> allGridMedianDepth;
+    bool PosInGrid(const cv::KeyPoint &kp, int &posX, int &posY); // x horizontal   y vertical
+    bool PosInGrid(int ptx, int pty, int &posX, int &posY);
+
+    void EraseMapObjectMatch(const size_t &idx);
+    void EraseMapObjectMatch(MapObject *pMP);
+
+    bool frame_object_being_drawed = false;
+
+    // for ground scaling methods.
+    std::vector<int> ground_region_potential_pts; // inds of lower 1/3 and middle pts. so that don't
+    // need to check again.
+    std::vector<bool>
+            keypoint_inany_object; // any 2d bbox, nothing to do with 3d, just want to remove them.
+    long unsigned int mnGroundFittingForKF = 0;
+
     static long unsigned int nNextId;
     long unsigned int mnId;
     const long unsigned int mnFrameId;
 
     const double mTimeStamp;
+
+    int record_txtrow_id = -1; // final save to txt row id.
 
     // Grid (to speed up feature matching)
     const int mnGridCols;

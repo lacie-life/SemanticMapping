@@ -22,6 +22,7 @@
 
 #include "MapPoint.h"
 #include "KeyFrame.h"
+#include "MapObject.h"
 
 #include <set>
 #include <pangolin/pangolin.h>
@@ -37,6 +38,7 @@ class MapPoint;
 class KeyFrame;
 class Atlas;
 class KeyFrameDatabase;
+class MapObject;
 
 class Map
 {
@@ -75,18 +77,25 @@ public:
 
     void AddKeyFrame(KeyFrame* pKF);
     void AddMapPoint(MapPoint* pMP);
+    void AddMapObject(MapObject *pMO);
+
     void EraseMapPoint(MapPoint* pMP);
     void EraseKeyFrame(KeyFrame* pKF);
+    void EraseMapObject(MapObject *pMO);
+
     void SetReferenceMapPoints(const std::vector<MapPoint*> &vpMPs);
     void InformNewBigChange();
     int GetLastBigChangeIdx();
 
     std::vector<KeyFrame*> GetAllKeyFrames();
     std::vector<MapPoint*> GetAllMapPoints();
+    std::vector<MapObject *> GetAllMapObjects(); // not sequential....
+    std::vector<MapObject *> GetGoodMapObjects();
     std::vector<MapPoint*> GetReferenceMapPoints();
 
     long unsigned int MapPointsInMap();
     long unsigned  KeyFramesInMap();
+    long unsigned int MapObjectsInMap(); // get number of objects.
 
     long unsigned int GetId();
 

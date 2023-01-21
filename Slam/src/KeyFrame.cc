@@ -19,12 +19,19 @@
 #include "KeyFrame.h"
 #include "Converter.h"
 #include "ImuTypes.h"
+
+#include "detect_3d_cuboid/detect_3d_cuboid.h"
+#include "MapObject.h"
+#include "Config.h"
+#include <ctime>
+#include <math.h>
+
 #include <mutex>
 
 namespace ORB_SLAM3
 {
 
-long unsigned int KeyFrame::nNextId=0;
+long unsigned int KeyFrame::nNextId = 0;
 
 KeyFrame::KeyFrame():
         mnFrameId(0),  mTimeStamp(0), mnGridCols(FRAME_GRID_COLS), mnGridRows(FRAME_GRID_ROWS),
@@ -77,7 +84,12 @@ KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB):
         }
     }
 
-
+    // TODO: Need check
+    if (whether_dynamic_object)
+    {
+        KeysStatic = F.KeysStatic;
+        keypoint_associate_objectID = F.keypoint_associate_objectID;
+    }
 
     if(!F.HasVelocity()) {
         mVw.setZero();
@@ -316,6 +328,18 @@ void KeyFrame::EraseMapPointMatch(MapPoint* pMP)
         mvpMapPoints[rightIndex]=static_cast<MapPoint*>(NULL);
 }
 
+void KeyFrame::EraseMapObjectMatch(const size_t &idx)
+{
+    unique_lock<mutex> lock(mMutexFeatures);
+    cuboids_landmark[idx] = static_cast<MapObject *>(NULL);
+}
+
+void KeyFrame::EraseMapObjectMatch(MapObject *pMP)
+{
+    int idx = pMP->GetIndexInKeyFrame(this);
+    if (idx >= 0)
+        cuboids_landmark[idx] = static_cast<MapObject *>(NULL);
+}
 
 void KeyFrame::ReplaceMapPointMatch(const int &idx, MapPoint* pMP)
 {
@@ -362,6 +386,12 @@ int KeyFrame::TrackedMapPoints(const int &minObs)
     }
 
     return nPoints;
+}
+
+vector<MapPoint *> KeyFrame::GetHarrisMapPointMatches()
+{
+    unique_lock<mutex> lock(mMutexFeatures);
+    return mvpMapPointsHarris;
 }
 
 vector<MapPoint*> KeyFrame::GetMapPointMatches()
@@ -673,7 +703,6 @@ void KeyFrame::SetBadFlag()
         mbBad = true;
     }
 
-
     mpMap->EraseKeyFrame(this);
     mpKeyFrameDB->erase(this);
 }
@@ -769,6 +798,56 @@ bool KeyFrame::UnprojectStereo(int i, Eigen::Vector3f &x3D)
     }
     else
         return false;
+}
+
+cv::Mat KeyFrame::UnprojectDepth(int i, float depth)
+{
+    const float z = depth;
+    if (z > 0)
+    {
+        const float u = mvKeys[i].pt.x;
+        const float v = mvKeys[i].pt.y;
+        const float x = (u - cx) * z * invfx;
+        const float y = (v - cy) * z * invfy;
+        cv::Mat x3Dc = (cv::Mat_<float>(3, 1) << x, y, z);
+
+        unique_lock<mutex> lock(mMutexPose);
+        cv::Mat Twc = Converter::toCvMat(Converter::toSE3Quat(mTcw));
+        return Twc.rowRange(0, 3).colRange(0, 3) * x3Dc + Twc.rowRange(0, 3).col(3);
+    }
+    else
+        return cv::Mat();
+}
+
+cv::Mat KeyFrame::UnprojectPixelDepth(cv::Point2f &pt, float depth)
+{
+    const float z = depth;
+    if (z > 0)
+    {
+        const float u = pt.x;
+        const float v = pt.y;
+        const float x = (u - cx) * z * invfx;
+        const float y = (v - cy) * z * invfy;
+        cv::Mat x3Dc = (cv::Mat_<float>(3, 1) << x, y, z);
+
+        unique_lock<mutex> lock(mMutexPose);
+        cv::Mat Twc = Converter::toCvMat(Converter::toSE3Quat(mTcw));
+        return Twc.rowRange(0, 3).colRange(0, 3) * x3Dc + Twc.rowRange(0, 3).col(3);
+    }
+    else
+        return cv::Mat();
+}
+
+void KeyFrame::SetupSimpleMapPoints(MapPoint *pNewMP, int point_ind)
+{
+    pNewMP->AddObservation(this, point_ind);
+    AddMapPoint(pNewMP, point_ind);
+    if (!(use_dynamic_klt_features && pNewMP->is_dynamic))
+    {
+        pNewMP->ComputeDistinctiveDescriptors();
+        pNewMP->UpdateNormalAndDepth();
+    }
+    mpMap->AddMapPoint(pNewMP);
 }
 
 float KeyFrame::ComputeSceneMedianDepth(const int q)

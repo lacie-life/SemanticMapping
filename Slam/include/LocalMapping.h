@@ -48,8 +48,12 @@ public:
 
     void SetTracker(Tracking* pTracker);
 
+    bool RunMappingIteration();
+    void bundle_adjustment_caller();
+
     // Main function
     void Run();
+    void RunWithObject();
 
     void InsertKeyFrame(KeyFrame* pKF);
     void EmptyQueue();

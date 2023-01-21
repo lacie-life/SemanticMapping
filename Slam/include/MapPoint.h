@@ -40,6 +40,7 @@ namespace ORB_SLAM3
 class KeyFrame;
 class Map;
 class Frame;
+class MapObject;
 
 class MapPoint
 {
@@ -152,6 +153,17 @@ public:
     int PredictScale(const float &currentDist, KeyFrame*pKF);
     int PredictScale(const float &currentDist, Frame* pF);
 
+    // detect 3d cuboid, for association with object
+    void AddObjectObservation(MapObject *obj); // called by AddObservation
+    void EraseObjectObservation(MapObject *obj);
+    void FindBestObject(); // find which object observes this point most
+
+    int GetBelongedObject(MapObject *&obj); // change obj, return observation times.
+    MapObject *GetBelongedObject();         // return obj
+
+    Eigen::Vector3f GetWorldPosVec();
+    cv::Mat GetWorldPosBA();
+
     Map* GetMap();
     void UpdateMap(Map* pMap);
 
@@ -196,6 +208,29 @@ public:
     Eigen::Vector3f mPosMerge;
     Eigen::Vector3f mNormalVectorMerge;
 
+    // for dynamic stuff
+    bool is_dynamic = false;
+    cv::Mat mWorldPos_latestKF;
+    cv::Mat mWorldPos_latestFrame;
+    cv::Mat PosToObj; // 3d point relative to object center. ideally will converge/fix after BA
+
+    bool is_triangulated = false; // whether this point is triangulated or depth inited?
+    bool is_optimized = false;
+
+    MapObject *best_object; // one point can only belong to at most one object
+    int max_object_vote;    // sometimes point is wrongly associated to an object. need more frame
+    // observation
+    std::set<MapObject *>
+            LocalObjObservations; // observed by local objects which hasn't become landmark at that time
+    std::map<MapObject *, int> MapObjObservations; // object and observe times.
+    std::mutex mMutexObject;
+
+    bool already_bundled;
+
+    bool ground_fitted_point = false;
+    long unsigned int mnGroundFittingForKF;
+
+    int record_txtrow_id = -1; // when finally record to txt, row id in txt
 
     // Fopr inverse depth optimization
     double mInvDepth;
