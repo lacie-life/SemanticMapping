@@ -46,6 +46,7 @@ class Map;
 class MapPoint;
 class Frame;
 class KeyFrameDatabase;
+class MapObject;
 
 class GeometricCamera;
 

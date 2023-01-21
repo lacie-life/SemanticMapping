@@ -6,7 +6,7 @@
 
 #include "mutex"
 
-namespace ORB_SLAM2
+namespace ORB_SLAM3
 {
 using namespace std;
 long int MapObject::nNextId = 0;
