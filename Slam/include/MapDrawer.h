@@ -32,6 +32,8 @@ namespace ORB_SLAM3
 {
 
 class Settings;
+class MapPoint;
+class MapObject;
 
 class MapDrawer
 {
@@ -44,6 +46,7 @@ public:
     Atlas* mpAtlas;
 
     void DrawMapPoints();
+    void DrawMapCuboids();
     void DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const bool bDrawInertialGraph, const bool bDrawOptLba);
     void DrawCurrentCamera(pangolin::OpenGlMatrix &Twc);
     void SetCurrentCameraPose(const Sophus::SE3f &Tcw);
@@ -71,6 +74,10 @@ private:
                                 {0.6f, 0.0f, 1.0f},
                                 {1.0f, 1.0f, 0.0f},
                                 {0.0f, 1.0f, 1.0f}};
+
+    std::vector<Eigen::Vector3f> box_colors;
+    Eigen::MatrixXd all_edge_pt_ids; // for object drawing
+    Eigen::MatrixXd front_edge_pt_ids;
 
 };
 

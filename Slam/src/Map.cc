@@ -83,6 +83,12 @@ void Map::AddMapPoint(MapPoint *pMP)
     mspMapPoints.insert(pMP);
 }
 
+void Map::AddMapObject(MapObject *pMO)
+{
+    unique_lock<mutex> lock(mMutexMap);
+    mspMapObjects.insert(pMO);
+}
+
 void Map::SetImuInitialized()
 {
     unique_lock<mutex> lock(mMutexMap);
@@ -126,6 +132,12 @@ void Map::EraseKeyFrame(KeyFrame *pKF)
     // Delete the MapPoint
 }
 
+void Map::EraseMapObject(MapObject *pMO)
+{
+    unique_lock<mutex> lock(mMutexMap);
+    mspMapObjects.erase(pMO);
+}
+
 void Map::SetReferenceMapPoints(const vector<MapPoint *> &vpMPs)
 {
     unique_lock<mutex> lock(mMutexMap);
@@ -156,6 +168,21 @@ vector<MapPoint*> Map::GetAllMapPoints()
     return vector<MapPoint*>(mspMapPoints.begin(),mspMapPoints.end());
 }
 
+vector<MapObject *> Map::GetAllMapObjects()
+{
+    unique_lock<mutex> lock(mMutexMap);
+    return vector<MapObject *>(mspMapObjects.begin(), mspMapObjects.end());
+}
+
+vector<MapObject *> Map::GetGoodMapObjects()
+{
+    vector<MapObject *> res;
+    for (set<MapObject *>::iterator sit = mspMapObjects.begin(), send = mspMapObjects.end(); sit != send; sit++)
+        if ((*sit)->isGood)
+            res.push_back(*sit);
+    return res;
+}
+
 long unsigned int Map::MapPointsInMap()
 {
     unique_lock<mutex> lock(mMutexMap);
@@ -166,6 +193,12 @@ long unsigned int Map::KeyFramesInMap()
 {
     unique_lock<mutex> lock(mMutexMap);
     return mspKeyFrames.size();
+}
+
+long unsigned int Map::MapObjectsInMap()
+{
+    unique_lock<mutex> lock(mMutexMap);
+    return mspMapObjects.size();
 }
 
 vector<MapPoint*> Map::GetReferenceMapPoints()
@@ -225,6 +258,8 @@ void Map::clear()
 
     mspMapPoints.clear();
     mspKeyFrames.clear();
+    mspMapObjects.clear();
+
     mnMaxKFid = mnInitKFid;
     mbImuInitialized = false;
     mvpReferenceMapPoints.clear();

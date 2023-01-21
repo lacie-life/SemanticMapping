@@ -187,6 +187,7 @@ void Viewer::Run()
     pangolin::Var<bool> menuTopView("menu.Top View",false,false);
     // pangolin::Var<bool> menuSideView("menu.Side View",false,false);
     pangolin::Var<bool> menuShowPoints("menu.Show Points",true,true);
+    pangolin::Var<bool> menuShowObjects("menu.Show Objects", true, true);
     pangolin::Var<bool> menuShowKeyFrames("menu.Show KeyFrames",true,true);
     pangolin::Var<bool> menuShowGraph("menu.Show Graph",false,true);
     pangolin::Var<bool> menuShowInertialGraph("menu.Show Inertial Graph",true,true);
@@ -321,6 +322,8 @@ void Viewer::Run()
             mpMapDrawer->DrawKeyFrames(menuShowKeyFrames,menuShowGraph, menuShowInertialGraph, menuShowOptLba);
         if(menuShowPoints)
             mpMapDrawer->DrawMapPoints();
+        if (menuShowObjects)
+            mpMapDrawer->DrawMapCuboids();
 
         pangolin::FinishFrame();
 
@@ -370,6 +373,7 @@ void Viewer::Run()
             menuShowInertialGraph = true;
             menuShowKeyFrames = true;
             menuShowPoints = true;
+            menuShowObjects = true;
             menuLocalizationMode = false;
             if(bLocalizationMode)
                 mpSystem->DeactivateLocalizationMode();

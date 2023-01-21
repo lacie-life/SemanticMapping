@@ -24,6 +24,11 @@
 
 #include <mutex>
 
+#include "Config.h"
+#include "Converter.h"
+#include "detect_3d_cuboid/object_3d_util.h"
+#include "MapObject.h"
+
 namespace ORB_SLAM3
 {
 
@@ -32,6 +37,15 @@ FrameDrawer::FrameDrawer(Atlas* pAtlas):both(false),mpAtlas(pAtlas)
     mState=Tracking::SYSTEM_NOT_READY;
     mIm = cv::Mat(480,640,CV_8UC3, cv::Scalar(0,0,0));
     mImRight = cv::Mat(480,640,CV_8UC3, cv::Scalar(0,0,0));
+
+    box_colors.push_back(cv::Scalar(255, 255, 0));
+    box_colors.push_back(cv::Scalar(255, 0, 255));
+    box_colors.push_back(cv::Scalar(0, 255, 255));
+    box_colors.push_back(cv::Scalar(145, 30, 180));
+    box_colors.push_back(cv::Scalar(210, 245, 60));
+    box_colors.push_back(cv::Scalar(128, 0, 0));
+
+    whether_keyframe = false;
 }
 
 cv::Mat FrameDrawer::DrawFrame(float imageScale)
@@ -45,6 +59,10 @@ cv::Mat FrameDrawer::DrawFrame(float imageScale)
     int state; // Tracking state
     vector<float> vCurrentDepth;
     float thDepth;
+
+    vector<cv::KeyPoint> vCurrentKeys_inlastframe;
+    vector<cv::Point2f> vfeaturesklt_lastframe;
+    vector<cv::Point2f> vfeaturesklt_thisframe;
 
     Frame currentFrame;
     vector<MapPoint*> vpLocalMap;
@@ -73,12 +91,20 @@ cv::Mat FrameDrawer::DrawFrame(float imageScale)
             vIniKeys = mvIniKeys;
             vMatches = mvIniMatches;
             vTracks = mvTracks;
+
+            vCurrentKeys_inlastframe = mvCurrentKeys_inlastframe;
+            vfeaturesklt_lastframe = mvfeaturesklt_lastframe;
+            vfeaturesklt_thisframe = mvfeaturesklt_thisframe;
         }
         else if(mState==Tracking::OK)
         {
             vCurrentKeys = mvCurrentKeys;
             vbVO = mvbVO;
             vbMap = mvbMap;
+
+            vCurrentKeys_inlastframe = mvCurrentKeys_inlastframe;
+            vfeaturesklt_lastframe = mvfeaturesklt_lastframe;
+            vfeaturesklt_thisframe = mvfeaturesklt_thisframe;
 
             currentFrame = mCurrentFrame;
             vpLocalMap = mvpLocalMap;
@@ -96,6 +122,9 @@ cv::Mat FrameDrawer::DrawFrame(float imageScale)
         else if(mState==Tracking::LOST)
         {
             vCurrentKeys = mvCurrentKeys;
+            vCurrentKeys_inlastframe = mvCurrentKeys_inlastframe;
+            vfeaturesklt_lastframe = mvfeaturesklt_lastframe;
+            vfeaturesklt_thisframe = mvfeaturesklt_thisframe;
         }
     }
 
@@ -191,7 +220,43 @@ cv::Mat FrameDrawer::DrawFrame(float imageScale)
                     cv::circle(im,point,2,odometryColor,-1);
                     mnTrackedVO++;
                 }
+
+                if (associate_point_with_object && (point_Object_AssoID.size() > 0)) // red object points
+                    if (point_Object_AssoID[i] > -1)
+                        cv::circle(im, vCurrentKeys[i].pt, 4, box_colors[point_Object_AssoID[i] % box_colors.size()], -1);
+
+                if (vCurrentKeys_inlastframe.size() > 0 && !(vCurrentKeys_inlastframe[i].pt.x == 0 && vCurrentKeys_inlastframe[i].pt.y == 0))
+                    cv::line(im, vCurrentKeys[i].pt, vCurrentKeys_inlastframe[i].pt, cv::Scalar(0, 0, 255), 2);
             }
+        }
+    }
+
+    if (whether_detect_object) //draw object box
+    {                          // better to write some warning that if it is keyframe or not, because I only detect cuboid for keyframes.
+        for (size_t i = 0; i < bbox_2ds.size(); i++)
+        {
+            cv::rectangle(im, bbox_2ds[i], box_colors[i % box_colors.size()], 2); // 2d bounding box.
+            if ((scene_unique_id != kitti) && (box_corners_2ds[i].cols() > 0))    // for most offline read data, usually cannot read it, could use rviz.
+            {
+                plot_image_with_cuboid_edges(im, box_corners_2ds[i], edge_markers_2ds[i]); // eight corners.
+            }
+            if (truth2d_trackid.size() > 0 && 1) //draw truth id
+            {
+                int font = cv::FONT_HERSHEY_PLAIN;
+                char seq_index_c[256];
+                sprintf(seq_index_c, "%d", truth2d_trackid[i]);
+                std::string show_strings2(seq_index_c);
+                cv::putText(im, show_strings2, cv::Point(bbox_2ds[i].x + 10, bbox_2ds[i].y + 10), font, 2, cv::Scalar(0, 0, 255), 2, 8); // # bgr
+            }
+        }
+    }
+
+    // draw ground pts
+    for (size_t i = 0; i < potential_ground_fit_inds.size(); i++)
+    {
+        if (vbVO[i] || vbMap[i])
+        {
+            cv::circle(im, vCurrentKeys[potential_ground_fit_inds[i]].pt, 2, cv::Scalar(0, 0, 255), -1);
         }
     }
 
@@ -388,6 +453,9 @@ void FrameDrawer::Update(Tracking *pTracker)
     mvbMap = vector<bool>(N,false);
     mbOnlyTracking = pTracker->mbOnlyTracking;
 
+    potential_ground_fit_inds.clear();
+    current_frame_id = int(pTracker->mCurrentFrame.mnId);
+
     //Variables for the new visualization
     mCurrentFrame = pTracker->mCurrentFrame;
     mmProjectPoints = mCurrentFrame.mmProjectPoints;
@@ -434,6 +502,44 @@ void FrameDrawer::Update(Tracking *pTracker)
 
     }
     mState=static_cast<int>(pTracker->mLastProcessedState);
+
+    if (whether_detect_object) // copy some object data for visualization
+    {
+        cam_pose_cw = pTracker->mCurrentFrame.mTcw; // camera pose, world to cam
+        Kalib = pTracker->Kalib;
+        bbox_2ds.clear();
+        truth2d_trackid.clear();
+        box_corners_2ds.clear();
+        edge_markers_2ds.clear();
+        point_Object_AssoID.clear();
+        if (pTracker->mCurrentFrame.mpReferenceKF != NULL)                                             // mCurrentFrame.mpReferenceKF
+            if ((pTracker->mCurrentFrame.mnId - pTracker->mCurrentFrame.mpReferenceKF->mnFrameId) < 1) // if current frame is a keyframe
+            {
+                if (whether_detect_object)
+                {
+                    for (const MapObject *object : pTracker->mCurrentFrame.mpReferenceKF->local_cuboids)
+                    {
+                        bbox_2ds.push_back(object->bbox_2d);
+                        box_corners_2ds.push_back(object->box_corners_2d);
+                        edge_markers_2ds.push_back(object->edge_markers);
+                        if (pTracker->use_truth_trackid)
+                            truth2d_trackid.push_back(object->truth_tracklet_id);
+                    }
+
+                    if (associate_point_with_object)
+                        point_Object_AssoID = pTracker->mCurrentFrame.mpReferenceKF->keypoint_associate_objectID;
+                }
+            }
+    }
+
+    if (enable_ground_height_scale)
+    {
+        if (pTracker->mCurrentFrame.mpReferenceKF != NULL)                                             // mCurrentFrame.mpReferenceKF
+            if ((pTracker->mCurrentFrame.mnId - pTracker->mCurrentFrame.mpReferenceKF->mnFrameId) < 1) // if current frame is a keyframe
+            {
+                potential_ground_fit_inds = pTracker->mCurrentFrame.mpReferenceKF->ground_region_potential_pts;
+            }
+    }
 }
 
 } //namespace ORB_SLAM

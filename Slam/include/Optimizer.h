@@ -42,6 +42,10 @@ namespace ORB_SLAM3
 {
 
 class LoopClosing;
+class Map;
+class MapPoint;
+class Frame;
+class MapObject;
 
 class Optimizer
 {
@@ -55,6 +59,12 @@ public:
     void static FullInertialBA(Map *pMap, int its, const bool bFixLocal=false, const unsigned long nLoopKF=0, bool *pbStopFlag=NULL, bool bInit=false, float priorG = 1e2, float priorA=1e6, Eigen::VectorXd *vSingVal = NULL, bool *bHess=NULL);
 
     void static LocalBundleAdjustment(KeyFrame* pKF, bool *pbStopFlag, Map *pMap, int& num_fixedKF, int& num_OptKF, int& num_MPs, int& num_edges);
+
+    // similar to LocalBA, add point-camera  object-camera 2d, point-object 3d
+    void static LocalBACameraPointObjects(KeyFrame *pKF, bool *pbStopFlag, Map *pMap,
+                                          bool fixCamera = false, bool fixPoint = false);
+    void static LocalBACameraPointObjectsDynamic(KeyFrame *pKF, bool *pbStopFlag, Map *pMap,
+                                                 bool fixCamera = false, bool fixPoint = false);
 
     int static PoseOptimization(Frame* pFrame);
     int static PoseInertialOptimizationLastKeyFrame(Frame* pFrame, bool bRecInit = false);

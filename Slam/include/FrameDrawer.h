@@ -36,6 +36,9 @@ namespace ORB_SLAM3
 
 class Tracking;
 class Viewer;
+class MapPoint;
+class MapObject;
+class Map;
 
 class FrameDrawer
 {
@@ -53,6 +56,27 @@ public:
     bool both;
 
 protected:
+
+    // detect 3d cuboid
+    std::vector<cv::Rect> bbox_2ds;                // yolo detected 2D bbox_2d, which has 3D cuboid
+    std::vector<Eigen::Matrix2Xi> box_corners_2ds; //2*8 corners on object.
+    std::vector<Eigen::MatrixXi> edge_markers_2ds; // in order to plot 2d cuboids with 8 corners.
+    std::vector<int> truth2d_trackid;              // truth 2d track id
+
+    std::vector<int> potential_ground_fit_inds;
+    int current_frame_id = -1;
+    int saved_img_id = -1;
+
+    // just for debug visualization
+    std::vector<cv::KeyPoint> mvCurrentKeys_inlastframe;
+    std::vector<cv::Point2f> mvfeaturesklt_lastframe;
+    std::vector<cv::Point2f> mvfeaturesklt_thisframe;
+
+    std::vector<cv::Scalar> box_colors; // fixed
+    std::vector<int> point_Object_AssoID;
+    bool whether_keyframe;
+    cv::Mat cam_pose_cw; // camera pose, world to cam
+    Eigen::Matrix3d Kalib;
 
     void DrawTextInfo(cv::Mat &im, int nState, cv::Mat &imText);
 

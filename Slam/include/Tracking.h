@@ -55,6 +55,8 @@ namespace ORB_SLAM3
 class Viewer;
 class FrameDrawer;
 class Atlas;
+class MapPoint;
+class MapObject;
 class LocalMapping;
 class LoopClosing;
 class System;
@@ -74,6 +76,7 @@ public:
     bool ParseCamParamFile(cv::FileStorage &fSettings);
     bool ParseORBParamFile(cv::FileStorage &fSettings);
     bool ParseIMUParamFile(cv::FileStorage &fSettings);
+    bool ParseCUBOIDParamFile(cv::FileStorage &fSettings);
 
     // Preprocess the input and call Track(). Extract features and performs stereo matching.
     Sophus::SE3f GrabImageStereo(const cv::Mat &imRectLeft,const cv::Mat &imRectRight, const double &timestamp, string filename);

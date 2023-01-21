@@ -164,12 +164,27 @@ public:
     std::set<long unsigned int> msOptKFs;
     std::set<long unsigned int> msFixedKFs;
 
+    // detect 3d cuboid, object map scale
+    cv::Mat InitToGround, GroundToInit; // orb's init camera frame to my ground
+    Eigen::Matrix4f InitToGround_eigen;
+    Eigen::Matrix4d InitToGround_eigen_d, GroundToInit_eigen_d;
+    Eigen::Matrix3f Kalib_f, invKalib_f;
+    Eigen::Matrix3d Kalib, invKalib;
+
+    int img_width, img_height;
+
+    cv::Mat GroundToInit_opti;
+    cv::Mat InitToGround_opti;
+    cv::Mat RealGroundToMine_opti;
+    cv::Mat MineGroundToReal_opti;
+
 protected:
 
     long unsigned int mnId;
 
     std::set<MapPoint*> mspMapPoints;
     std::set<KeyFrame*> mspKeyFrames;
+    std::set<MapObject *> mspMapObjects;
 
     // Save/load, the set structure is broken in libboost 1.58 for ubuntu 16.04, a vector is serializated
     std::vector<MapPoint*> mvpBackupMapPoints;
