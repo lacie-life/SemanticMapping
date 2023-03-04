@@ -31,12 +31,9 @@
 *.out
 *.app
 
-build-Engine-Desktop_Qt_5_15_2_GCC_64bit-Debug/
-Slam/Thirdparty/DBoW2/build/
-Slam/Thirdparty/g2o/build/
-cmake-build-debug/
-/Data/vocabulary/ORBvoc.txt
-CMakeLists.txt.user
-Data/model/yolov4.weights
-bin
+ag_mapping/Thirdparty/DBoW2/build/
+ag_mapping/Thirdparty/g2o/build/
+config/Model/yolov4.weights
+ag_mapping/Thirdparty/yolov5/build/
+ag_mapping/Thirdparty/yolov5/lib/
 
