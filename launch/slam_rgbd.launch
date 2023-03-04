@@ -1,0 +1,15 @@
+<launch>  
+	<!-- OrbSlam3  -->
+	<node pkg="ag_mapping" name="simple_rgbd_node" type="simple_rgbd_node" 
+	args="/home/lacie/Github/AG-Mapping/ag_mapping/Vocabulary/ORBvoc.txt.bin
+	/home/lacie/Github/AG-Mapping/ag_mapping/config/RGB-D/TUM2.yaml
+	/home/lacie/Github/Data/TUM/rgbd_dataset_freiburg2_large_with_loop
+	/home/lacie/Github/Data/TUM/rgbd_dataset_freiburg2_large_with_loop/depth.txt 
+	/home/lacie/Github/Data/TUM/rgbd_dataset_freiburg2_large_with_loop/rgb.txt"
+	output="screen"/>
+
+	<include file="$(find ag_mapping)/launch/transform.launch" />
+	<include file="$(find ag_mapping)/launch/octomap.launch" />
+	<node pkg="rviz" name="rviz" type="rviz" /> 
+	
+</launch>
