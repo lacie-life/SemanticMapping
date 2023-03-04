@@ -17,6 +17,7 @@ An application for 3D mapping tasks in agriculture uses object-based Visual SLAM
    	   - [ ] Improve Object filter
    - [x] Add ZED example  
    - [ ] Optimize mapping memory
+   - [ ] Plant bounding box
    
  - [ ] Evaluate results
    - [ ] SLAM 
