@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
-project(ag_mapping)
+project(ag-mapping)
 
 IF (NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release)
@@ -77,10 +77,6 @@ find_package(Boost COMPONENTS system filesystem serialization REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
 
-# list(APPEND CMAKE_PREFIX_PATH "~/Github/libtorch/")
-# find_package(Torch REQUIRED)
-# include_directories(${TORCH_INCLUDE_DIRS})
-
 # cuda
 find_package(CUDA REQUIRED)
 include_directories(${CUDA_INCLUDE_DIRS})
@@ -112,44 +108,43 @@ catkin_package(
 include_directories(
         ${PROJECT_SOURCE_DIR}
         ${PROJECT_SOURCE_DIR}/include
-        ${PROJECT_SOURCE_DIR}/ag_mapping
-        ${PROJECT_SOURCE_DIR}/ag_mapping/include
-        ${PROJECT_SOURCE_DIR}/ag_mapping/include/CameraModels
-        ${PROJECT_SOURCE_DIR}/ag_mapping/include/cuda
-        ${PROJECT_SOURCE_DIR}/ag_mapping/Thirdparty
-        ${PROJECT_SOURCE_DIR}/ag_mapping/Thirdparty/Sophus
-        ${PROJECT_SOURCE_DIR}/ag_mapping/Thirdparty/yolov5
+        ${PROJECT_SOURCE_DIR}/sematic_slam
+        ${PROJECT_SOURCE_DIR}/sematic_slam/include
+        ${PROJECT_SOURCE_DIR}/sematic_slam/include/CameraModels
+        ${PROJECT_SOURCE_DIR}/sematic_slam/include/cuda
+        ${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty
+        ${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/Sophus
+        ${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/yolov5
         ${EIGEN3_INCLUDE_DIR}
         ${Pangolin_INCLUDE_DIRS}
         ${catkin_INCLUDE_DIRS}
 )
 
-include(${PROJECT_SOURCE_DIR}/ag_mapping/Thirdparty/DBoW2/CMakeLists.txt)
-include(${PROJECT_SOURCE_DIR}/ag_mapping/Thirdparty/g2o/CMakeLists.txt)
-# include(${PROJECT_SOURCE_DIR}/ag_mapping/Thirdparty/yolov5/CMakeLists.txt)
+include(${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/DBoW2/CMakeLists.txt)
+include(${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/g2o/CMakeLists.txt)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/ag_mapping/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/sematic_slam/lib)
 
 file(GLOB HEADERS 
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/include/*.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/include/*.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/include/CameraModels/*.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/include/cuda/*.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/include/line_lbd/*.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/include/line_lbd/*.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/include/line_lbd/line_descriptor/*.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/include/detect_3d_cuboid/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/*.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/CameraModels/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/cuda/*.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/line_lbd/*.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/line_lbd/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/line_lbd/line_descriptor/*.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/detect_3d_cuboid/*.h
         )
 
 file(GLOB SOURCES 
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/src/*.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/src/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/src/CameraModels/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/src/cuda/*.cu
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/src/line_detect/libs/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/src/line_detect/libs/*.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/src/line_detect/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ag_mapping/src/detect_3d_cuboid/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/*.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/CameraModels/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/cuda/*.cu
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/line_detect/libs/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/line_detect/libs/*.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/line_detect/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/detect_3d_cuboid/*.cpp
         )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -160,7 +155,7 @@ cuda_add_library(${PROJECT_NAME} SHARED
         ${SOURCES}
         )
 
- set(TRT_LIBS nvinfer)
+set(TRT_LIBS nvinfer)
 
 target_link_libraries(${PROJECT_NAME}
         ${OpenCV_LIBS}
@@ -168,26 +163,15 @@ target_link_libraries(${PROJECT_NAME}
         ${Pangolin_LIBRARIES}
         ${PCL_LIBRARIES}
         ${OCTOMAP_LIBRARIES}
-        # ${TORCH_LIBRARIES}
         ${TRT_LIBS}
         ${CUDA_CUDA_LIBRARY}
         ${CUDA_CUDART_LIBRARY}
-        ${PROJECT_SOURCE_DIR}/ag_mapping/Thirdparty/DBoW2/lib/libDBoW2.so
-        ${PROJECT_SOURCE_DIR}/ag_mapping/Thirdparty/g2o/lib/libg2o.so
-        ${PROJECT_SOURCE_DIR}/ag_mapping/Thirdparty/yolov5/lib/libyolov5-detector.so
+        ${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/DBoW2/lib/libDBoW2.so
+        ${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/g2o/lib/libg2o.so
+        ${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/yolov5/lib/libyolov5-detector.so
         -lboost_serialization
         -lcrypto
          nvToolsExt
-#        opencv_cudabgsegm
-#        opencv_cudaobjdetect
-#        opencv_cudastereo
-#        opencv_cudafeatures2d
-#        opencv_cudacodec
-#        opencv_cudaoptflow
-#        opencv_cudalegacy
-#        opencv_cudawarping
-#        opencv_cudaimgproc
-#        opencv_cudafilters
         )
 
 ## ROS node
@@ -198,4 +182,45 @@ target_link_libraries(simple_rgbd_node
         ${catkin_LIBRARIES}
         )
 
+## ZED ROS node
+add_executable(zed_rgbd_node
+        src/zed_node_rgbd.cpp
+        src/common.cc)
+target_link_libraries(zed_rgbd_node
+        ${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+        )
 
+## D435i ROS node
+add_executable(d435i_rgbd_node
+        src/d435i_rgbd.cpp
+        src/common.cc)
+target_link_libraries(d435i_rgbd_node
+        ${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+        )
+
+## D455 ROS node
+add_executable(D455_rgbd_node
+        src/D455_rgbd.cpp
+        src/common.cc)
+target_link_libraries(D455_rgbd_node
+        ${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+        )
+
+## zed_pipeline ROS node
+add_executable(zed_pipeline
+        src/zed_pipeline.cpp)
+target_link_libraries(zed_pipeline
+        ${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+        )
+
+## detector_test ROS node
+add_executable(detector_test
+        src/detector_test.cpp)
+target_link_libraries(detector_test
+        ${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+        )

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>ag_mapping</name>
+  <name>ag-mapping</name>
   <version>0.0.1</version>
-  <description>AG-Mapping implementation.</description>
+  <description>My object SLAM framework</description>
 
   <maintainer email="lifezero@xyz.com">Life Zero</maintainer>
 

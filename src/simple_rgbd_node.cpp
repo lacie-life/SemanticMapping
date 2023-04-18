@@ -1,21 +1,3 @@
-/**
-* This file is part of ORB-SLAM3
-*
-* Copyright (C) 2017-2021 Carlos Campos, Richard Elvira, Juan J. Gómez Rodríguez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
-* Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
-*
-* ORB-SLAM3 is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* ORB-SLAM3 is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
-* the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License along with ORB-SLAM3.
-* If not, see <http://www.gnu.org/licenses/>.
-*/
-
 #include <iostream>
 #include <algorithm>
 #include <fstream>
@@ -26,7 +8,7 @@
 #include "System.h"
 
 using namespace std;
- ORB_SLAM3::
+
 void LoadImages(const string &strAssociationFilenameDepth, const string &strAssociationFilenameRGB, vector<string> &vstrImageFilenamesRGB,
                 vector<string> &vstrImageFilenamesD, vector<double> &vTimestamps);
 
@@ -38,7 +20,7 @@ int main(int argc, char **argv)
 
     if(argc != 6)
     {
-        cerr << endl << "Usage: rosrun orb_slam3_ros simple_rgbd_node path_to_vocabulary path_to_settings path_to_sequence path_to_association_depth path_to_association_rgb" << endl;
+        cerr << endl << "Usage: rosrun object_slam simple_rgbd_node path_to_vocabulary path_to_settings path_to_sequence path_to_association_depth path_to_association_rgb" << endl;
         return 1;
     }
 
@@ -64,7 +46,7 @@ int main(int argc, char **argv)
     }
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    AG_MAPPING::System SLAM(argv[1], argv[2],AG_MAPPING::System::RGBD, true);
+    semantic_slam::System SLAM(argv[1], argv[2], semantic_slam::System::RGBD, true);
     float imageScale = SLAM.GetImageScale();
 
     // Vector for tracking time statistics
@@ -170,8 +152,6 @@ void LoadImages(const string &strAssociationFilenameDepth, const string &strAsso
             ss >> sD;
             vstrImageFilenamesD.push_back(sD);
 
-//            cout << sD << endl;
-
             string _s;
             stringstream _ss;
             getline(fAssociationRGB, _s);
@@ -179,9 +159,6 @@ void LoadImages(const string &strAssociationFilenameDepth, const string &strAsso
             _ss >> t;
             _ss >> sRGB;
             vstrImageFilenamesRGB.push_back(sRGB);
-
-//            cout << sRGB << endl;
-
         }
     }
 }
