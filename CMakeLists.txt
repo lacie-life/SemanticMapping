@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
-project(ag-mapping)
+project(ag_mapping)
 
 IF (NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release)
@@ -57,6 +57,7 @@ find_package(catkin REQUIRED COMPONENTS
         rospy
         tf
         tf2
+        pcl_ros
         message_generation
         )
 
@@ -99,7 +100,7 @@ generate_messages(
 )
 
 catkin_package(
-        CATKIN_DEPENDS roscpp rospy std_msgs cv_bridge image_transport tf sensor_msgs dynamic_reconfigure message_runtime
+        CATKIN_DEPENDS roscpp rospy std_msgs cv_bridge image_transport tf sensor_msgs dynamic_reconfigure message_runtime pcl_ros
         LIBRARIES {PROJECT_NAME} libDBoW2 libg2o libyolov5-detector
 )
 
@@ -108,43 +109,43 @@ catkin_package(
 include_directories(
         ${PROJECT_SOURCE_DIR}
         ${PROJECT_SOURCE_DIR}/include
-        ${PROJECT_SOURCE_DIR}/sematic_slam
-        ${PROJECT_SOURCE_DIR}/sematic_slam/include
-        ${PROJECT_SOURCE_DIR}/sematic_slam/include/CameraModels
-        ${PROJECT_SOURCE_DIR}/sematic_slam/include/cuda
-        ${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty
-        ${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/Sophus
-        ${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/yolov5
+        ${PROJECT_SOURCE_DIR}/semantic_slam
+        ${PROJECT_SOURCE_DIR}/semantic_slam/include
+        ${PROJECT_SOURCE_DIR}/semantic_slam/include/CameraModels
+        ${PROJECT_SOURCE_DIR}/semantic_slam/include/cuda
+        ${PROJECT_SOURCE_DIR}/semantic_slam/Thirdparty
+        ${PROJECT_SOURCE_DIR}/semantic_slam/Thirdparty/Sophus
+        ${PROJECT_SOURCE_DIR}/semantic_slam/Thirdparty/yolov5
         ${EIGEN3_INCLUDE_DIR}
         ${Pangolin_INCLUDE_DIRS}
         ${catkin_INCLUDE_DIRS}
 )
 
-include(${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/DBoW2/CMakeLists.txt)
-include(${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/g2o/CMakeLists.txt)
+include(${PROJECT_SOURCE_DIR}/semantic_slam/Thirdparty/DBoW2/CMakeLists.txt)
+include(${PROJECT_SOURCE_DIR}/semantic_slam/Thirdparty/g2o/CMakeLists.txt)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/sematic_slam/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/semantic_slam/lib)
 
 file(GLOB HEADERS 
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/*.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/*.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/CameraModels/*.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/cuda/*.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/line_lbd/*.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/line_lbd/*.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/line_lbd/line_descriptor/*.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/include/detect_3d_cuboid/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/include/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/include/*.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/include/CameraModels/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/include/cuda/*.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/include/line_lbd/*.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/include/line_lbd/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/include/line_lbd/line_descriptor/*.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/include/detect_3d_cuboid/*.h
         )
 
 file(GLOB SOURCES 
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/*.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/CameraModels/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/cuda/*.cu
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/line_detect/libs/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/line_detect/libs/*.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/line_detect/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sematic_slam/src/detect_3d_cuboid/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/src/*.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/src/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/src/CameraModels/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/src/cuda/*.cu
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/src/line_detect/libs/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/src/line_detect/libs/*.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/src/line_detect/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/semantic_slam/src/detect_3d_cuboid/*.cpp
         )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -166,9 +167,9 @@ target_link_libraries(${PROJECT_NAME}
         ${TRT_LIBS}
         ${CUDA_CUDA_LIBRARY}
         ${CUDA_CUDART_LIBRARY}
-        ${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/DBoW2/lib/libDBoW2.so
-        ${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/g2o/lib/libg2o.so
-        ${PROJECT_SOURCE_DIR}/sematic_slam/Thirdparty/yolov5/lib/libyolov5-detector.so
+        ${PROJECT_SOURCE_DIR}/semantic_slam/Thirdparty/DBoW2/lib/libDBoW2.so
+        ${PROJECT_SOURCE_DIR}/semantic_slam/Thirdparty/g2o/lib/libg2o.so
+        ${PROJECT_SOURCE_DIR}/semantic_slam/Thirdparty/yolov5/lib/libyolov5-detector.so
         -lboost_serialization
         -lcrypto
          nvToolsExt
@@ -187,6 +188,15 @@ add_executable(zed_rgbd_node
         src/zed_node_rgbd.cpp
         src/common.cc)
 target_link_libraries(zed_rgbd_node
+        ${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+        )
+
+## ZED ROS node
+add_executable(zed_stereo_node
+        src/zed_stereo_imu_node.cpp
+        src/common.cc)
+target_link_libraries(zed_stereo_node
         ${PROJECT_NAME}
         ${catkin_LIBRARIES}
         )
