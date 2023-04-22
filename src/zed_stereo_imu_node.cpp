@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
     bool bEqual = false;
     if (argc < 4 || argc > 5) {
         cerr << endl
-             << "Usage: rosrun ORB_SLAM3 Stereo_Inertial path_to_vocabulary path_to_settings do_rectify [do_equalize]"
+             << "Usage: rosrun object_slam zed_stereo_node path_to_vocabulary path_to_settings do_rectify [do_equalize]"
              << endl;
         ros::shutdown();
         return 1;
