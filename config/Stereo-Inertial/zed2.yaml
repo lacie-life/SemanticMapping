@@ -32,7 +32,6 @@ Camera.RGB: 1
 ThDepth: 40.0 # 35
 
 # Transformation from camera 0 to body-frame (imu)
-
 Tbc: !!opencv-matrix
   rows: 4
   cols: 4

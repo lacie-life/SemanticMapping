@@ -2,15 +2,14 @@
 
 #--------------------------------------------------------------------------------------------
 # Camera Parameters. Adjust them!
-# These are taken from the Camera Information in Python API of ZED
 #--------------------------------------------------------------------------------------------
 Camera.type: "PinHole"
 
 # Camera calibration and distortion parameters (OpenCV) 
-Camera.fx: 524.650390625
-Camera.fy: 524.650390625
-Camera.cx: 636.3681030273438
-Camera.cy: 359.5227966308594
+Camera.fx: 260.4708254827622
+Camera.fy: 261.839672846784
+Camera.cx: 311.4989497955604
+Camera.cy: 183.83828311365187
 
 Camera.k1: 0.0
 Camera.k2: 0.0
@@ -18,17 +17,16 @@ Camera.k3: 0.0
 Camera.p1: 0.0
 Camera.p2: 0.0
 
-
 Camera.bFishEye: 0
 
-Camera.width: 1280
-Camera.height: 720
+Camera.width: 640
+Camera.height: 360
 
 # Camera frames per second 
 Camera.fps: 30.0
 
 # stereo baseline in meters times fx
-Camera.bf: 62.92245016 # 119.9321517944336 * 524.65039
+Camera.bf: 30.7824 # 119.9321517944336 * 524.65039
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
 Camera.RGB: 1
@@ -87,7 +85,7 @@ PointCloudMapping.Resolution: 0.01
 # Semantic Mapping
 #---------------------------------------------------------------------------------------------
 Semantic.Model: 0 # Yolov5: 0
-Semantic.ModelPath: "/home/lacie/slam_ws/src/junbot_planner/object_slam/config/Model"
+Semantic.ModelPath: "/home/lacie/workspace/ag-ws/src/AG-Mapping/config/Model"
 Semantic.ObjectAssociation: 0 # Cudoid_3d: 0, PointCloud_Segmentation: 1
 Semantic.ObjectOptimize: 0
 

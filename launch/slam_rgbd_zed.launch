@@ -1,18 +1,8 @@
 <launch>  
-	<arg name="rgb_image_node" default="/zed2/zed_node/rgb/image_rect_color"/>
-	<arg name="depth_image_node" default="/zed2/zed_node/depth/depth_registered"/>
-	<arg name="zed_params_dir" default="$(find object_slam)/config"/>
-	<arg name="zed_params" default="/RGB-D/ZED2.yaml"/>
-
-
 	<!-- SLAM  -->
-	<node pkg="sematic_slam" name="zed_rgbd_node" type="zed_rgbd_node"
-		  args="/home/lacie/slam_ws/src/junbot_planner/object_slam/object_slam/Vocabulary/ORBvoc.txt.bin
-	            /home/lacie/slam_ws/src/junbot_planner/object_slam/config/RGB-D/ZED2.yaml" output="screen">
-
-		<!-- Parameters for original ORB-SLAM3 -->
-    	<param name="voc_file"      type="string" value="$(find sematic_slam)/sematic_slam/Vocabulary/ORBvoc.txt.bin"/>
-    	<param name="settings_file" type="string" value="$(find sematic_slam)/config/RGB-D/ZED2.yaml"/>
+	<node pkg="ag_mapping" name="zed_rgbd_node" type="zed_rgbd_node"
+		  args="/home/lacie/workspace/ag-ws/src/AG-Mapping/semantic_slam/Vocabulary/ORBvoc.txt.bin
+	            /home/lacie/workspace/ag-ws/src/AG-Mapping/config/RGB-D/ZED2.yaml" output="screen">
 
 		<remap from="/camera/rgb/image_raw"                 to="/zed2/zed_node/rgb/image_rect_color"/>
     	<remap from="/camera/depth_registered/image_raw"    to="/zed2/zed_node/depth/depth_registered"/>
@@ -25,8 +15,8 @@
 	</node>
 
 	<!-- Run other launch file -->
-    <include file="$(find sematic_slam)/launch/octomap.launch" />
-	<include file="$(find sematic_slam)/launch/transform.launch" />
+    <include file="$(find ag_mapping)/launch/octomap.launch" />
+	<include file="$(find ag_mapping)/launch/transform.launch" />
 	<node pkg="rviz" name="rviz" type="rviz" /> 
 	
 </launch>

@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
-    message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/zed2/zed_node/rgb/image_rect_color", 100);
+    message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/zed2/zed_node/left/image_rect_color", 100);
     message_filters::Subscriber<sensor_msgs::Image> depth_sub(nh, "/zed2/zed_node/depth/depth_registered", 100);
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> sync_pol;
     message_filters::Synchronizer<sync_pol> sync(sync_pol(10), rgb_sub,depth_sub);

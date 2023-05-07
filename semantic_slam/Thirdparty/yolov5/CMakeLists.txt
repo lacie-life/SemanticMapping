@@ -17,7 +17,7 @@ endif()
 SET(EXECUTABLE_OUTPUT_PATH ".")
 SET(SPECIAL_OS_LIBS "")
 
-set(OpenCV_DIR "/home/hn/opencv-4.5.2/build")
+#set(OpenCV_DIR "/home/hn/opencv-4.5.2/build")
 find_package(OpenCV 4.5 REQUIRED NO_MODULE PATHS /usr/local NO_DEFAULT_PATH)
 
 find_package(GLUT REQUIRED)
