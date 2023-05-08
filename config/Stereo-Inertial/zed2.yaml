@@ -3,6 +3,7 @@
 #--------------------------------------------------------------------------------------------
 # Camera Parameters. Adjust them!
 #--------------------------------------------------------------------------------------------
+
 Camera.type: "PinHole"
 
 # Camera calibration and distortion parameters (OpenCV) (equal for both cameras after stereo rectification)

@@ -1,0 +1,20 @@
+<launch>  
+	<!-- SLAM  -->
+	<node pkg="ag_mapping" name="zed_stereo_node" type="zed_stereo_node"
+		  args="/home/lacie/workspace/ag-ws/src/AG-Mapping/semantic_slam/Vocabulary/ORBvoc.txt.bin
+	            /home/lacie/workspace/ag-ws/src/AG-Mapping/config/Stereo-Inertial/zed2.yaml 
+                true" output="screen">
+
+		<!-- Parameters for ROS -->
+    	<param name="worl4d_frame_id"    type="string"   value="world" />
+    	<param name="cam_frame_id"      type="string"   value="camera" />
+		<param name="enable_pangolin"   type="bool"     value="true" />
+		
+	</node>
+
+	<!-- Run other launch file -->
+    <include file="$(find ag_mapping)/launch/octomap.launch" />
+	<include file="$(find ag_mapping)/launch/transform.launch" />
+	<node pkg="rviz" name="rviz" type="rviz" /> 
+	
+</launch>
