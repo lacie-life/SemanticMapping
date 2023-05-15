@@ -101,7 +101,7 @@ generate_messages(
 
 catkin_package(
         CATKIN_DEPENDS roscpp rospy std_msgs cv_bridge image_transport tf sensor_msgs dynamic_reconfigure message_runtime pcl_ros
-        LIBRARIES {PROJECT_NAME} libDBoW2 libg2o libyolov5-detector
+        LIBRARIES {PROJECT_NAME} libDBoW2 libg2o libyolov5-detector icm20948
 )
 
 ## Specify additional locations of header files
@@ -123,6 +123,7 @@ include_directories(
 
 include(${PROJECT_SOURCE_DIR}/semantic_slam/Thirdparty/DBoW2/CMakeLists.txt)
 include(${PROJECT_SOURCE_DIR}/semantic_slam/Thirdparty/g2o/CMakeLists.txt)
+include(${PROJECT_SOURCE_DIR}/semantic_slam/Thirdparty/IMU/CMakeLists.txt)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/semantic_slam/lib)
 
